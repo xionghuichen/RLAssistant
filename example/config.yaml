@@ -1,0 +1,25 @@
+PROJECT_TYPE:
+  # lib: backup the project in YOUR_PROJECT_ROOT/build/lib.
+  # It suit to the situation when you run the code by building a package. (e.g., "python setup.py install")
+  # source: backup the project in YOUR_PROJECT_ROOT/{backup_code_dir}.
+  # It suit to the situation when you run your code directly.
+  # Backup will ignore the files satisfy the rules in IGNORE_RULE (the default value is: YOUR_PROJECT_ROOT/.gitignore)
+  # and all log files in easy_log.
+  backup_code_by: 'lib'
+
+BACKUP_CONFIG:
+  backup_code_dir:
+    ''
+  main_file: './main.py'
+
+PROJECT_ROOT: './'
+IGNORE_RULE: './.gitignore'
+
+LOG_ROOT: '../'
+
+SEND_LOG_FILE: False
+REMOTE_SETTING:
+  ftp_server: ''
+  username: ''
+  password: ''
+  remote_log_root: ''
