@@ -1,6 +1,5 @@
 # rl_training_assistant
-## easy_log: Tools to record your experiments.
-### Usage
+## Quick start
 
 #### initialization
 Step1: config config.yaml
@@ -85,4 +84,5 @@ The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 you can find a project demo from the example directory.
 
 # TODO
-1. be compatible to torch;  
+1. to be compatible to torch;  
+2. add comment to functions
