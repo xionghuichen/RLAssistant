@@ -1,13 +1,18 @@
-# rl_training_assistant
-## Quick start
+# RL training assistant
 
-#### initialization
+RLA is a tool for managing your RL experiments automatically (e.g., your hyper-parameters, logs, checkpoints, figures, and code, etc.).  RLA has decoupled to the training code although some additional configuration codes and predetermined directory structures are still needed (see Quickstart and the example project). 
+
+PS: The repo is inspired by [openai/baselines](https://github.com/openai/baselines).
+
+## Quickstart
+
+#### Initialization
 Step1: config config.yaml
-config.yaml is used to defined the work flow of easy_log. It is nessary to config before use RLA.
+config.yaml is used to define the workflow of easy_log. It is necessary to config before use RLA.
 
 See ./example/config.yaml for more details.
 
-Step2: config the Tester object in your main file, which is a manger of RLA.
+Step2: config the Tester object in your main file, which is a manager of RLA.
 
 ```python
 from RLA.easy_log.tester import tester
@@ -34,7 +39,7 @@ tester.log_files_gen()
 
 ```
 
-#### structure of logs and usages
+#### Structure of logs and usages
 For each experiment, RLA generate the following logs:
 
 
@@ -60,7 +65,7 @@ tester.save_checkpoint()
 ```python
 from RLA.easy_log import logger
 reward = 10
-logger.logkv("performance/reward", reward)
+logger.record_tabular("performance/reward", reward)
 logger.dump_tabular()
 ```
 
@@ -74,7 +79,7 @@ simple_plot(name="test_plot", data=[[1,2,3,4,5,6]])
 ```
 the figure will be stored in "LOG_ROOT/results/log_name/"
 
-hyper-parameters: the hyperparameters will be record in the "text" tab of tensorboard and a pickle files of Tester object.
+hyper-parameters: the hyperparameters will be recorded in the "text" tab of Tensorboard and a pickle file of Tester object.
 The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 
 "log_name" above is a formatted string contraining "task_name/datetime/ip/record_param"
@@ -84,5 +89,5 @@ The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 you can find a project demo from the example directory.
 
 # TODO
-1. to be compatible to torch;  
-2. add comment to functions
+1. to be compatible with Pytorch;  
+2. add comments and documents to other functions.
