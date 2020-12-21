@@ -80,58 +80,9 @@ The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 
 "log_name" above is a formatted string contraining "task_name/datetime/ip/record_param"
 
-#### virtualize your logs
 
-
-Method1: tensorboard --logdir LOG_ROOT/log/log_name/task_name/Y/M/D... show the tensorboard which task is "task_name" and are done in the date: Y-M-D    
-
-
-Method2: plot in jupyter notebook
-
-```python
-%matplotlib inline
-import matplotlib.pyplot as plt
-from RLA.easy_plot.plot_func import plot_res_func
-from RLA.easy_log.const import LOG
-import os.path as osp
-from common.private import LOG_ROOT, SUB_PROJ # 前面所述的private 配置文件
-
-
-def meta_plot_func(task, regs, split_keys, misc=None, title='', misc_scale=None, misc_scale_index=None, 
-*args, **kwargs):
-    prefix_dir = osp.join(LOG_ROOT, SUB_PROJ, LOG, task)
-    if misc is None:
-        misc = ['eval/performance']
-    scale_dict = {}        
-    if misc_scale_index is None:
-        misc_scale_index = []
-                          
-    for i in range(len(misc)):
-        if i in misc_scale_index:
-            scale_dict[misc[i]] = misc_scale[misc_scale_index.index(i)]
-        else:
-            scale_dict[misc[i]] = 1
-    from common import private
-    plot_res_func(prefix_dir, regs, split_keys, misc, scale_dict, config=private)
-    plt.title(title)
-    plt.show()
-task_plot_func = lambda task, regs, split_keys, misc=None, title='', misc_scale=None, misc_scale_index=None: meta_plot_func(task, regs, split_keys, misc, title, misc_scale, 
-misc_scale_index, *args, **kwargs)
-
-
-task = "Ant-v2--sh2.0-l1.0-b1.5-st2.0"
-task_plot_func(task, ["2020/01/13/00-3*"], 
-               ["info",  "van_sac", "alpha_max"], 
-                ['eval/performance'])
-```
-
-结果demo：
-![](./resource/sample-plot.png)
-    
-**日志删除**
-
-RLA.easy_log.delete_log_tool 提供了与tester日志结构一致的配套的删除功能，支持基于通配符的日志删除
-
+## An example
+you can find a project demo from the example directory.
 
 # TODO
 1. be compatible to torch;  

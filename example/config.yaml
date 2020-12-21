@@ -5,17 +5,15 @@ PROJECT_TYPE:
   # It suit to the situation when you run your code directly.
   # Backup will ignore the files satisfy the rules in IGNORE_RULE (the default value is: YOUR_PROJECT_ROOT/.gitignore)
   # and all log files in easy_log.
-  backup_code_by: 'lib'
+  backup_code_by: 'source'
 
 BACKUP_CONFIG:
-  backup_code_dir:
-    ''
-  main_file: './main.py'
+  backup_code_dir: ['sub_task1/src', 'sub_task2/src']
 
-PROJECT_ROOT: './'
+PROJECT_ROOT: '../'
 IGNORE_RULE: './.gitignore'
 
-LOG_ROOT: '../'
+LOG_ROOT: './'
 
 SEND_LOG_FILE: False
 REMOTE_SETTING:

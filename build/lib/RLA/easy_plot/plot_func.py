@@ -139,7 +139,7 @@ def plot_res_func(prefix_dir, regs, split_keys,
         import os
 
         from RLA.easy_log.const import LOG, OTHER_RESULTS
-        dir_name = prefix_dir.replace(LOG, OTHER_RESULTS, 1)
+        dir_name = prefix_dir.replace(LOG, OTHER_RESULTS, maxsplit=1)
         os.makedirs(dir_name, exist_ok=True)
 
         if lgd is not None:
