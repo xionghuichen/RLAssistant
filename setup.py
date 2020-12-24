@@ -16,6 +16,7 @@ setup(
                         if package.startswith("RLA")],
         platforms=["all"],
         install_requires=[
-            "pyyaml"
+            "pyyaml",
+            "argparse"
         ]
     )

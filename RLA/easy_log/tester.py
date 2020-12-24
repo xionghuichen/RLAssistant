@@ -180,10 +180,10 @@ class Tester(object):
 
     def feed_hyper_params_to_tb(self):
         import tensorflow as tf
-        with tf.Session() as sess:
+        with tf.Session(graph=tf.Graph()) as sess:
             hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in self.hyper_param.items()]
             summary = sess.run(tf.summary.text('hyperparameters', tf.stack(hyperparameters)))
-            self.add_summary_to_logger(summary, freq=1)
+        self.add_summary_to_logger(summary, 'hyperparameters', freq=1)
 
     def sync_log_file(self):
         """
@@ -451,7 +451,7 @@ class Tester(object):
 
     def dict_to_table_text_summary(self, input_dict, name):
         import tensorflow as tf
-        with tf.Session() as sess:
+        with tf.Session(graph=tf.Graph()) as sess:
             to_tensor = [tf.convert_to_tensor([k, str(v)]) for k, v in input_dict.items()]
             return sess.run(tf.summary.text(name, tf.stack(to_tensor)))
 
