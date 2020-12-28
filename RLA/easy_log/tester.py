@@ -21,6 +21,7 @@ import shutil
 
 def load_tester_from_record_date(task_name, record_date, fork_hp):
     global tester
+    assert isinstance(tester, Tester)
     load_tester = tester.load_tester(record_date, task_name, tester.root + ARCHIVE_TESTER + '/')
     # copy log file
     tester.log_file_copy(load_tester)
@@ -31,8 +32,10 @@ def load_tester_from_record_date(task_name, record_date, fork_hp):
         tester.private_config = load_tester.private_config
     # load checkpoint
     load_tester.new_saver(var_prefix='')
-    load_tester.load_checkpoint()
+    load_iter, load_res = load_tester.load_checkpoint()
+    tester.time_step_holder.set_time(load_iter)
     tester.print_log_dir()
+    return load_res
 
 
 class Tester(object):
@@ -45,7 +48,6 @@ class Tester(object):
         self.hyper_param = {}
         self.strftims = None
         self.private_config = None
-        self.saver = None
         self.last_record_fph_time = None
         self.hyper_param_record = []
         self.metadata_list = []
@@ -57,8 +59,10 @@ class Tester(object):
         self.results_dir = None
         self.log_dir = None
         self.code_dir = None
+        self.saver = None
+        self.dl_framework = None
 
-    def configure(self, task_name, private_config_path, run_file):
+    def configure(self, task_name, private_config_path, run_file, log_root):
         """
 
         :param task_name:
@@ -69,8 +73,10 @@ class Tester(object):
         self.private_config = yaml.load(fs)
         self.run_file = run_file
         self.task_name = task_name
-        self.root = self.private_config["LOG_ROOT"]
+        self.root = log_root
         logger.info("private_config: ")
+        self.dl_framework = self.private_config["DL_FRAMEWORK"]
+        self.project_root = private_config_path.split("rla_config.yaml")[0]
         for k, v in self.private_config.items():
             logger.info("k: {}, v: {}".format(k, v))
 
@@ -114,6 +120,7 @@ class Tester(object):
         self.__copy_source_code(self.run_file, code_dir)
         self.print_log_dir()
         self.feed_hyper_params_to_tb()
+
 
     def init_logger(self):
         self.writer = None
@@ -201,14 +208,13 @@ class Tester(object):
         """
 
         logger.warn("sync: start")
-        ignore_files = self.private_config["IGNORE_RULE"]
+        # ignore_files = self.private_config["IGNORE_RULE"]
         if self.private_config["SEND_LOG_FILE"]:
             from RLA.auto_ftp import FTPHandler
             try:
                 ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
                                  username=self.private_config["REMOTE_SETTING"]["username"],
-                                 password=self.private_config["REMOTE_SETTING"]["password"],
-                                 ignore=ignore_files)
+                                 password=self.private_config["REMOTE_SETTING"]["password"])
                 for root, dirs, files in os.walk(self.log_dir):
                     remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_log_root"], root[3:])
                     local_root = root
@@ -277,11 +283,11 @@ class Tester(object):
         if self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'lib':
             assert os.listdir(code_dir) == []
             os.removedirs(code_dir)
-            shutil.copytree(self.private_config["PROJECT_ROOT"] + self.private_config["BACKUP_CONFIG"]["lib_dir"], code_dir)
+            shutil.copytree(self.project_root + self.private_config["BACKUP_CONFIG"]["lib_dir"], code_dir)
             shutil.copy(run_file, code_dir)
         elif self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'source':
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:
-                shutil.copytree(self.private_config["PROJECT_ROOT"] + dir_name, code_dir + '/' + dir_name)
+                shutil.copytree(self.project_root + dir_name, code_dir + '/' + dir_name)
         else:
             raise NotImplementedError
 
@@ -333,35 +339,63 @@ class Tester(object):
         del self._rc_start_time[name]
 
     # Saver manger.
-    def new_saver(self, var_prefix, max_to_keep):
+    def new_saver(self, max_to_keep, var_prefix=None):
         """
         initialize new tf.Saver
         :param var_prefix: we use var_prefix to filter the variables for saving.
         :param max_to_keep:
         :return:
         """
-        import tensorflow as tf
-        var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
-        logger.info("save variable :")
-        for v in var_list:
-            logger.info(v)
-        self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
+        if self.dl_framework == 'tensorflow':
+            import tensorflow as tf
+            if var_prefix is None:
+                var_prefix = ''
+            var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
+            logger.info("save variable :")
+            for v in var_list:
+                logger.info(v)
+            self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
+        elif self.dl_framework == 'pytorch':
+            self.max_to_keep = max_to_keep
+            self.checkpoint_keep_list = []
+        else:
+            raise NotImplementedError
 
-    def save_checkpoint(self, iter=None):
-        import tensorflow as tf
-        if iter is None:
+    def save_checkpoint(self, model_dict=None):
+        if self.dl_framework == 'tensorflow':
+            import tensorflow as tf
             iter = self.time_step_holder.get_time()
-        self.saver.save(tf.get_default_session(), self.checkpoint_dir + 'checkpoint', global_step=iter)
+            cpt_name = osp.join(self.checkpoint_dir, 'checkpoint')
+            logger.info("save checkpoint to ", cpt_name, iter)
+            self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+        elif self.dl_framework == 'pytorch':
+            import torch
+            iter = self.time_step_holder.get_time()
+            torch.save(model_dict, f=tester.checkpoint_dir + "checkpoint-{}.pt".format(iter))
+            self.checkpoint_keep_list.append(iter)
+            if len(self.checkpoint_keep_list) > self.max_to_keep:
+                for i in range(len(self.checkpoint_keep_list) - self.max_to_keep):
+                    rm_ckp_name = tester.checkpoint_dir + "checkpoint-{}.pt".format(self.checkpoint_keep_list[i])
+                    logger.info("rm the older checkpoint", rm_ckp_name)
+                    os.remove(rm_ckp_name)
+                self.checkpoint_keep_list = self.checkpoint_keep_list[-1 * self.max_to_keep:]
+        else:
+            raise NotImplementedError
 
     def load_checkpoint(self):
-        # TODO: load with variable scope.
-        import tensorflow as tf
-        logger.info("load checkpoint {}".format(self.checkpoint_dir))
-        ckpt_path = tf.train.latest_checkpoint(self.checkpoint_dir)
-        self.saver.restore(tf.get_default_session(), ckpt_path)
-        max_iter = ckpt_path.split('-')[-1]
-        self.time_step_holder.set_time(max_iter)
-        return int(max_iter)
+        if self.dl_framework == 'tensorflow':
+            # TODO: load with variable scope.
+            import tensorflow as tf
+            cpt_name = osp.join(self.checkpoint_dir)
+            logger.info("load checkpoint {}".format(cpt_name))
+            ckpt_path = tf.train.latest_checkpoint(cpt_name)
+            self.saver.restore(tf.get_default_session(), ckpt_path)
+            max_iter = ckpt_path.split('-')[-1]
+            self.time_step_holder.set_time(max_iter)
+            return int(max_iter), None
+        elif self.dl_framework =='pytorch':
+            import torch
+            return self.checkpoint_keep_list[-1], torch.load(tester.checkpoint_dir + "checkpoint-{}.pt".format(self.checkpoint_keep_list[-1]))
 
     def auto_parse_info(self):
         return '&'.join(self.hyper_param_record)

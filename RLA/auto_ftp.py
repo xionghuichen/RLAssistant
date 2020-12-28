@@ -51,7 +51,7 @@ def getList():
 
 class FTPHandler(object):
 
-    def __init__(self, ftp_server, username, password, ignore):
+    def __init__(self, ftp_server, username, password, ignore=None):
         self.ftp_server = ftp_server
         self.username = username
         self.password = password

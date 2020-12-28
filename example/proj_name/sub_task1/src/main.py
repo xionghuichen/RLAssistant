@@ -18,7 +18,8 @@ def get_param():
 
 kwargs = get_param()
 task_name = 'demo_task'
-tester.configure(task_name, private_config_path='../../config.yaml', run_file='main.py')
+log_root = '../'
+tester.configure(task_name, private_config_path='../../../rla_config.yaml', run_file='main.py', log_root=log_root)
 tester.log_files_gen()
 tester.print_args()
 
@@ -66,7 +67,7 @@ from RLA.easy_log.const import LOG
 import datetime
 import os
 print(os.getcwd())
-prefix_dir = './{}/{}'.format(LOG, task_name)
+prefix_dir = '{}{}/{}'.format(log_root, LOG, task_name)
 # filter the experiment name.
 regex_of_your_log_date = str(tester.record_date.strftime("%Y/%m/%d/%H-%M")) + '*env_id=Hopper-v4*'
 plot_res_func(prefix_dir, regs=[regex_of_your_log_date], split_keys=[], qualities=["ma/ma_var2", "perf/var2", "perf/var1"],
@@ -75,5 +76,5 @@ plot_res_func(prefix_dir, regs=[regex_of_your_log_date], split_keys=[], qualitie
               smooth_step=5, replace_legend_keys=["A", "B", "C"], pretty=True, save_name='example.pdf')
 # delete your log
 from RLA.easy_log.delete_log_tool import DeleteLogTool
-dlt = DeleteLogTool(proj_root='../', sub_proj='sub_task1', task=task_name, regex=regex_of_your_log_date)
+dlt = DeleteLogTool(proj_root=tester.project_root, sub_proj='sub_task1', task=task_name, regex=regex_of_your_log_date)
 dlt.delete_related_log()

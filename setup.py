@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='RLA',
-        version=0.2,
+        version=0.3,
         description=(
             'RL assistant'
         ),
