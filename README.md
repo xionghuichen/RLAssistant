@@ -17,9 +17,11 @@ Step2: config the Tester object in your main file, which is a manager of RLA.
 ```python
 from RLA.easy_log.tester import tester
 task_name = 'demo_task'
-private_config_path = './example/config.yaml'
+private_config_path = '../../../rla_config.yaml'
 your_main_file_name = 'main.py'
-tester.configure(task_name=task_name, private_config_path=private_config_path, run_file=your_main_file_name)
+log_root_path = '../'
+tester.configure(task_name=task_name, private_config_path=private_config_path, 
+run_file=your_main_file_name, log_root=log_root_path)
 ```
 
 Step3: record hyperparameters

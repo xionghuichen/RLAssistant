@@ -19,10 +19,10 @@ import yaml
 import shutil
 
 
-def load_tester_from_record_date(task_name, record_date, fork_hp):
+def load_from_record_date(task_name, record_date, fork_hp):
     global tester
     assert isinstance(tester, Tester)
-    load_tester = tester.load_tester(record_date, task_name, tester.root + ARCHIVE_TESTER + '/')
+    load_tester = tester.load_tester(record_date, task_name, tester.root + '/')
     # copy log file
     tester.log_file_copy(load_tester)
     # copy attribute
@@ -31,11 +31,11 @@ def load_tester_from_record_date(task_name, record_date, fork_hp):
         tester.hyper_param_record = load_tester.hyper_param_record
         tester.private_config = load_tester.private_config
     # load checkpoint
-    load_tester.new_saver(var_prefix='')
+    load_tester.new_saver(var_prefix='', max_to_keep=1)
     load_iter, load_res = load_tester.load_checkpoint()
     tester.time_step_holder.set_time(load_iter)
     tester.print_log_dir()
-    return load_res
+    return load_iter, load_res
 
 
 class Tester(object):
@@ -133,8 +133,11 @@ class Tester(object):
 
     def log_file_copy(self, source_tester):
         assert isinstance(source_tester, Tester)
+        shutil.rmtree(self.checkpoint_dir)
         shutil.copytree(source_tester.checkpoint_dir, self.checkpoint_dir)
+        shutil.rmtree(self.results_dir)
         shutil.copytree(source_tester.results_dir, self.results_dir)
+        shutil.rmtree(self.log_dir)
         shutil.copytree(source_tester.log_dir, self.log_dir)
 
     def task_gen(self, task_pattern_list):

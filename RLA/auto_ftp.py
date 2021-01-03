@@ -59,7 +59,8 @@ class FTPHandler(object):
         logger.info("login success.")
         self.ignore = ignore
         self.ignore_rules = []
-        self.__init_gitignore()
+        if self.ignore is not None:
+            self.__init_gitignore()
         assert isinstance(self.ftp, FTP)
 
     def __init_gitignore(self):
@@ -84,8 +85,9 @@ class FTPHandler(object):
     def ftpconnect(self):
         ftp = FTP()
         ftp.set_debuglevel(0)
-        ftp.connect(self.ftp_server, 21)
+        ftp.connect(self.ftp_server, 21, timeout=60)
         ftp.login(self.username, self.password)
+        logger.warn("login succeed")
         return ftp
 
     def all_file_search(self, root_path, files, filter_length):
@@ -105,6 +107,7 @@ class FTPHandler(object):
 
     def upload_file(self, remote_dir, local_dir, local_file):
         self.ftp = self.ftpconnect()
+
         bufsize = 1024
         with open(os.path.join(local_dir, local_file), 'rb') as fp:
             try:
