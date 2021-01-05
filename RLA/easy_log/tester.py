@@ -139,6 +139,7 @@ class Tester(object):
         shutil.copytree(source_tester.results_dir, self.results_dir)
         shutil.rmtree(self.log_dir)
         shutil.copytree(source_tester.log_dir, self.log_dir)
+        self.init_logger()
 
     def task_gen(self, task_pattern_list):
         return '-'.join(task_pattern_list)
