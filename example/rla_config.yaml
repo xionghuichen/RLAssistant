@@ -8,7 +8,9 @@ PROJECT_TYPE:
 
 # When the following path is set to relative path, the current working directory is the path which rla_config.yaml in.
 BACKUP_CONFIG:
-  backup_code_dir: ['proj_name/sub_task1/src', 'proj_name/sub_task2/src']
+  backup_code_dir:
+    - 'proj_name/sub_task1/src'
+    - 'proj_name/sub_task2/src'
   lib_dir: './build/lib/'
 
 # select a DL framework: tensorflow or pytorch.
