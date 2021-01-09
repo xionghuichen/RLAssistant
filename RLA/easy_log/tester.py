@@ -135,10 +135,16 @@ class Tester(object):
         assert isinstance(source_tester, Tester)
         shutil.rmtree(self.checkpoint_dir)
         shutil.copytree(source_tester.checkpoint_dir, self.checkpoint_dir)
-        shutil.rmtree(self.results_dir)
-        shutil.copytree(source_tester.results_dir, self.results_dir)
-        shutil.rmtree(self.log_dir)
-        shutil.copytree(source_tester.log_dir, self.log_dir)
+        if os.path.exists(source_tester.results_dir):
+            shutil.rmtree(self.results_dir)
+            shutil.copytree(source_tester.results_dir, self.results_dir)
+        else:
+            logger.warn("[load warning]: can not find results dir")
+        if os.path.exists(source_tester.log_dir):
+            shutil.rmtree(self.log_dir)
+            shutil.copytree(source_tester.log_dir, self.log_dir)
+        else:
+            logger.warn("[load warning]: can not find log dir")
         self.init_logger()
 
     def task_gen(self, task_pattern_list):

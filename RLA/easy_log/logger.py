@@ -12,9 +12,9 @@ from collections import defaultdict, deque
 
 import tensorflow as tf
 
-from stable_baselines.common.misc_util import mpi_rank_or_zero
 from contextlib import contextmanager
 from RLA.const import DEFAULT_X_NAME
+
 DEBUG = 10
 INFO = 20
 WARN = 30
@@ -541,6 +541,18 @@ def configure(dir=None, format_strs=None, comm=None):
             datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f"))
     assert isinstance(dir, str)
     os.makedirs(dir, exist_ok=True)
+
+    def mpi_rank_or_zero():
+        """
+        Return the MPI rank if mpi is installed. Otherwise, return 0.
+        :return: (int)
+        """
+        try:
+            from mpi4py import MPI
+            return MPI.COMM_WORLD.Get_rank()
+        except ImportError:
+            return 0
+
     rank = mpi_rank_or_zero()
     log_suffix = ''
     # check environment variables here instead of importing mpi4py
