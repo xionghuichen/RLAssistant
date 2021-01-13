@@ -6,7 +6,7 @@
 # Modified    :   2017-11-12
 # Version     :   1.0
 from collections import deque
-import pickle
+import dill
 import time
 import os
 
@@ -160,12 +160,22 @@ class Tester(object):
     def load_tester(cls, record_date, task_name, log_root):
         logger.info("load tester")
         res_dir, res_file = cls.log_file_finder(record_date, task_name=task_name, file_root=log_root + ARCHIVE_TESTER + '/', log_type='files')
-        import pickle
-        return pickle.load(open(res_dir+'/'+res_file, 'rb'))
+        import dill
+        return dill.load(open(res_dir+'/'+res_file, 'rb'))
 
     def add_record_param(self, keys):
         for k in keys:
-            self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}'))
+            if '.' in k:
+                try:
+                    sub_k_list = k.split('.')
+                    v = self.hyper_param[sub_k_list[0]]
+                    for sub_k in sub_k_list[1:]:
+                        v = v[sub_k]
+                    self.hyper_param_record.append(str(k) + '=' + str(v).replace('[', '{').replace(']', '}'))
+                except KeyError as e:
+                    print("do not include dot ('.') in your hyperparemeter name")
+            else:
+                self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}'))
 
     def add_summary_to_logger(self, summary, name='', simple_val=False, freq=20):
         if name not in self.summary_add_dict:
@@ -453,7 +463,7 @@ class Tester(object):
 
     def serialize_object_and_save(self):
         """
-        This method is to save test object to a pickle.
+        This method is to save test object to a dill.
         This method will be call every time you call add_custom_record or other record function like self.check_and_test
         """
         # remove object which can is not serializable
@@ -462,7 +472,7 @@ class Tester(object):
         saver = self.saver
         self.saver = None
         with open(self.pkl_file, 'wb') as f:
-            pickle.dump(self, f)
+            dill.dump(self, f)
         self.writer = writer
         self.saver = saver
 

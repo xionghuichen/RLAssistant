@@ -17,6 +17,7 @@ setup(
         platforms=["all"],
         install_requires=[
             "pyyaml",
-            "argparse"
+            "argparse",
+            "dill",
         ]
     )
