@@ -1,5 +1,8 @@
+"""
+A script to delete useless experimental logs by regex string.
+
+"""
 from RLA.easy_log.log_tools import DeleteLogTool
-import yaml
 import argparse
 
 def argsparser():

@@ -1,3 +1,12 @@
+"""
+A script to archive benchmarking experiments. 
+
+It is convenient to merge the archived experiments and the current task into tensorboard by:
+
+tensorboard --logdir ./log/your_task/,./log/archived/
+
+"""
+
 from RLA.easy_log.log_tools import ArchiveLogTool
 import argparse
 
