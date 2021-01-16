@@ -19,5 +19,6 @@ setup(
             "pyyaml",
             "argparse",
             "dill",
+            "seaborn"
         ]
     )

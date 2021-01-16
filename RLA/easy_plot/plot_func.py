@@ -109,8 +109,7 @@ def plot_res_func(prefix_dir, regs, split_keys,
         for log in log_found:
             print(log)
 
-    results = plot_util.load_results(dirs, names=qualities + [xlabel],
-                                     enable_monitor=False, x_bound=[xlabel, x_bound], use_buf=use_buf)
+    results = plot_util.load_results(dirs, names=qualities + [xlabel], x_bound=[xlabel, x_bound], use_buf=use_buf)
 
     print("---- load dataset {}---- ".format(len(results)))
 

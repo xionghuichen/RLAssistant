@@ -480,15 +480,7 @@ class Logger(object):
         self.name2cnt[key] = cnt + 1
 
     def dumpkvs(self):
-        if self.comm is None:
-            d = self.name2val
-        else:
-            from baselines.common import mpi_util
-            d = mpi_util.mpi_weighted_mean(self.comm,
-                {name : (val, self.name2cnt.get(name, 1))
-                    for (name, val) in self.name2val.items()})
-            if self.comm.rank != 0:
-                d['dummy'] = 1 # so we don't get a warning about empty dict
+        d = self.name2val
         out = d.copy() # Return the dict for unit testing purposes
         for fmt in self.output_formats:
             if isinstance(fmt, KVWriter):
