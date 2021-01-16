@@ -1,4 +1,4 @@
-from RLA.easy_log.delete_log_tool import ArchiveLogTool
+from RLA.easy_log.log_tools import ArchiveLogTool
 import argparse
 
 def argsparser():

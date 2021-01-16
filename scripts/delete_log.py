@@ -1,4 +1,4 @@
-from RLA.easy_log.delete_log_tool import DeleteLogTool
+from RLA.easy_log.log_tools import DeleteLogTool
 import yaml
 import argparse
 
