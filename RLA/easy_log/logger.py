@@ -288,10 +288,14 @@ def timestep():
 ma_dict = {}
 
 
-def ma_record_tabular(key, val, record_len):
+def ma_record_tabular(key, val, record_len, ignore_nan=False):
     if key not in ma_dict:
         ma_dict[key] = deque(maxlen=record_len)
-    ma_dict[key].append(val)
+    if ignore_nan:
+        if val != np.nan:
+            ma_dict[key].append(val)
+    else:
+        ma_dict[key].append(val)
     if len(ma_dict[key]) == record_len:
         record_tabular(key, np.mean(ma_dict[key]))
 
