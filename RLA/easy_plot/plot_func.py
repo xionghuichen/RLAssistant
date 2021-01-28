@@ -100,7 +100,9 @@ def plot_res_func(prefix_dir, regs, split_keys,
     dirs = []
     if xlabel is None:
         xlabel = DEFAULT_X_NAME
-
+    if replace_legend_keys is not None:
+        assert len(replace_legend_keys) == len(regs)
+        print("In manual legend-key mode, the number of keys should be one-to-one matched with regs")
     for regex_str in regs:
         print("check regs {}. log found: ".format(osp.join(prefix_dir, regex_str)))
         log_found = glob.glob(osp.join(prefix_dir, regex_str))
