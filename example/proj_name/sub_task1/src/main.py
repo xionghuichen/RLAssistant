@@ -70,9 +70,9 @@ print(os.getcwd())
 prefix_dir = '{}{}/{}'.format(log_root, LOG, task_name)
 # filter the experiment name.
 regex_of_your_log_date = str(tester.record_date.strftime("%Y/%m/%d/%H-%M")) + '*env_id=Hopper-v4*'
-plot_res_func(prefix_dir, regs=[regex_of_your_log_date], split_keys=[], qualities=["ma/ma_var2", "perf/var2", "perf/var1"],
+plot_res_func(prefix_dir, regs=[regex_of_your_log_date], param_keys=[], value_keys=["ma/ma_var2", "perf/var2", "perf/var1"],
               smooth_step=5)
-plot_res_func(prefix_dir, regs=[regex_of_your_log_date], split_keys=[], qualities=["ma/ma_var2", "perf/var2", "perf/var1"],
+plot_res_func(prefix_dir, regs=[regex_of_your_log_date], param_keys=[], value_keys=["ma/ma_var2", "perf/var2", "perf/var1"],
               smooth_step=5, replace_legend_keys=["A", "B", "C"], pretty=True, save_name='example.pdf')
 # delete your log
 from RLA.easy_log.log_tools import DeleteLogTool, ArchiveLogTool

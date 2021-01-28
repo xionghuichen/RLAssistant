@@ -3,3 +3,8 @@ dist**
 RLA.egg-info**
 .idea**
 **.pyc
+**/archive_tester/**
+**/checkpoint/**
+**/code/**
+**/results/**
+**/log/**

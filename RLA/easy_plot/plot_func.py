@@ -8,7 +8,7 @@ from RLA.easy_plot import plot_util
 from RLA.const import DEFAULT_X_NAME
 
 
-def split_by_task(taskpath, split_keys, y_names):
+def split_by_task(taskpath, param_keys, y_names):
     pair_delimiter = '&'
     kv_delimiter = '='
     pairs = taskpath.dirname.split(pair_delimiter)
@@ -19,23 +19,23 @@ def split_by_task(taskpath, split_keys, y_names):
         key_value[key] = p.split(kv_delimiter)[-1]
     # filter_key_value = {}
     parse_list = []
-    for split_key in split_keys:
+    for split_key in param_keys:
         if split_key in key_value.keys():
             parse_list.append(split_key + '=' + key_value[split_key])
             # filter_key_value[split_key] = key_value[split_key]
         else:
             parse_list.append(split_key + '=NF')
     task_split_key = '.'.join(parse_list)
-    split_keys = []
+    param_keys = []
     for y_name in y_names:
-        split_keys.append(task_split_key + ' eval:' + y_name)
-    return split_keys, y_names
+        param_keys.append(task_split_key + ' eval:' + y_name)
+    return param_keys, y_names
 
     # if y_names is not None:
-    #     split_keys = []
+    #     param_keys = []
     #     for y_name in y_names:
-    #         split_keys.append(task_split_key+' eval:' + y_name)
-    #     return split_keys, y_names
+    #         param_keys.append(task_split_key+' eval:' + y_name)
+    #     return param_keys, y_names
     # else:
     #     return task_split_key, y_names
     # return '_'.join(value[-3:])
@@ -46,11 +46,11 @@ def auto_gen_key_value_name(dict):
         parse_list.append(key + '=' + value)
 
 
-def picture_split(taskpath, single_name=None, split_keys=None, y_names=None):
+def picture_split(taskpath, single_name=None, param_keys=None, y_names=None):
     if single_name is not None:
         return single_name, None
     else:
-        return split_by_task(taskpath, split_keys, y_names)
+        return split_by_task(taskpath, param_keys, y_names)
 
 def csv_to_xy(r, x_name, y_name, scale_dict, x_bound=None, x_start=None, y_bound=None, remove_outlier=False):
 
@@ -90,8 +90,8 @@ def word_replace_back(strings):
     return eval(strings.replace('--', '/').replace("||", "\'"))
 
 
-def plot_res_func(prefix_dir, regs, split_keys,
-                  qualities, misc_scale=None, misc_scale_index=None,
+def plot_res_func(prefix_dir, regs, param_keys,
+                  value_keys, misc_scale=None, misc_scale_index=None,
                   replace_legend_keys=None,
                   save_name=None,
                   resample=int(1e3), smooth_step=1.0,
@@ -101,7 +101,8 @@ def plot_res_func(prefix_dir, regs, split_keys,
     if xlabel is None:
         xlabel = DEFAULT_X_NAME
     if replace_legend_keys is not None:
-        assert len(replace_legend_keys) == len(regs)
+        assert (len(replace_legend_keys) == len(regs) and len(value_keys) == 1) or \
+               (len(regs) == 1 and len(value_keys) == len(replace_legend_keys))
         print("In manual legend-key mode, the number of keys should be one-to-one matched with regs")
     for regex_str in regs:
         print("check regs {}. log found: ".format(osp.join(prefix_dir, regex_str)))
@@ -111,27 +112,27 @@ def plot_res_func(prefix_dir, regs, split_keys,
         for log in log_found:
             print(log)
 
-    results = plot_util.load_results(dirs, names=qualities + [xlabel], x_bound=[xlabel, x_bound], use_buf=use_buf)
+    results = plot_util.load_results(dirs, names=value_keys + [xlabel], x_bound=[xlabel, x_bound], use_buf=use_buf)
 
     print("---- load dataset {}---- ".format(len(results)))
 
-    y_names = qualities # []
+    y_names = value_keys # []
     if ylabel is None:
-        ylabel = qualities
+        ylabel = value_keys
     scale_dict = {}
     if misc_scale_index is None:
         misc_scale_index = []
-    for i in range(len(qualities)):
+    for i in range(len(value_keys)):
         if i in misc_scale_index:
-            scale_dict[qualities[i]] = misc_scale[misc_scale_index.index(i)]
+            scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
         else:
-            scale_dict[qualities[i]] = 1
+            scale_dict[value_keys[i]] = 1
     _, _, lgd, texts = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
                                                                                            scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
-                           # split_fn=lambda r: picture_split(taskpath=r, split_keys=split_keys, y_names=y_names)[0],
-                           group_fn=lambda r: picture_split(taskpath=r, split_keys=split_keys, y_names=y_names), # picture_split(taskpath=r, y_names=y_names),
+                           # split_fn=lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names)[0],
+                           group_fn=lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names), # picture_split(taskpath=r, y_names=y_names),
                            average_group=True, resample=resample, smooth_step=smooth_step,
                            ylabel=ylabel, xlabel=xlabel, replace_legend_keys=replace_legend_keys,
                             *args, **kwargs)
