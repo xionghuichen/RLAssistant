@@ -5,50 +5,6 @@ import os
 import traceback
 from RLA.easy_log import logger
 
-def ftpconnect():
-    ftp_server = '114.212.86.172'
-    username = 'amax'
-    password = 'zp19950310'
-    ftp = FTP()
-    ftp.set_debuglevel(2)
-    ftp.connect(ftp_server, 21)
-    ftp.login(username, password)
-    return ftp
-
-
-def downloadfiles(remote_path, local_path):
-    ftp = ftpconnect()
-    print(ftp.getwelcome())
-    bufsize = 1024
-    split_path = remote_path.split('/')
-    fp = open(local_path+'/'+split_path[-1], 'wb')
-    ftp.retrbinary('RETR ' + remote_path, fp.write, bufsize)
-    ftp.set_debuglevel(0)
-    fp.close()
-    ftp.quit()
-
-
-def uploadfile():
-    remotepath = "/opt/ftpadmin/redis.sh"
-    ftp = ftpconnect()
-    bufsize = 1024
-    localpath = '/Users/admin/redis.sh'
-    fp = open(localpath, 'rb')
-    ftp.storbinary('STOR ' + remotepath, fp, bufsize)
-    ftp.set_debuglevel(0)
-    fp.close()
-    ftp.quit()
-
-
-def getList():
-    ftp = ftpconnect()
-    print('*' * 40)
-    ftp.dir()
-    ftp.dir('/aaa/')
-    print('+' * 40)
-
-
-
 class FTPHandler(object):
 
     def __init__(self, ftp_server, username, password, ignore=None):
@@ -107,7 +63,7 @@ class FTPHandler(object):
 
     def upload_file(self, remote_dir, local_dir, local_file):
         self.ftp = self.ftpconnect()
-
+        self.ftp.timeout = 600
         bufsize = 1024
         with open(os.path.join(local_dir, local_file), 'rb') as fp:
             try:

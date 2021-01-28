@@ -13,6 +13,12 @@ BACKUP_CONFIG:
     - 'sub_task2/src'
   lib_dir: './build/lib/'
 
+LOG_USED:
+  - 'stdout'
+  - 'log'
+  - 'tensorboard'
+  - 'csv'
+
 # select a DL framework: tensorflow or pytorch.
 DL_FRAMEWORK: 'tensorflow'
 
@@ -22,3 +28,4 @@ REMOTE_SETTING:
   username: ''
   password: ''
   remote_log_root: ''
+

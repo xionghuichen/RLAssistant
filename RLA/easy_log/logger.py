@@ -279,10 +279,12 @@ def make_output_format(format, ev_dir, log_suffix=''):
 # ================================================================
 
 def timestep():
-    for fmt in Logger.CURRENT.output_formats:
-        if isinstance(fmt, TensorBoardOutputFormat):
-            return fmt.step
-    raise NotImplementedError
+    from RLA.easy_log.time_step import time_step_holder
+    return time_step_holder.get_time()
+    # for fmt in Logger.CURRENT.output_formats:
+    #     if isinstance(fmt, TensorBoardOutputFormat):
+    #         return fmt.step
+    # raise NotImplementedError
 
 
 ma_dict = {}

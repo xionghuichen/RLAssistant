@@ -12,6 +12,7 @@ import os
 
 import datetime
 import os.path as osp
+from RLA.easy_log.const import *
 from RLA.easy_log.time_step import time_step_holder
 from RLA.easy_log import logger
 from RLA.easy_log.const import *
@@ -126,10 +127,12 @@ class Tester(object):
         self.writer = None
         # logger configure
         logger.info("store file %s" % self.pkl_file)
-        logger.configure(self.log_dir, ['stdout', 'log', 'tensorboard', 'csv'])
+        logger.configure(self.log_dir, self.private_config["LOG_USED"])
         for fmt in logger.Logger.CURRENT.output_formats:
             if isinstance(fmt, logger.TensorBoardOutputFormat):
                 self.writer = fmt.writer
+        if "tensorboard" not in self.private_config["LOG_USED"]:
+            time_step_holder.config(0, 0, tf_log=False)
 
     def log_file_copy(self, source_tester):
         assert isinstance(source_tester, Tester)
@@ -178,6 +181,9 @@ class Tester(object):
                 self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}'))
 
     def add_summary_to_logger(self, summary, name='', simple_val=False, freq=20):
+        if "tensorboard" not in self.private_config["LOG_USED"]:
+            logger.info("skip adding summary to tb")
+            return
         if name not in self.summary_add_dict:
             self.summary_add_dict[name] = []
         if freq > 0:
@@ -206,6 +212,10 @@ class Tester(object):
             self.summary_add_dict[name].append(summary_ts)
 
     def feed_hyper_params_to_tb(self):
+        if "tensorboard" not in self.private_config["LOG_USED"]:
+            logger.info("skip feeding hyper-param to tb")
+            return
+
         import tensorflow as tf
         with tf.Session(graph=tf.Graph()) as sess:
             hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in self.hyper_param.items()]
