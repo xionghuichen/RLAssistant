@@ -31,6 +31,7 @@ Step3: record hyperparameters
 ```python
 from RLA.easy_log.tester import tester
 kwargs = {"hp_a": 1, "hp_b": 2, "info": "description of the experiment"}
+
 tester.set_hyper_param(**kwargs)
 # add the hyperparameters to track.
 tester.add_record_param(["info", "hp_a"])
@@ -96,4 +97,5 @@ you can find a project demo from the "example" directory.
 
 # TODO
 - [x] to be compatible with Pytorch;  
+- [ ] add a video to visualize the workflow of RLA.
 - [ ] add comments and documents to other functions.

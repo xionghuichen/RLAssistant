@@ -465,8 +465,8 @@ def plot_results(
                     sorted_index = replace_legend_sort
                 else:
                     sorted_index = np.argsort(legend_keys)
-                # print(legend_keys)
-                # print(sorted_index)
+                assert legend_keys.shape[0] == legend_lines.shape[0], \
+                    "The number of lines is not consistent with the keys"
                 legend_keys = legend_keys[sorted_index]
                 legend_lines = legend_lines[sorted_index]
                 for index, l in enumerate(legend_lines):
@@ -476,7 +476,7 @@ def plot_results(
                     if shaded_err:
                         res = g2lf[original_legend_keys[index] + '-se']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-err : ({} +- {})".format(legend_keys[index],  res[1][-1], res[2][-1]))
+                        print("{}-err : ({} +- {})".format(legend_keys[index], res[1][-1], res[2][-1]))
                     if shaded_std:
                         res = g2lf[original_legend_keys[index] + '-ss']
                         res[0].update(props={"color": colors[index % len(colors)]})
@@ -485,6 +485,7 @@ def plot_results(
                         res = g2lf[original_legend_keys[index] + '-sr']
                         res[0].update(props={"color": colors[index % len(colors)]})
                         print("{}-range : ({} - {})".format(legend_keys[index], res[1][-1], res[2][-1]))
+
             if bound_line is not None:
                 for bl in bound_line:
                     y = np.ones(x.shape) * bl[0]
