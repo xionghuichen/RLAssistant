@@ -77,7 +77,7 @@ class Tester(object):
         self.root = log_root
         logger.info("private_config: ")
         self.dl_framework = self.private_config["DL_FRAMEWORK"]
-        self.project_root = private_config_path.split("rla_config.yaml")[0]
+        self.project_root = "/".join(private_config_path.split("/")[:-1])
         for k, v in self.private_config.items():
             logger.info("k: {}, v: {}".format(k, v))
 
@@ -313,11 +313,11 @@ class Tester(object):
         if self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'lib':
             assert os.listdir(code_dir) == []
             os.removedirs(code_dir)
-            shutil.copytree(self.project_root + self.private_config["BACKUP_CONFIG"]["lib_dir"], code_dir)
+            shutil.copytree(osp.join(self.project_root, self.private_config["BACKUP_CONFIG"]["lib_dir"]), code_dir)
             shutil.copy(run_file, code_dir)
         elif self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'source':
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:
-                shutil.copytree(self.project_root + dir_name, code_dir + '/' + dir_name)
+                shutil.copytree(osp.join(self.project_root, dir_name), code_dir + '/' + dir_name)
         else:
             raise NotImplementedError
 
