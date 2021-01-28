@@ -246,7 +246,9 @@ class Tester(object):
                                  username=self.private_config["REMOTE_SETTING"]["username"],
                                  password=self.private_config["REMOTE_SETTING"]["password"])
                 for root, dirs, files in os.walk(self.log_dir):
-                    remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_log_root"], root[3:])
+                    suffix = root.split("/{}/".format(LOG))
+                    assert len(suffix) == 2, "root should have only one pattern \"/log/\""
+                    remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_log_root"], LOG, suffix[1])
                     local_root = root
                     logger.warn("sync {} <- {}".format(remote_root, local_root))
                     for file in files:
