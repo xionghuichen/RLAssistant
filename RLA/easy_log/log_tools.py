@@ -33,12 +33,18 @@ class DeleteLogTool(BasicLogTool):
                     for file_list in os.walk(root_dir): # walk into the leave of the file-tree.
                         for name in file_list[2]:
                             if not show:
-                                os.chmod(os.path.join(file_list[0], name), stat.S_IWRITE)
-                                os.remove(os.path.join(file_list[0], name))
+                                # os.chmod(os.path.join(file_list[0], name), stat.S_IWRITE)
+                                try:
+                                    os.remove(os.path.join(file_list[0], name))
+                                except PermissionError as e:
+                                    print("skip the permission error file")
                             # print("delete file {}".format(name))
                     if os.path.isdir(root_dir):
                         if not show:
-                            shutil.rmtree(root_dir)
+                            try:
+                                shutil.rmtree(root_dir)
+                            except PermissionError as e:
+                                print("skip the permission error file")
                         print("delete dir {}".format(root_dir))
                     else:
                         if not show:
@@ -85,7 +91,10 @@ class ArchiveLogTool(BasicLogTool):
                             # os.makedirs(archiving_target, exist_ok=True)
                             shutil.copytree(root_dir, archiving_target)
                             if self.remove:
-                                shutil.rmtree(root_dir)
+                                try:
+                                    shutil.rmtree(root_dir)
+                                except PermissionError as e:
+                                    print("skip the permission error file")
                         print("move dir {}, to {}".format(root_dir, archiving_target))
                     else:
                         if not show:
