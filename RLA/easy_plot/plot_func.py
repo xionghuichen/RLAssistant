@@ -40,6 +40,20 @@ def split_by_task(taskpath, param_keys, y_names):
     #     return task_split_key, y_names
     # return '_'.join(value[-3:])
 
+def split_by_reg(taskpath, reg_group, y_names):
+    task_split_key = "None"
+    for i , reg_k in enumerate(reg_group.keys()):
+        if taskpath.dirname in reg_group[reg_k]:
+            assert task_split_key == "None", "one experiment should belong to only one reg_group"
+            task_split_key = str(i)
+    assert len(y_names) == 1
+    return task_split_key, y_names
+
+# def split_by_value_key(taskpath, reg_group, y_names):
+#     assert len(reg_group) == 1
+#     return y_names, y_names
+
+
 def auto_gen_key_value_name(dict):
     parse_list = []
     for key, value in dict.iterms():
@@ -100,17 +114,16 @@ def plot_res_func(prefix_dir, regs, param_keys,
     dirs = []
     if xlabel is None:
         xlabel = DEFAULT_X_NAME
-    if replace_legend_keys is not None:
-        assert (len(replace_legend_keys) == len(regs) and len(value_keys) == 1) or \
-               (len(regs) == 1 and len(value_keys) == len(replace_legend_keys))
-        print("In manual legend-key mode, the number of keys should be one-to-one matched with regs")
+    reg_group = {}
     for regex_str in regs:
         print("check regs {}. log found: ".format(osp.join(prefix_dir, regex_str)))
         log_found = glob.glob(osp.join(prefix_dir, regex_str))
         dirs.extend(log_found)
         # print("regex str :{}. log found".format(regex_str))
+        reg_group[regex_str] = []
         for log in log_found:
             print(log)
+            reg_group[regex_str].append(log)
 
     results = plot_util.load_results(dirs, names=value_keys + [xlabel], x_bound=[xlabel, x_bound], use_buf=use_buf)
 
@@ -127,12 +140,23 @@ def plot_res_func(prefix_dir, regs, param_keys,
             scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
         else:
             scale_dict[value_keys[i]] = 1
+    if replace_legend_keys is not None:
+        assert len(replace_legend_keys) == len(regs) and len(value_keys) == 1,  "In manual legend-key mode, the number of keys should be one-to-one matched with regs"
+        # if len(replace_legend_keys) == len(regs):
+        group_fn = lambda r: split_by_reg(taskpath=r, reg_group=reg_group, y_names=y_names)
+        # elif len(value_keys) == len(replace_legend_keys):
+        #     group_fn = lambda r: split_by_value_key(taskpath=r, reg_group=reg_group, y_names=y_names)
+        # else:
+        #     raise NotImplementedError
+    else:
+        group_fn = lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names)
+
     _, _, lgd, texts = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
                                                                                            scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
                            # split_fn=lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names)[0],
-                           group_fn=lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names), # picture_split(taskpath=r, y_names=y_names),
+                           group_fn=group_fn, # picture_split(taskpath=r, y_names=y_names),
                            average_group=True, resample=resample, smooth_step=smooth_step,
                            ylabel=ylabel, xlabel=xlabel, replace_legend_keys=replace_legend_keys,
                             *args, **kwargs)
