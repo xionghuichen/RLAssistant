@@ -248,9 +248,9 @@ def load_results(root_dir_or_dirs, names, x_bound, enable_progress=True, use_buf
     if verbose: print('loaded %i results'%len(allresults))
     return allresults
 
-COLORS = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'purple', 'pink',
-        'brown', 'orange', 'teal',  'lightblue', 'lime', 'lavender', 'turquoise',
-        'darkgreen', 'tan', 'salmon', 'gold',  'darkred', 'darkblue']
+COLORS = ['blue', 'green', 'red',  'orange', 'gold', 'cyan', 'magenta', 'yellow', 'black', 'purple', 'pink',
+        'brown',  'teal',  'lightblue', 'lime', 'lavender', 'turquoise',
+        'darkgreen', 'tan', 'salmon',   'darkred', 'darkblue']
 
 
 def default_xy_fn(r, y_name):
@@ -357,7 +357,7 @@ def plot_results(
                 largest_divisor = i
         ncols = largest_divisor
         nrows = N // ncols
-    figsize = figsize or (8 * ncols, 6 * nrows)
+    figsize = figsize or (7 * ncols, 6 * nrows)
     # if legend_outside:
     #     figsize = list(figsize)
     #     figsize[0] += 4
@@ -528,7 +528,7 @@ def plot_results(
         texts.append(plt.ylabel(ylabel, fontsize=18))
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        plt.title(title, fontsize=7)
+        plt.title(title, fontsize=18)
     else:
         plt.gcf().subplots_adjust(bottom=0.12, left=0.12)
     return f, axarr, lgd, texts

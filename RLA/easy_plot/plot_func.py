@@ -109,25 +109,32 @@ def plot_res_func(prefix_dir, regs, param_keys,
                   replace_legend_keys=None,
                   save_name=None,
                   resample=int(1e3), smooth_step=1.0,
-                  ylabel=None, x_bound=None, y_bound=None, x_start=None, use_buf=False, remove_outlier=False, xlabel=None,
+                  ylabel=None, x_bound=None, y_bound=None, x_start=None, use_buf=False,
+                  remove_outlier=False, xlabel=None,
+                  verbose=True,
                   *args, **kwargs):
     dirs = []
     if xlabel is None:
         xlabel = DEFAULT_X_NAME
     reg_group = {}
+
     for regex_str in regs:
-        print("check regs {}. log found: ".format(osp.join(prefix_dir, regex_str)))
+        if verbose:
+            print("check regs {}. log found: ".format(osp.join(prefix_dir, regex_str)))
+
         log_found = glob.glob(osp.join(prefix_dir, regex_str))
         dirs.extend(log_found)
         # print("regex str :{}. log found".format(regex_str))
         reg_group[regex_str] = []
+
         for log in log_found:
-            print(log)
+            if verbose:
+                print(log)
             reg_group[regex_str].append(log)
 
-    results = plot_util.load_results(dirs, names=value_keys + [xlabel], x_bound=[xlabel, x_bound], use_buf=use_buf)
-
-    print("---- load dataset {}---- ".format(len(results)))
+    results = plot_util.load_results(dirs, names=value_keys + [DEFAULT_X_NAME], x_bound=[DEFAULT_X_NAME, x_bound], use_buf=use_buf)
+    if verbose:
+        print("---- load dataset {}---- ".format(len(results)))
 
     y_names = value_keys # []
     if ylabel is None:
