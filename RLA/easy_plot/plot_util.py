@@ -248,9 +248,11 @@ def load_results(root_dir_or_dirs, names, x_bound, enable_progress=True, use_buf
     if verbose: print('loaded %i results'%len(allresults))
     return allresults
 
-COLORS = ['blue', 'green', 'red',  'orange', 'gold', 'cyan', 'magenta', 'yellow', 'black', 'purple', 'pink',
-        'brown',  'teal',  'lightblue', 'lime', 'lavender', 'turquoise',
-        'darkgreen', 'tan', 'salmon',   'darkred', 'darkblue']
+COLORS = ['blue', 'green', 'red',  'm', 'darkorange', 'k',
+          'dodgerblue', 'darkturquoise', 'deeppink', 'brown', 'rosybrown', 'sandybrown',  'gold',
+          'cyan', 'magenta', 'yellow', 'black', 'purple', 'pink',
+        'brown',    'lightblue', 'lime', 'lavender', 'turquoise',
+         'tan', 'salmon',   'darkred', 'darkblue',  'gold']
 
 
 def default_xy_fn(r, y_name):
@@ -289,6 +291,9 @@ def plot_results(
     bound_line=None,
     colors=None,
     log=False,
+    ylim=None,
+    xlim=None,
+    show_number=True,
     skip_legend=False,
     rescale_idx=None):
     '''
@@ -453,7 +458,11 @@ def plot_results(
         if not pretty:
             plt.tight_layout()
         if any(g2l.keys()):
-            legend_keys = np.array(['%s (%i)'%(g, g2c[g]) for g in g2l] if average_group else g2l.keys())
+            if show_number:
+                legend_keys = np.array(['%s (%i)'%(g, g2c[g]) for g in g2l] if average_group else g2l.keys())
+            else:
+                legend_keys = np.array(['%s'%(g) for g in g2l] if average_group else g2l.keys())
+
             legend_lines = np.array(list(g2l.values()))
 
             sorted_index = np.argsort(legend_keys)
@@ -469,6 +478,7 @@ def plot_results(
                     "The number of lines is not consistent with the keys"
                 legend_keys = legend_keys[sorted_index]
                 legend_lines = legend_lines[sorted_index]
+            if pretty:
                 for index, l in enumerate(legend_lines):
                     l.update(props={"color": colors[index % len(colors)]})
                     original_legend_keys = np.array(['%s' % (g) for g in g2l] if average_group else g2l.keys())
@@ -476,15 +486,15 @@ def plot_results(
                     if shaded_err:
                         res = g2lf[original_legend_keys[index] + '-se']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-err : ({} +- {})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-err : ({:.4f} \pm {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                     if shaded_std:
                         res = g2lf[original_legend_keys[index] + '-ss']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-std :({} +- {})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-std :({:.4f} \pm {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                     if shaded_range:
                         res = g2lf[original_legend_keys[index] + '-sr']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-range : ({} - {})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-range : ({:.4f} \pm {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
 
             if bound_line is not None:
                 for bl in bound_line:
@@ -518,20 +528,24 @@ def plot_results(
     if title is not None:
         plt.title(title)
     plt.grid(True)
+    if ylim is not None:
+        plt.ylim(ylim)
+    if xlim is not None:
+        plt.xlim(xlim)
     texts = []
     if pretty:
         from matplotlib.ticker import ScalarFormatter
         xfmt = ScalarFormatter(useMathText=True)
         xfmt.set_powerlimits((-4, 4))  # Or whatever your limits are . . .
         plt.gca().yaxis.set_major_formatter(xfmt)
-        texts.append(plt.xlabel(xlabel, fontsize=18))
-        texts.append(plt.ylabel(ylabel, fontsize=18))
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
+        plt.xlabel(xlabel, fontsize=20)
+        plt.ylabel(ylabel, fontsize=20)
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
         plt.title(title, fontsize=18)
     else:
         plt.gcf().subplots_adjust(bottom=0.12, left=0.12)
-    return f, axarr, lgd, texts
+    return f, axarr, lgd, texts, g2lf
 
 def regression_analysis(df):
     xcols = list(df.columns.copy())

@@ -8,7 +8,11 @@ from RLA.easy_plot import plot_util
 from RLA.const import DEFAULT_X_NAME
 
 
-def split_by_task(taskpath, param_keys, y_names):
+def default_key_to_legend(parse_list, y_name):
+    task_split_key = '.'.join(parse_list)
+    return task_split_key + ' eval:' + y_name
+
+def split_by_task(taskpath, param_keys, y_names, key_to_legend_fn):
     pair_delimiter = '&'
     kv_delimiter = '='
     pairs = taskpath.dirname.split(pair_delimiter)
@@ -25,10 +29,9 @@ def split_by_task(taskpath, param_keys, y_names):
             # filter_key_value[split_key] = key_value[split_key]
         else:
             parse_list.append(split_key + '=NF')
-    task_split_key = '.'.join(parse_list)
     param_keys = []
     for y_name in y_names:
-        param_keys.append(task_split_key + ' eval:' + y_name)
+        param_keys.append(key_to_legend_fn(parse_list, y_name))
     return param_keys, y_names
 
     # if y_names is not None:
@@ -60,11 +63,12 @@ def auto_gen_key_value_name(dict):
         parse_list.append(key + '=' + value)
 
 
-def picture_split(taskpath, single_name=None, param_keys=None, y_names=None):
+def picture_split(taskpath, single_name=None, param_keys=None, y_names=None,
+                  key_to_legend_fn=None):
     if single_name is not None:
         return single_name, None
     else:
-        return split_by_task(taskpath, param_keys, y_names)
+        return split_by_task(taskpath, param_keys, y_names, key_to_legend_fn=key_to_legend_fn)
 
 def csv_to_xy(r, x_name, y_name, scale_dict, x_bound=None, x_start=None, y_bound=None, remove_outlier=False):
 
@@ -111,9 +115,12 @@ def plot_res_func(prefix_dir, regs, param_keys,
                   resample=int(1e3), smooth_step=1.0,
                   ylabel=None, x_bound=None, y_bound=None, x_start=None, use_buf=False,
                   remove_outlier=False, xlabel=None,
+                  key_to_legend_fn=None,
                   verbose=True,
                   *args, **kwargs):
     dirs = []
+    if key_to_legend_fn is None:
+        key_to_legend_fn = default_key_to_legend
     if xlabel is None:
         xlabel = DEFAULT_X_NAME
     reg_group = {}
@@ -156,9 +163,10 @@ def plot_res_func(prefix_dir, regs, param_keys,
         # else:
         #     raise NotImplementedError
     else:
-        group_fn = lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names)
+        group_fn = lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names,
+                                           key_to_legend_fn=key_to_legend_fn)
 
-    _, _, lgd, texts = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
+    _, _, lgd, texts, g2lf = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
                                                                                            scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
@@ -181,6 +189,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
             plt.savefig(osp.join(dir_name, save_name), bbox_extra_artists=tuple(texts), bbox_inches='tight')
         print("saved location: {}".format(osp.join(dir_name, save_name)))
     plt.show()
+    return g2lf
 
 def scale_index_to_dict(measure, scale_index, scale):
     scale_dict = {}
