@@ -23,7 +23,7 @@ import shutil
 def load_from_record_date(task_name, record_date, fork_hp):
     global tester
     assert isinstance(tester, Tester)
-    load_tester = tester.load_tester(record_date, task_name, tester.root + '/')
+    load_tester = tester.load_tester(record_date, task_name, tester.root)
     # copy log file
     tester.log_file_copy(load_tester)
     # copy attribute
@@ -116,12 +116,23 @@ class Tester(object):
         self.results_dir, _ = self.__create_file_directory(osp.join(self.root, OTHER_RESULTS, self.task_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
+
         self.init_logger()
         self.serialize_object_and_save()
         self.__copy_source_code(self.run_file, code_dir)
-        self.print_log_dir()
         self.feed_hyper_params_to_tb()
+        self.print_log_dir()
 
+    def update_log_files_location(self, root):
+        self.root = root
+        code_dir, _ = self.__create_file_directory(osp.join(self.root, CODE, self.task_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.root, LOG, self.task_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.root, ARCHIVE_TESTER, self.task_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.root, CHECKPOINT, self.task_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.root, OTHER_RESULTS, self.task_name), is_file=False)
+        self.log_dir = log_dir
+        self.code_dir = code_dir
+        self.print_log_dir()
 
     def init_logger(self):
         self.writer = None
@@ -162,9 +173,16 @@ class Tester(object):
     @classmethod
     def load_tester(cls, record_date, task_name, log_root):
         logger.info("load tester")
-        res_dir, res_file = cls.log_file_finder(record_date, task_name=task_name, file_root=log_root + ARCHIVE_TESTER + '/', log_type='files')
+        res_dir, res_file = cls.log_file_finder(record_date, task_name=task_name,
+                                                file_root=osp.join(log_root, ARCHIVE_TESTER),
+                                                log_type='files')
         import dill
-        return dill.load(open(res_dir+'/'+res_file, 'rb'))
+        load_tester = dill.load(open(res_dir+'/'+res_file, 'rb'))
+        assert isinstance(load_tester, Tester)
+        logger.info("update log files' root")
+        load_tester.update_log_files_location(root=log_root)
+        return load_tester
+
 
     def add_record_param(self, keys):
         for k in keys:
@@ -272,9 +290,9 @@ class Tester(object):
     @classmethod
     def log_file_finder(cls, record_date, task_name='train', file_root='../checkpoint/', log_type='dir'):
         record_date = datetime.datetime.strptime(record_date, '%Y/%m/%d/%H-%M-%S-%f')
-        prefix = file_root + task_name
+        prefix = osp.join(file_root, task_name)
         directory = str(record_date.strftime("%Y/%m/%d"))
-        directory = prefix + '/' + directory
+        directory = osp.join(prefix, directory)
         file_found = ''
         for root, dirs, files in os.walk(directory):
             if log_type == 'dir':
@@ -425,7 +443,7 @@ class Tester(object):
             max_iter = ckpt_path.split('-')[-1]
             self.time_step_holder.set_time(max_iter)
             return int(max_iter), None
-        elif self.dl_framework =='pytorch':
+        elif self.dl_framework == 'pytorch':
             import torch
             return self.checkpoint_keep_list[-1], torch.load(tester.checkpoint_dir + "checkpoint-{}.pt".format(self.checkpoint_keep_list[-1]))
 
