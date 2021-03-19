@@ -18,19 +18,13 @@ from RLA.easy_log import logger
 from RLA.easy_log.const import *
 import yaml
 import shutil
+import argparse
 
 
-def load_from_record_date(task_name, record_date, fork_hp):
+def load_from_record_date(task_name, record_date):
     global tester
     assert isinstance(tester, Tester)
     load_tester = tester.load_tester(record_date, task_name, tester.root)
-    # copy log file
-    tester.log_file_copy(load_tester)
-    # copy attribute
-    if fork_hp:
-        tester.hyper_param = load_tester.hyper_param
-        tester.hyper_param_record = load_tester.hyper_param_record
-        tester.private_config = load_tester.private_config
     # load checkpoint
     load_tester.new_saver(var_prefix='', max_to_keep=1)
     load_iter, load_res = load_tester.load_checkpoint()
@@ -38,6 +32,24 @@ def load_from_record_date(task_name, record_date, fork_hp):
     tester.print_log_dir()
     return load_iter, load_res
 
+def import_hyper_parameters(task_name, record_date):
+    global tester
+    assert isinstance(tester, Tester)
+    load_tester = tester.load_tester(record_date, task_name, tester.root)
+
+    args = argparse.Namespace(**load_tester.hyper_param)
+    return args
+
+def fork_tester_log_files(task_name, record_date):
+    global tester
+    assert isinstance(tester, Tester)
+    load_tester = tester.load_tester(record_date, task_name, tester.root)
+    # copy log file
+    tester.log_file_copy(load_tester)
+    # copy attribute
+    tester.hyper_param = load_tester.hyper_param
+    tester.hyper_param_record = load_tester.hyper_param_record
+    tester.private_config = load_tester.private_config
 
 class Tester(object):
 
@@ -177,7 +189,7 @@ class Tester(object):
                                                 file_root=osp.join(log_root, ARCHIVE_TESTER),
                                                 log_type='files')
         import dill
-        load_tester = dill.load(open(res_dir+'/'+res_file, 'rb'))
+        load_tester = dill.load(open(osp.join(res_dir, res_file), 'rb'))
         assert isinstance(load_tester, Tester)
         logger.info("update log files' root")
         load_tester.update_log_files_location(root=log_root)
@@ -214,6 +226,7 @@ class Tester(object):
             summ.ParseFromString(summary)
             if simple_val:
                 list_field = summ.ListFields()
+
                 def recursion_util(inp_field):
                     if hasattr(inp_field, "__getitem__"):
                         for inp in inp_field:
@@ -337,7 +350,7 @@ class Tester(object):
             shutil.copy(run_file, code_dir)
         elif self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'source':
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:
-                shutil.copytree(osp.join(self.project_root, dir_name), code_dir + '/' + dir_name)
+                shutil.copytree(osp.join(self.project_root, dir_name), osp.join(code_dir, dir_name))
         else:
             raise NotImplementedError
 
