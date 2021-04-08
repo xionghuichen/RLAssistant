@@ -59,11 +59,11 @@ def simple_hist(name, data, labels=None, pretty=False, xlabel='', ylabel='',
             # ['r', 'b'], ['x--', '+-']
             if labels is not None:
                 for d, l in zip(data, labels):
-                    plt.hist(d, label=l, histtype='step', *args, **kwargs)
+                    plt.hist(d, label=l, *args, **kwargs)
             else:
-                plt.hist(data, histtype='step', *args, **kwargs)
+                plt.hist(data,  *args, **kwargs)
         else:
-            plt.hist(data, label=labels, histtype='step', *args, **kwargs)
+            plt.hist(data, label=labels, *args, **kwargs)
         # plt.tight_layout()
         if labels is not None:
             plt.legend(prop={'size': 13})
@@ -85,7 +85,7 @@ def simple_hist(name, data, labels=None, pretty=False, xlabel='', ylabel='',
 
 
 def simple_plot(name, data=None, x=None, y=None, labels=None, pretty=False, xlabel='', ylabel='',
-                colors=None, styles=None, cover=False):
+                colors=None, styles=None, cover=False, title=None, legend_outside=False, *args, **kwargs):
     import os.path as osp
     if pretty:
         save_path = osp.join(tester.results_dir, name + '.pdf')
@@ -98,10 +98,10 @@ def simple_plot(name, data=None, x=None, y=None, labels=None, pretty=False, xlab
         if labels is None:
             if data is not None:
                 for d in data:
-                    plt.plot(d)
+                    plt.plot(d, *args, **kwargs)
             elif x is not None:
                 for x_i, y_i in zip(x, y):
-                    plt.plot(x_i, y_i)
+                    plt.plot(x_i, y_i, *args, **kwargs)
             else:
                 raise NotImplementedError
         else:
@@ -109,32 +109,40 @@ def simple_plot(name, data=None, x=None, y=None, labels=None, pretty=False, xlab
                 # ['r', 'b'], ['x--', '+-']
                 if data is not None:
                     for d, l, c, s in zip(data, labels, colors, styles):
-                        plt.plot(d, s, label=l, color=c)
+                        plt.plot(d, s, label=l, color=c, *args, **kwargs)
                 elif x is not None:
                     for x_i, y_i, l, c, s in zip(x, y, labels, colors, styles):
-                        plt.plot(x_i, y_i, s, label=l, color=c)
+                        plt.plot(x_i, y_i, s, label=l, color=c, *args, **kwargs)
                 else:
                     raise NotImplementedError
             else:
                 if data is not None:
                     for d, l in zip(data, labels):
-                        plt.plot(d, label=l)
+                        plt.plot(d, label=l, *args, **kwargs)
                 elif x is not None:
                     for x_i, y_i, l_i in zip(x, y, labels):
-                        plt.plot(x_i, y_i, label=l_i)
+                        plt.plot(x_i, y_i, label=l_i, *args, **kwargs)
                 else:
                     raise NotImplementedError
         if labels is not None:
             # plt.xlabel('time-step (per day)', fontsize=15)
             # plt.ylabel('normalized FOs', fontsize=15)
-            plt.legend(prop={'size': 15})
+            lgd = plt.legend(prop={'size': 15},
+                             loc=2 if legend_outside else None,
+                             bbox_to_anchor=(1, 1) if legend_outside else None,
+                             )
+        else:
+            lgd = None
 
         plt.xlabel(xlabel, fontsize=18)
         plt.ylabel(ylabel, fontsize=18)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        # plt.title(name, fontsize=7)
+        plt.title(title, fontsize=7)
         plt.grid(True)
         save_dir = '/'.join(save_path.split('/')[:-1])
         os.makedirs(save_dir, exist_ok=True)
-        plt.savefig(save_path)
+        if lgd is not None:
+            plt.savefig(save_path, bbox_extra_artists=tuple([lgd]), bbox_inches='tight')
+        else:
+            plt.savefig(save_path)
