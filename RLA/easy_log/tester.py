@@ -21,7 +21,94 @@ import shutil
 import argparse
 
 
+class ExperimentLoader(object):
+    def __init__(self):
+        self.task_name = None
+        self.record_date = None
+        self.root = None
+        pass
+
+    def config(self, task_name, record_date, root):
+        self.task_name = task_name
+        self.record_date = record_date
+        self.root = root
+
+    @property
+    def is_valid_config(self):
+        if self.record_date is not None and self.task_name is not None and self.root is not None:
+            return True
+        else:
+            logger.warn("meet invalid loader config when use it")
+            logger.warn("record_date", self.record_date)
+            logger.warn("task_name", self.task_name)
+            logger.warn("root", self.root)
+            return False
+
+    def import_hyper_parameters(self):
+        if self.is_valid_config:
+            load_tester = Tester.load_tester(self.record_date, self.task_name, self.root)
+            args = argparse.Namespace(**load_tester.hyper_param)
+            return args
+        else:
+            return None
+
+    def load_from_record_date(self, var_prefix=''):
+        if self.is_valid_config:
+            loaded_tester = Tester.load_tester(self.record_date, self.task_name, self.root)
+            # load checkpoint
+            loaded_tester.new_saver(var_prefix=var_prefix, max_to_keep=1)
+            load_iter, load_res = loaded_tester.load_checkpoint()
+            tester.time_step_holder.set_time(load_iter)
+            tester.print_log_dir()
+            return load_iter, load_res
+        else:
+            return 0, {}
+
+    def fork_tester_log_files(self):
+        """
+        copy the log files in task_name/record_date to the new experiment.
+        :param task_name:
+        :param record_date:
+        :return:
+        """
+        if self.is_valid_config:
+            global tester
+            assert isinstance(tester, Tester)
+            loaded_tester = Tester.load_tester(self.record_date, self.task_name, self.root)
+            # copy log file
+            tester.log_file_copy(loaded_tester)
+            # copy attribute
+            tester.hyper_param = loaded_tester.hyper_param
+            tester.hyper_param_record = loaded_tester.hyper_param_record
+            tester.private_config = loaded_tester.private_config
+
+experimental_loader = ExperimentLoader()
+
+def import_hyper_parameters(task_name, record_date):
+    """
+    return the hyper parameters of the experiment in task_name/record_date, which is stored in Tester.
+
+    :param task_name:
+    :param record_date:
+    :return:
+    """
+    logger.warn("the function is deprecated. please check the ExperimentLoader as the new implementation")
+    global tester
+    assert isinstance(tester, Tester)
+    load_tester = tester.load_tester(record_date, task_name, tester.root)
+
+    args = argparse.Namespace(**load_tester.hyper_param)
+    return args
+
+
 def load_from_record_date(task_name, record_date):
+    """
+    load the checkpoint of the experiment in task_name/record_date.
+    :param task_name:
+    :param record_date:
+    :return:
+    """
+    logger.warn("the function is deprecated. please check the ExperimentLoader as the new implementation")
     global tester
     assert isinstance(tester, Tester)
     load_tester = tester.load_tester(record_date, task_name, tester.root)
@@ -32,15 +119,15 @@ def load_from_record_date(task_name, record_date):
     tester.print_log_dir()
     return load_iter, load_res
 
-def import_hyper_parameters(task_name, record_date):
-    global tester
-    assert isinstance(tester, Tester)
-    load_tester = tester.load_tester(record_date, task_name, tester.root)
-
-    args = argparse.Namespace(**load_tester.hyper_param)
-    return args
 
 def fork_tester_log_files(task_name, record_date):
+    """
+    copy the log files in task_name/record_date to the new experiment.
+    :param task_name:
+    :param record_date:
+    :return:
+    """
+    logger.warn("the function is deprecated. please check the ExperimentLoader as the new implementation")
     global tester
     assert isinstance(tester, Tester)
     load_tester = tester.load_tester(record_date, task_name, tester.root)
