@@ -99,3 +99,5 @@ you can find a project demo from the "example" directory.
 - [x] to be compatible with Pytorch;  
 - [ ] add a video to visualize the workflow of RLA.
 - [ ] add comments and documents to other functions.
+- [ ] add an auto integration script.
+
