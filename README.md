@@ -96,8 +96,8 @@ The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 you can find a project demo from the "example" directory.
 
 # TODO
-- [x] to be compatible with Pytorch;  
 - [ ] add a video to visualize the workflow of RLA.
 - [ ] add comments and documents to other functions.
 - [ ] add an auto integration script.
+- [ ] plot function can do average on varied length (time-step) of experiment curves.
 
