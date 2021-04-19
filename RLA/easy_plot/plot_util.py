@@ -375,9 +375,9 @@ def plot_results(
     groups = list(set(groups))
     groups.sort()
 
-    default_samples = 512
-    if average_group:
-        resample = resample or default_samples
+    # default_samples = 512
+    # if average_group:
+    #     resample = resample or default_samples
     lgd = None
     for (isplit, sk) in enumerate(sorted(sk2r.keys())):
         g2l = {}
@@ -423,6 +423,7 @@ def plot_results(
                     continue
                 color = colors[groups.index(group) % len(colors)]
                 origxs = [xy[0] for xy in xys]
+                maxlen = max(map(len, origxs))
                 minxlen = min(map(len, origxs))
                 def allequal(qs):
                     return all((q==qs[0]).all() for q in qs[1:])
@@ -437,11 +438,20 @@ def plot_results(
                     assert allequal([x[:minxlen] for x in origxs]),\
                         'If you want to average unevenly sampled data, set resample=<number of samples you want>'
                     usex = origxs[0]
-                    ys = [xy[1][:minxlen] for xy in xys]
-                ymean = np.mean(ys, axis=0)
-                ystd = np.std(ys, axis=0)
-                ymin = np.min(ys, axis=0)
-                ymax = np.max(ys, axis=0)
+                    for ox in origxs:
+                        if len(ox) > len(usex):
+                            usex = ox
+                    ys = []
+                    for xy in xys:
+                        if len(xy[1]) < maxlen:
+                            y = np.append(xy[1], np.ones(maxlen - len(xy[1])) * np.nan)
+                            ys.append(y)
+                        else:
+                            ys.append(xy[1])
+                ymean = np.nanmean(ys, axis=0)
+                ystd = np.nanstd(ys, axis=0)
+                ymin = np.nanmin(ys, axis=0)
+                ymax = np.nanmax(ys, axis=0)
                 ystderr = ystd / np.sqrt(len(ys))
                 l, = axarr[idx_row][idx_col].plot(usex, ymean, color=color)
                 g2l[group] = l
