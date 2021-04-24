@@ -280,6 +280,7 @@ def plot_results(
     figsize=None,
     legend_outside=False,
     resample=0,
+    vary_len_plot=False,
     smooth_step=1.0,
     tiling='vertical',
     xlabel=None,
@@ -337,6 +338,8 @@ def plot_results(
                                               See docstrings for decay_steps in symmetric_ema or one_sided_ema functions.
 
     '''
+    if vary_len_plot:
+        assert resample <=0, "plot varied length averaged lines only allowed in unresample mode."
     if colors is None:
         colors = COLORS
     if split_fn is None: split_fn = lambda _ : ''
@@ -435,19 +438,27 @@ def plot_results(
                     for (x, y) in xys:
                         ys.append(symmetric_ema(x, y, low, high, resample, decay_steps=smooth_step)[1])
                 else:
-                    assert allequal([x[:minxlen] for x in origxs]),\
+                    assert allequal([x[:minxlen] for x in origxs]), \
                         'If you want to average unevenly sampled data, set resample=<number of samples you want>'
-                    usex = origxs[0]
-                    for ox in origxs:
-                        if len(ox) > len(usex):
-                            usex = ox
-                    ys = []
-                    for xy in xys:
-                        if len(xy[1]) < maxlen:
-                            y = np.append(xy[1], np.ones(maxlen - len(xy[1])) * np.nan)
-                            ys.append(y)
-                        else:
-                            ys.append(xy[1])
+                    if vary_len_plot:
+                        usex = origxs[0]
+                        for ox in origxs:
+                            if len(ox) > len(usex):
+                                usex = ox
+                        ys = []
+                        for xy in xys:
+                            if len(xy[1]) < maxlen:
+                                y = np.append(xy[1], np.ones(maxlen - len(xy[1])) * np.nan)
+                                ys.append(y)
+                            else:
+                                ys.append(xy[1])
+                    else:
+                        usex = origxs[0]
+                        ys = []
+                        for xy in xys:
+                            if len(xy[1]) < minxlen:
+                                y = np.append(xy[1], np.ones(minxlen - len(xy[1])) * np.nan)
+                                ys.append(y)
                 ymean = np.nanmean(ys, axis=0)
                 ystd = np.nanstd(ys, axis=0)
                 ymin = np.nanmin(ys, axis=0)
@@ -504,7 +515,7 @@ def plot_results(
                     if shaded_range:
                         res = g2lf[original_legend_keys[index] + '-sr']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-range : ({:.4f} \pm {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-range : ({:.4f}, {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
 
             if bound_line is not None:
                 for bl in bound_line:

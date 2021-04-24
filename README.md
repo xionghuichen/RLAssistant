@@ -99,6 +99,6 @@ you can find a project demo from the "example" directory.
 - [ ] add a video to visualize the workflow of RLA.
 - [ ] add comments and documents to other functions.
 - [ ] add an auto integration script.
-- [ ] plot function can do average on varied length (time-step) of experiment curves.
+- [x] plot function can do average on varied length (time-step) of experiment curves.
 - [ ] download / upload experiment logs through timestamp
 
