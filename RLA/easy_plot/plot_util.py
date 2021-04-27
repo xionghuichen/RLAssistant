@@ -453,12 +453,8 @@ def plot_results(
                             else:
                                 ys.append(xy[1])
                     else:
-                        usex = origxs[0]
-                        ys = []
-                        for xy in xys:
-                            if len(xy[1]) < minxlen:
-                                y = np.append(xy[1], np.ones(minxlen - len(xy[1])) * np.nan)
-                                ys.append(y)
+                        usex = origxs[0][:minxlen]
+                        ys = [xy[1][:minxlen] for xy in xys]
                 ymean = np.nanmean(ys, axis=0)
                 ystd = np.nanstd(ys, axis=0)
                 ymin = np.nanmin(ys, axis=0)
@@ -491,14 +487,14 @@ def plot_results(
             legend_lines = legend_lines[sorted_index]
             if replace_legend_keys is not None:
                 legend_keys = np.array(replace_legend_keys)
-                if replace_legend_sort is not None:
-                    sorted_index = replace_legend_sort
-                else:
-                    sorted_index = np.argsort(legend_keys)
-                assert legend_keys.shape[0] == legend_lines.shape[0], \
-                    "The number of lines is not consistent with the keys"
-                legend_keys = legend_keys[sorted_index]
-                legend_lines = legend_lines[sorted_index]
+                # if replace_legend_sort is not None:
+                #     sorted_index = replace_legend_sort
+                # else:
+                #     sorted_index = np.argsort(legend_keys)
+                # assert legend_keys.shape[0] == legend_lines.shape[0], \
+                #     "The number of lines is not consistent with the keys"
+                # legend_keys = legend_keys[sorted_index]
+                # legend_lines = legend_lines[sorted_index]
             if pretty:
                 for index, l in enumerate(legend_lines):
                     l.update(props={"color": colors[index % len(colors)]})
@@ -559,6 +555,9 @@ def plot_results(
         xfmt = ScalarFormatter(useMathText=True)
         xfmt.set_powerlimits((-4, 4))  # Or whatever your limits are . . .
         plt.gca().yaxis.set_major_formatter(xfmt)
+        plt.gca().yaxis.offsetText.set_fontsize(15)
+        plt.gca().xaxis.set_major_formatter(xfmt)
+        plt.gca().xaxis.offsetText.set_fontsize(15)
         plt.xlabel(xlabel, fontsize=20)
         plt.ylabel(ylabel, fontsize=20)
         plt.xticks(fontsize=16)

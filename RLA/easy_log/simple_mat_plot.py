@@ -138,7 +138,7 @@ def simple_plot(name, data=None, x=None, y=None, labels=None, pretty=False, xlab
         plt.ylabel(ylabel, fontsize=18)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        plt.title(title, fontsize=7)
+        plt.title(title, fontsize=13)
         plt.grid(True)
         save_dir = '/'.join(save_path.split('/')[:-1])
         os.makedirs(save_dir, exist_ok=True)
