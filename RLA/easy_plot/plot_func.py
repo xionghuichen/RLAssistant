@@ -166,7 +166,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
         group_fn = lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names,
                                            key_to_legend_fn=key_to_legend_fn)
 
-    _, _, lgd, texts, g2lf = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
+    _, _, lgd, texts, g2lf = plot_util.plot_rreesults(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
                                                                                            scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
@@ -180,7 +180,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
         import os
 
         from RLA.easy_log.const import LOG, OTHER_RESULTS
-        dir_name = prefix_dir.replace(LOG, osp.join(OTHER_RESULTS, 'easy_plot'), 1)
+        dir_name = prefix_dir.replace(f"/{LOG}/", f"/{osp.join(OTHER_RESULTS, 'easy_plot')}/", 1)
         os.makedirs(dir_name, exist_ok=True)
 
         if lgd is not None:
