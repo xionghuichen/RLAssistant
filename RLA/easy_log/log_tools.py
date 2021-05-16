@@ -42,7 +42,7 @@ class DeleteLogTool(BasicLogTool):
                     if os.path.isdir(root_dir):
                         if not show:
                             try:
-                                shutil.rmtree(root_dir)
+                                shutil.rmtree(root_dir, ignore_errors=True)
                             except PermissionError as e:
                                 print("skip the permission error file")
                         print("delete dir {}".format(root_dir))

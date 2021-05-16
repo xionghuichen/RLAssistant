@@ -141,7 +141,6 @@ class JSONOutputFormat(KVWriter):
         closes the file
         """
         self.file.close()
-
 class CSVOutputFormat(KVWriter):
     def __init__(self, filename):
         """
@@ -151,7 +150,15 @@ class CSVOutputFormat(KVWriter):
         """
         self.filename = filename
         self.file = open(filename, 'a+t')
-        self.keys = []
+        self.file.seek(0)
+        keys = self.file.readline()
+        if keys != '':
+            keys = keys[:-1] # skip '\n'
+            keys = keys.split(',')
+            self.keys = keys
+        else:
+            self.keys = []
+        self.file = open(filename, 'a+t')
         self.sep = ','
 
     def writekvs(self, kvs):
@@ -173,7 +180,6 @@ class CSVOutputFormat(KVWriter):
                 self.file.write(line[:-1])
                 self.file.write(self.sep * len(extra_keys))
                 self.file.write('\n')
-
             self.file = open(self.filename, 'a+t')
         for i, key in enumerate(self.keys):
             if i > 0:

@@ -2,7 +2,7 @@
 
 RLA is a tool for managing your RL experiments automatically (e.g., your hyper-parameters, logs, checkpoints, figures, and code, etc.).  RLA has decoupled to the training code although some additional configuration codes and predetermined directory structures are still needed (see Quickstart and the example project). 
 
-RLA is inspired by [openai/baselines](https://github.com/openai/baselines). You can transfer your logging system easily from the "baselines.logger" by modifying the import lines (i.e., ```from baselines import logger``` -> ```from RLA.easy_log import logger```).
+The logger function of RLA is forked from and compatible with the logger object in [openai/baselines](https://github.com/openai/baselines). You can transfer your logging system easily from the "baselines.logger" by modifying the import lines (i.e., ```from baselines import logger``` -> ```from RLA.easy_log import logger```).
 
 
 
@@ -96,6 +96,9 @@ The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 you can find a project demo from the "example" directory.
 
 # TODO
-- [x] to be compatible with Pytorch;  
 - [ ] add a video to visualize the workflow of RLA.
 - [ ] add comments and documents to other functions.
+- [ ] add an auto integration script.
+- [x] plot function can do average on varied length (time-step) of experiment curves.
+- [ ] download / upload experiment logs through timestamp
+

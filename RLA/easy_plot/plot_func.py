@@ -155,7 +155,8 @@ def plot_res_func(prefix_dir, regs, param_keys,
         else:
             scale_dict[value_keys[i]] = 1
     if replace_legend_keys is not None:
-        assert len(replace_legend_keys) == len(regs) and len(value_keys) == 1,  "In manual legend-key mode, the number of keys should be one-to-one matched with regs"
+        assert len(replace_legend_keys) == len(regs) and len(value_keys) == 1,  \
+            "In manual legend-key mode, the number of keys should be one-to-one matched with regs"
         # if len(replace_legend_keys) == len(regs):
         group_fn = lambda r: split_by_reg(taskpath=r, reg_group=reg_group, y_names=y_names)
         # elif len(value_keys) == len(replace_legend_keys):
