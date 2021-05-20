@@ -181,7 +181,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
         import os
 
         from RLA.easy_log.const import LOG, OTHER_RESULTS
-        dir_name = prefix_dir.replace(LOG, osp.join(OTHER_RESULTS, 'easy_plot'), 1)
+        dir_name = prefix_dir.replace(f"/{LOG}/", f"/{osp.join(OTHER_RESULTS, 'easy_plot')}/", 1)
         os.makedirs(dir_name, exist_ok=True)
 
         if lgd is not None:
