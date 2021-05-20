@@ -253,7 +253,7 @@ COLORS = ['blue', 'green', 'red',  'm', 'darkorange', 'k',
           'cyan', 'magenta', 'yellow', 'black', 'purple', 'pink',
         'brown',    'lightblue', 'lime', 'lavender', 'turquoise',
          'tan', 'salmon',   'darkred', 'darkblue',  'gold']
-
+PRETTY_COLORS = ['royalblue', 'orange', 'seagreen', 'deeppink', 'darkred', 'deepskyblue']
 
 def default_xy_fn(r, y_name):
     x = np.cumsum(r.monitor.l)
@@ -339,9 +339,12 @@ def plot_results(
 
     '''
     if vary_len_plot:
-        assert resample <=0, "plot varied length averaged lines only allowed in unresample mode."
+        assert resample <= 0, "plot varied length averaged lines only allowed in unresample mode."
     if colors is None:
-        colors = COLORS
+        if pretty:
+            colors = PRETTY_COLORS
+        else:
+            colors = COLORS
     if split_fn is None: split_fn = lambda _ : ''
     if group_fn is None: group_fn = lambda _ : ''
     sk2r = defaultdict(list) # splitkey2results
