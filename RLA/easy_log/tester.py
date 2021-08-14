@@ -216,10 +216,10 @@ class Tester(object):
         self.log_dir = log_dir
         self.code_dir = code_dir
 
-        self.init_logger()
+        self._init_logger()
         self.serialize_object_and_save()
         self.__copy_source_code(self.run_file, code_dir)
-        self.feed_hyper_params_to_tb()
+        self._feed_hyper_params_to_tb()
         self.print_log_dir()
 
     def update_log_files_location(self, root):
@@ -233,7 +233,7 @@ class Tester(object):
         self.code_dir = code_dir
         self.print_log_dir()
 
-    def init_logger(self):
+    def _init_logger(self):
         self.writer = None
         # logger configure
         logger.info("store file %s" % self.pkl_file)
@@ -258,7 +258,7 @@ class Tester(object):
             shutil.copytree(source_tester.log_dir, self.log_dir)
         else:
             logger.warn("[load warning]: can not find log dir")
-        self.init_logger()
+        self._init_logger()
 
     def task_gen(self, task_pattern_list):
         return '-'.join(task_pattern_list)
@@ -329,7 +329,7 @@ class Tester(object):
                 self.writer.flush()
             self.summary_add_dict[name].append(summary_ts)
 
-    def feed_hyper_params_to_tb(self):
+    def _feed_hyper_params_to_tb(self):
         if "tensorboard" not in self.private_config["LOG_USED"]:
             logger.info("skip feeding hyper-param to tb")
             return
