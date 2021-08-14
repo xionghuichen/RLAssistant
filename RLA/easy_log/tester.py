@@ -365,27 +365,20 @@ class Tester(object):
                                  password=self.private_config["REMOTE_SETTING"]["password"])
                 for root, dirs, files in os.walk(self.log_dir):
                     suffix = root.split("/{}/".format(LOG))
-                    assert len(suffix) == 2, "root should have only one pattern \"/log/\""
+                    assert len(suffix) == 2, "root should only have one pattern \"/log/\""
                     remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_log_root"], LOG, suffix[1])
                     local_root = root
                     logger.warn("sync {} <- {}".format(remote_root, local_root))
                     for file in files:
                         ftp.upload_file(remote_root, local_root, file)
-                # for root, dirs, files in os.walk(self.code_dir):
-                #     remote_root = osp.join(self.private_config.remote_porject_dir, root[3:])
-                #     local_root = root
-                #     logger.warn("sync {} <- {}".format(remote_root, local_root))
-                #     for file in files:
-                #         ftp.upload_file(remote_root, local_root, file)
-                # for root, dirs, files in os.walk(self.checkpoint_dir):
-                #     for file in files:
-                #         ftp.upload_file(remote_porject_dir + root[2:], root + '/', file)
 
                 logger.warn("sync: send success!")
             except Exception as e:
                 logger.warn("sending log file failed. {}".format(e))
                 import traceback
                 logger.warn(traceback.format_exc())
+        else:
+            logger.warn("SEND_LOG_FILE in rla_config.yaml is set to False. skip the sync process.")
 
     @classmethod
     def log_file_finder(cls, record_date, task_name='train', file_root='../checkpoint/', log_type='dir'):
