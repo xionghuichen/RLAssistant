@@ -83,43 +83,42 @@ class DeleteLogTool(BasicLogTool):
         super(DeleteLogTool, self).__init__(*args, **kwargs)
 
     def _find_small_timestep_log(self):
-        for log_type in self.log_types:
-            root_dir_regex = osp.join(self.proj_root, self.sub_proj, log_type, self.task, self.regex)
-            for root_dir in glob.glob(root_dir_regex):
-                if os.path.exists(root_dir):
-                    for file_list in os.walk(root_dir):
-                        if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
-                            target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
-                        else:
-                            target_reg = None
-                        if target_reg is not None:
-                            if LOG in root_dir_regex:
-                                try:
-                                    print(
-                                        re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(1))
-                                    raise RuntimeError("found repeated timestamp")
-                                except IndexError as e:
-                                    pass
-                                if file_list[1] == ['tb']: # in root of logdir
-                                    progress_csv_file = file_list[0] + '/progress.csv'
-                                    if not os.path.exists(progress_csv_file):
-                                        print("find an experiment without progress.csv. we will delete it", file_list[0])
-                                        self.small_timestep_regs.append(target_reg)
-                                    else:
-                                        with open(progress_csv_file, mode='r') as f:
-                                            counter = 0
-                                            for _ in f:
-                                                counter += 1
-                                        if counter < self.filter.timstep_bound:
-                                            self.small_timestep_regs.append(target_reg)
-                                            print("find an experiment with too small number of logs. we will delete it.", file_list[0])
-                                elif file_list[1] == ['events']: # in tb dir
-                                    pass
-                                elif 'events' in file_list[0]: # in event dir
-                                    pass
-                                else: # empty dir
+        root_dir_regex = osp.join(self.proj_root, self.sub_proj, LOG, self.task, self.regex)
+        for root_dir in glob.glob(root_dir_regex):
+            if os.path.exists(root_dir):
+                for file_list in os.walk(root_dir):
+                    if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
+                        target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
+                    else:
+                        target_reg = None
+                    if target_reg is not None:
+                        if LOG in root_dir_regex:
+                            try:
+                                print(
+                                    re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(1))
+                                raise RuntimeError("found repeated timestamp")
+                            except IndexError as e:
+                                pass
+                            if file_list[1] == ['tb']: # in root of logdir
+                                progress_csv_file = file_list[0] + '/progress.csv'
+                                if not os.path.exists(progress_csv_file):
+                                    print("find an experiment without progress.csv. we will delete it", file_list[0])
                                     self.small_timestep_regs.append(target_reg)
-                                    print("find an experiment without any files. we will delete it.", file_list[0])
+                                else:
+                                    with open(progress_csv_file, mode='r') as f:
+                                        counter = 0
+                                        for _ in f:
+                                            counter += 1
+                                    if counter < self.filter.timstep_bound:
+                                        self.small_timestep_regs.append(target_reg)
+                                        print("find an experiment with too small number of logs. we will delete it.", file_list[0])
+                            elif file_list[1] == ['events']: # in tb dir
+                                pass
+                            elif 'events' in file_list[0]: # in event dir
+                                pass
+                            else: # empty dir
+                                self.small_timestep_regs.append(target_reg)
+                                print("find an experiment without any files. we will delete it.", file_list[0])
 
     def _delete_related_log(self, regex, show=False):
         for log_type in self.log_types:
@@ -175,7 +174,7 @@ class DeleteLogTool(BasicLogTool):
         self._find_small_timestep_log()
         print("complete searching.")
         for reg in self.small_timestep_regs:
-            print("[delete small-timestep log related to] ", reg)
+            print("[delete small-timestep log] reg: ", reg)
             self._delete_related_log(show=True, regex=reg + '*')
         s = input("delete these files? (y/n)")
         if s == 'y':
