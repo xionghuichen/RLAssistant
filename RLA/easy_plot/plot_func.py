@@ -111,6 +111,7 @@ def word_replace_back(strings):
 def plot_res_func(prefix_dir, regs, param_keys,
                   value_keys, misc_scale=None, misc_scale_index=None,
                   replace_legend_keys=None,
+                  legend_rescale=None,
                   save_name=None,
                   resample=int(1e3), smooth_step=1.0,
                   ylabel=None, x_bound=None, y_bound=None, x_start=None, use_buf=False,
@@ -182,13 +183,14 @@ def plot_res_func(prefix_dir, regs, param_keys,
 
         from RLA.easy_log.const import LOG, OTHER_RESULTS
         dir_name = prefix_dir.replace(f"/{LOG}/", f"/{osp.join(OTHER_RESULTS, 'easy_plot')}/", 1)
-        os.makedirs(dir_name, exist_ok=True)
+        file_name = osp.join(dir_name, save_name)
+        os.makedirs(os.path.dirname(file_name), exist_ok=True)
 
         if lgd is not None:
-            plt.savefig(osp.join(dir_name, save_name), bbox_extra_artists=tuple([lgd] + texts), bbox_inches='tight')
+            plt.savefig(file_name, bbox_extra_artists=tuple([lgd] + texts), bbox_inches='tight')
         else:
-            plt.savefig(osp.join(dir_name, save_name), bbox_extra_artists=tuple(texts), bbox_inches='tight')
-        print("saved location: {}".format(osp.join(dir_name, save_name)))
+            plt.savefig(file_name, bbox_extra_artists=tuple(texts), bbox_inches='tight')
+        print("saved location: {}".format(file_name))
     plt.show()
     return g2lf
 
