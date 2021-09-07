@@ -6,9 +6,12 @@ import shutil
 import glob
 import re
 from RLA.easy_log.const import *
+from RLA.const import DEFAULT_X_NAME
 import stat
 import distutils.dir_util
 import yaml
+import pandas as pd
+import csv
 
 class Filter(object):
     ALL = 'all'
@@ -85,8 +88,10 @@ class DeleteLogTool(BasicLogTool):
     def _find_small_timestep_log(self):
         root_dir_regex = osp.join(self.proj_root, self.sub_proj, LOG, self.task, self.regex)
         for root_dir in glob.glob(root_dir_regex):
+            print("searching dirs", root_dir)
             if os.path.exists(root_dir):
                 for file_list in os.walk(root_dir):
+
                     if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
                         target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
                     else:
@@ -101,24 +106,30 @@ class DeleteLogTool(BasicLogTool):
                                 pass
                             if file_list[1] == ['tb']: # in root of logdir
                                 progress_csv_file = file_list[0] + '/progress.csv'
-                                if not os.path.exists(progress_csv_file):
-                                    print("find an experiment without progress.csv. we will delete it", file_list[0])
+                                if not os.path.exists(progress_csv_file) or os.path.getsize(progress_csv_file) == 0:
+                                    print("[delete] find an experiment without progress.csv.", file_list[0])
                                     self.small_timestep_regs.append(target_reg)
                                 else:
-                                    with open(progress_csv_file, mode='r') as f:
-                                        counter = 0
-                                        for _ in f:
-                                            counter += 1
-                                    if counter < self.filter.timstep_bound:
+                                    reader = pd.read_csv(progress_csv_file, chunksize=100000, quoting=csv.QUOTE_NONE,
+                                                         encoding='utf-8', index_col=False, comment='#')
+                                    raw_df = pd.DataFrame()
+                                    for chunk in reader:
+                                        slim_chunk = chunk[[DEFAULT_X_NAME]]
+                                        raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
+                                    last_timestep = raw_df[DEFAULT_X_NAME].max()
+                                    print("[found a log] time_step ", last_timestep, target_reg)
+                                    if last_timestep < self.filter.timstep_bound:
                                         self.small_timestep_regs.append(target_reg)
-                                        print("find an experiment with too small number of logs. we will delete it.", file_list[0])
+                                        print("[delete] find an experiment with too small number of logs. ", file_list[0])
+                                    else:
+                                        print("[valid]")
                             elif file_list[1] == ['events']: # in tb dir
                                 pass
                             elif 'events' in file_list[0]: # in event dir
                                 pass
                             else: # empty dir
                                 self.small_timestep_regs.append(target_reg)
-                                print("find an experiment without any files. we will delete it.", file_list[0])
+                                print("[delete] find an experiment without any files. ", file_list[0])
 
     def _delete_related_log(self, regex, show=False):
         for log_type in self.log_types:
@@ -179,7 +190,7 @@ class DeleteLogTool(BasicLogTool):
         s = input("delete these files? (y/n)")
         if s == 'y':
             for reg in self.small_timestep_regs:
-                print("do delete ...", reg)
+                print("do delete: ", reg)
                 self._delete_related_log(show=False, regex=reg + '*')
 
 
