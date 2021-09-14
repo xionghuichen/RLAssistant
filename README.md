@@ -100,5 +100,6 @@ you can find a project demo from the "example" directory.
 - [ ] add comments and documents to other functions.
 - [ ] add an auto integration script.
 - [x] plot function can do average on varied length (time-step) of experiment curves.
-- [ ] download / upload experiment logs through timestamp
+- [ ] download / upload experiment logs through timestamp;
+- [ ] remove the "run_file" setting. It is confusing and unnecessary.
 
