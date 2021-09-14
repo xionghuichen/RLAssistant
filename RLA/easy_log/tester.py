@@ -26,12 +26,14 @@ class ExperimentLoader(object):
         self.task_name = None
         self.record_date = None
         self.root = None
+        self.inherit_hp = None
         pass
 
-    def config(self, task_name, record_date, root):
+    def config(self, task_name, record_date, root, inherit_hp):
         self.task_name = task_name
         self.record_date = record_date
         self.root = root
+        self.inherit_hp = inherit_hp
 
     @property
     def is_valid_config(self):
@@ -60,7 +62,10 @@ class ExperimentLoader(object):
             load_iter, load_res = loaded_tester.load_checkpoint()
             tester.time_step_holder.set_time(load_iter)
             tester.print_log_dir()
-            return load_iter, load_res
+            if self.inherit_hp:
+                return load_iter, load_res
+            else:
+                return 0, load_res
         else:
             return 0, {}
 
@@ -196,6 +201,9 @@ class Tester(object):
 
         """
         self.hyper_param = argkw
+
+    def update_hyper_param(self, k, v):
+        self.hyper_param[k] = v
 
     def clear_record_param(self):
         self.hyper_param_record = []
