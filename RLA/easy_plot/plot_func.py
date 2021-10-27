@@ -109,7 +109,9 @@ def word_replace_back(strings):
 
 
 def plot_res_func(prefix_dir, regs, param_keys,
-                  value_keys, misc_scale=None, misc_scale_index=None,
+                  value_keys,
+                  scale_dict=None,
+                  # misc_scale=None, misc_scale_index=None,
                   replace_legend_keys=None,
                   legend_rescale=None,
                   save_name=None,
@@ -147,14 +149,16 @@ def plot_res_func(prefix_dir, regs, param_keys,
     y_names = value_keys # []
     if ylabel is None:
         ylabel = value_keys
-    scale_dict = {}
-    if misc_scale_index is None:
-        misc_scale_index = []
+    final_scale_dict = {}
+    # if misc_scale_index is None:
+    #     misc_scale_index = []
     for i in range(len(value_keys)):
-        if i in misc_scale_index:
-            scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
-        else:
-            scale_dict[value_keys[i]] = 1
+        # if i in misc_scale_index:
+        #     scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
+        # else:
+        final_scale_dict[value_keys[i]] = 1
+    if scale_dict is not None:
+        final_scale_dict.update(scale_dict)
     if replace_legend_keys is not None:
         assert len(replace_legend_keys) == len(regs) and len(value_keys) == 1,  \
             "In manual legend-key mode, the number of keys should be one-to-one matched with regs"
@@ -169,7 +173,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
                                            key_to_legend_fn=key_to_legend_fn)
 
     _, _, lgd, texts, g2lf = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
-                                                                                           scale_dict, x_start=x_start, y_bound=y_bound,
+                                                                                           final_scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
                            # split_fn=lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names)[0],
