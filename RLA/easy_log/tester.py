@@ -299,11 +299,11 @@ class Tester(object):
                     v = self.hyper_param[sub_k_list[0]]
                     for sub_k in sub_k_list[1:]:
                         v = v[sub_k]
-                    self.hyper_param_record.append(str(k) + '=' + str(v).replace('[', '{').replace(']', '}'))
+                    self.hyper_param_record.append(str(k) + '=' + str(v).replace('[', '{').replace(']', '}').replace('/', '_'))
                 except KeyError as e:
                     print("do not include dot ('.') in your hyperparemeter name")
             else:
-                self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}'))
+                self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}').replace('/', '_'))
 
     def add_summary_to_logger(self, summary, name='', simple_val=False, freq=20):
         if "tensorboard" not in self.private_config["LOG_USED"]:
