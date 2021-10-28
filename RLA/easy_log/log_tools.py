@@ -104,8 +104,8 @@ class DeleteLogTool(BasicLogTool):
                                 raise RuntimeError("found repeated timestamp")
                             except IndexError as e:
                                 pass
-                            if file_list[1] == ['tb']: # in root of logdir
-                                progress_csv_file = file_list[0] + '/progress.csv'
+                            progress_csv_file = file_list[0] + '/progress.csv'
+                            if file_list[1] == ['tb'] or os.path.exists(progress_csv_file): # in root of logdir
                                 if not os.path.exists(progress_csv_file) or os.path.getsize(progress_csv_file) == 0:
                                     print("[delete] find an experiment without progress.csv.", file_list[0])
                                     self.small_timestep_regs.append(target_reg)
@@ -184,14 +184,16 @@ class DeleteLogTool(BasicLogTool):
     def delete_small_timestep_log(self):
         self._find_small_timestep_log()
         print("complete searching.")
-        for reg in self.small_timestep_regs:
-            print("[delete small-timestep log] reg: ", reg)
-            self._delete_related_log(show=True, regex=reg + '*')
-        s = input("delete these files? (y/n)")
+        s = input("show files to be deletes? (y/n)")
         if s == 'y':
             for reg in self.small_timestep_regs:
-                print("do delete: ", reg)
-                self._delete_related_log(show=False, regex=reg + '*')
+                print("[delete small-timestep log] reg: ", reg)
+                self._delete_related_log(show=True, regex=reg + '*')
+            s = input("delete these files? (y/n)")
+            if s == 'y':
+                for reg in self.small_timestep_regs:
+                    print("do delete: ", reg)
+                    self._delete_related_log(show=False, regex=reg + '*')
 
 
 class ArchiveLogTool(BasicLogTool):
