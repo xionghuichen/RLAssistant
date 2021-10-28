@@ -16,9 +16,9 @@ setup(
                         if package.startswith("RLA")],
         platforms=["all"],
         install_requires=[
-            "pyyaml",
-            "argparse",
-            "dill",
-            "seaborn"
+            "pyyaml<=5.3.1",
+            "argparse<=1.4.0",
+            "dill<=0.3.4",
+            "seaborn<=0.11.1"
         ]
     )
