@@ -167,7 +167,7 @@ class Tester(object):
         self.saver = None
         self.dl_framework = None
 
-    def configure(self, task_name, private_config_path, run_file, log_root):
+    def configure(self, task_name, private_config_path, log_root, run_file=None):
         """
 
         :param task_name:
@@ -442,6 +442,7 @@ class Tester(object):
             assert os.listdir(code_dir) == []
             os.removedirs(code_dir)
             shutil.copytree(osp.join(self.project_root, self.private_config["BACKUP_CONFIG"]["lib_dir"]), code_dir)
+            assert run_file is not None, "you should define the run_file in lib backup mode."
             shutil.copy(run_file, code_dir)
         elif self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'source':
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:

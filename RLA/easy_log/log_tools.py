@@ -110,19 +110,23 @@ class DeleteLogTool(BasicLogTool):
                                     print("[delete] find an experiment without progress.csv.", file_list[0])
                                     self.small_timestep_regs.append(target_reg)
                                 else:
-                                    reader = pd.read_csv(progress_csv_file, chunksize=100000, quoting=csv.QUOTE_NONE,
-                                                         encoding='utf-8', index_col=False, comment='#')
-                                    raw_df = pd.DataFrame()
-                                    for chunk in reader:
-                                        slim_chunk = chunk[[DEFAULT_X_NAME]]
-                                        raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
-                                    last_timestep = raw_df[DEFAULT_X_NAME].max()
-                                    print("[found a log] time_step ", last_timestep, target_reg)
-                                    if last_timestep < self.filter.timstep_bound:
-                                        self.small_timestep_regs.append(target_reg)
-                                        print("[delete] find an experiment with too small number of logs. ", file_list[0])
-                                    else:
-                                        print("[valid]")
+                                    try:
+                                        reader = pd.read_csv(progress_csv_file, chunksize=100000, quoting=csv.QUOTE_NONE,
+                                                             encoding='utf-8', index_col=False, comment='#')
+                                        raw_df = pd.DataFrame()
+                                        for chunk in reader:
+                                            slim_chunk = chunk[[DEFAULT_X_NAME]]
+                                            raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
+                                        last_timestep = raw_df[DEFAULT_X_NAME].max()
+                                        print("[found a log] time_step ", last_timestep, target_reg)
+                                        if last_timestep < self.filter.timstep_bound:
+                                            self.small_timestep_regs.append(target_reg)
+                                            print("[delete] find an experiment with too small number of logs. ", file_list[0])
+                                        else:
+                                            print("[valid]")
+                                    except Exception as e:
+                                        print("Load progress.csv failed", e, "reg", target_reg)
+                                        pass
                             elif file_list[1] == ['events']: # in tb dir
                                 pass
                             elif 'events' in file_list[0]: # in event dir
