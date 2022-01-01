@@ -253,7 +253,7 @@ COLORS = ['blue', 'green', 'red',  'm', 'darkorange', 'k',
           'cyan', 'magenta', 'yellow', 'black', 'purple', 'pink',
         'brown',    'lightblue', 'lime', 'lavender', 'turquoise',
          'tan', 'salmon',   'darkred', 'darkblue',  'gold']
-PRETTY_COLORS = ['royalblue', 'orange', 'seagreen', 'deeppink', 'darkred', 'deepskyblue']
+PRETTY_COLORS = ['orangered',  'royalblue', 'forestgreen',  'orange', 'deeppink', 'deepskyblue']
 
 def default_xy_fn(r, y_name):
     x = np.cumsum(r.monitor.l)
@@ -506,15 +506,15 @@ def plot_results(
                     if shaded_err:
                         res = g2lf[original_legend_keys[index] + '-se']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-err : ({:.4f} \pm {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-err : ({:.2f} \pm {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                     if shaded_std:
                         res = g2lf[original_legend_keys[index] + '-ss']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-std :({:.4f} \pm {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-std :({:.2f} \pm {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                     if shaded_range:
                         res = g2lf[original_legend_keys[index] + '-sr']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-range : ({:.4f}, {:.4f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-range : ({:.2f}, {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
 
             if bound_line is not None:
                 for bl in bound_line:
