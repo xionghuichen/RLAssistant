@@ -26,12 +26,14 @@ class ExperimentLoader(object):
         self.task_name = None
         self.record_date = None
         self.root = None
+        self.inherit_hp = None
         pass
 
-    def config(self, task_name, record_date, root):
+    def config(self, task_name, record_date, root, inherit_hp):
         self.task_name = task_name
         self.record_date = record_date
         self.root = root
+        self.inherit_hp = inherit_hp
 
     @property
     def is_valid_config(self):
@@ -60,7 +62,10 @@ class ExperimentLoader(object):
             load_iter, load_res = loaded_tester.load_checkpoint()
             tester.time_step_holder.set_time(load_iter)
             tester.print_log_dir()
-            return load_iter, load_res
+            if self.inherit_hp:
+                return load_iter, load_res
+            else:
+                return 0, load_res
         else:
             return 0, {}
 
@@ -162,7 +167,7 @@ class Tester(object):
         self.saver = None
         self.dl_framework = None
 
-    def configure(self, task_name, private_config_path, run_file, log_root):
+    def configure(self, task_name, private_config_path, log_root, run_file=None):
         """
 
         :param task_name:
@@ -196,6 +201,9 @@ class Tester(object):
 
         """
         self.hyper_param = argkw
+
+    def update_hyper_param(self, k, v):
+        self.hyper_param[k] = v
 
     def clear_record_param(self):
         self.hyper_param_record = []
@@ -291,11 +299,11 @@ class Tester(object):
                     v = self.hyper_param[sub_k_list[0]]
                     for sub_k in sub_k_list[1:]:
                         v = v[sub_k]
-                    self.hyper_param_record.append(str(k) + '=' + str(v).replace('[', '{').replace(']', '}'))
+                    self.hyper_param_record.append(str(k) + '=' + str(v).replace('[', '{').replace(']', '}').replace('/', '_'))
                 except KeyError as e:
                     print("do not include dot ('.') in your hyperparemeter name")
             else:
-                self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}'))
+                self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}').replace('/', '_'))
 
     def add_summary_to_logger(self, summary, name='', simple_val=False, freq=20):
         if "tensorboard" not in self.private_config["LOG_USED"]:
@@ -427,6 +435,7 @@ class Tester(object):
             assert os.listdir(code_dir) == []
             os.removedirs(code_dir)
             shutil.copytree(osp.join(self.project_root, self.private_config["BACKUP_CONFIG"]["lib_dir"]), code_dir)
+            assert run_file is not None, "you should define the run_file in lib backup mode."
             shutil.copy(run_file, code_dir)
         elif self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'source':
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:

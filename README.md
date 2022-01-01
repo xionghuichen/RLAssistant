@@ -79,7 +79,7 @@ logger.dump_tabular()
 
 these files are stored in "LOG_ROOT/log/log_name/"
 
-Figures: you can record figures easily by the api in RLA.easy_log.simple_mat_plot
+**Figures**: you can record figures easily by the api in RLA.easy_log.simple_mat_plot
 
 ```python
 from RLA.easy_log.simple_mat_plot import *
@@ -87,7 +87,7 @@ simple_plot(name="test_plot", data=[[1,2,3,4,5,6]])
 ```
 the figure will be stored in "LOG_ROOT/results/log_name/"
 
-Hyper-parameters: the hyperparameters will be recorded in the "text" tab of Tensorboard and a pickle file of Tester object.
+**Hyper-parameters**: the hyperparameters will be recorded in the "text" tab of Tensorboard and a pickle file of Tester object.
 The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
 
 
@@ -100,5 +100,6 @@ you can find a project demo from the "example" directory.
 - [ ] add comments and documents to other functions.
 - [ ] add an auto integration script.
 - [x] plot function can do average on varied length (time-step) of experiment curves.
-- [ ] download / upload experiment logs through timestamp
+- [ ] download / upload experiment logs through timestamp;
+- [ ] remove the "run_file" setting. It is confusing and unnecessary.
 

@@ -231,10 +231,11 @@ def load_results(root_dir_or_dirs, names, x_bound, enable_progress=True, use_buf
                             result['progress'] = raw_df
                         except pandas.errors.EmptyDataError:
                             print('skipping progress file in ', dirname, 'empty data')
-                        except Exception:
+                        except Exception as e:
                             for name in names:
                                 if name not in slim_chunk.columns:
                                     print("[error keys]: {}".format(name))
+                            print("other read error :", e)
 
                     else:
                         if verbose: print('skipping %s: no progress file'%dirname)

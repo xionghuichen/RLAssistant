@@ -117,7 +117,7 @@ class FTPHandler(object):
         for file in files:
             remote_path = remote_root + file
             local_path = local_root + file
-            dir =self.get_dir(local_path)
+            dir = self.get_dir(local_path)
             if not os.path.exists(dir):
                 os.makedirs(dir)
             self.download_file(remote_path, local_path)

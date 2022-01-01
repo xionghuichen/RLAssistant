@@ -8,12 +8,13 @@ import os
 
 
 def simple_scatter(name, datas, texts, pretty=False, xlabel='', ylabel='',
-                   cover=False, *args, **kwargs):
+                   cover=False, save_path=None, *args, **kwargs):
     import os.path as osp
-    if pretty:
-        save_path = osp.join(tester.results_dir, name + '.pdf')
-    else:
-        save_path = osp.join(tester.results_dir, name + '.png')
+    if save_path is None:
+        if pretty:
+            save_path = osp.join(tester.results_dir, name + '.pdf')
+        else:
+            save_path = osp.join(tester.results_dir, name + '.png')
     if not osp.exists(save_path) or cover:
         from matplotlib import pyplot as plt
         from matplotlib.ticker import ScalarFormatter
@@ -44,13 +45,14 @@ def simple_scatter(name, datas, texts, pretty=False, xlabel='', ylabel='',
         plt.savefig(save_path, bbox_extra_artists=tuple(texts), bbox_inches='tight')
 
 
-def simple_hist(name, data, labels=None, pretty=False, xlabel='', ylabel='',
-                colors=None, styles=None, cover=False, *args, **kwargs):
+def simple_hist(name, data, labels=None, pretty=False, xlabel='', ylabel='', title=None,
+                colors=None, styles=None, cover=False, save_path=None,*args, **kwargs):
     import os.path as osp
-    if pretty:
-        save_path = osp.join(tester.results_dir, name + '.pdf')
-    else:
-        save_path = osp.join(tester.results_dir, name + '.png')
+    if save_path is None:
+        if pretty:
+            save_path = osp.join(tester.results_dir, name + '.pdf')
+        else:
+            save_path = osp.join(tester.results_dir, name + '.png')
     if not osp.exists(save_path) or cover:
         from matplotlib import pyplot as plt
         from matplotlib.ticker import ScalarFormatter
@@ -78,19 +80,21 @@ def simple_hist(name, data, labels=None, pretty=False, xlabel='', ylabel='',
         # xfmt.set_powerlimits((-2, 2))  # Or whatever your limits are . . .
         # plt.gca().yaxis.set_major_formatter(xfmt)
         # plt.gcf().subplots_adjust(bottom=0.12, left=0.12)
-        # plt.title(name, fontsize=7)
+        plt.title(title, fontsize=7)
         save_dir = '/'.join(save_path.split('/')[:-1])
         os.makedirs(save_dir, exist_ok=True)
         plt.savefig(save_path)
 
 
 def simple_plot(name, data=None, x=None, y=None, labels=None, pretty=False, xlabel='', ylabel='',
-                colors=None, styles=None, cover=False, title=None, legend_outside=False, *args, **kwargs):
+                colors=None, styles=None, cover=False, title=None, legend_outside=False,
+                save_path=None, *args, **kwargs):
     import os.path as osp
-    if pretty:
-        save_path = osp.join(tester.results_dir, name + '.pdf')
-    else:
-        save_path = osp.join(tester.results_dir, name + '.png')
+    if save_path is None:
+        if pretty:
+            save_path = osp.join(tester.results_dir, name + '.pdf')
+        else:
+            save_path = osp.join(tester.results_dir, name + '.png')
 
     if not osp.exists(save_path) or cover:
         from matplotlib import pyplot as plt

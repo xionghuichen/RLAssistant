@@ -109,8 +109,11 @@ def word_replace_back(strings):
 
 
 def plot_res_func(prefix_dir, regs, param_keys,
-                  value_keys, misc_scale=None, misc_scale_index=None,
+                  value_keys,
+                  scale_dict=None,
+                  # misc_scale=None, misc_scale_index=None,
                   replace_legend_keys=None,
+                  legend_rescale=None,
                   save_name=None,
                   resample=int(1e3), smooth_step=1.0,
                   ylabel=None, x_bound=None, y_bound=None, x_start=None, use_buf=False,
@@ -146,14 +149,16 @@ def plot_res_func(prefix_dir, regs, param_keys,
     y_names = value_keys # []
     if ylabel is None:
         ylabel = value_keys
-    scale_dict = {}
-    if misc_scale_index is None:
-        misc_scale_index = []
+    final_scale_dict = {}
+    # if misc_scale_index is None:
+    #     misc_scale_index = []
     for i in range(len(value_keys)):
-        if i in misc_scale_index:
-            scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
-        else:
-            scale_dict[value_keys[i]] = 1
+        # if i in misc_scale_index:
+        #     scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
+        # else:
+        final_scale_dict[value_keys[i]] = 1
+    if scale_dict is not None:
+        final_scale_dict.update(scale_dict)
     if replace_legend_keys is not None:
         assert len(replace_legend_keys) == len(regs) and len(value_keys) == 1,  \
             "In manual legend-key mode, the number of keys should be one-to-one matched with regs"
@@ -168,7 +173,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
                                            key_to_legend_fn=key_to_legend_fn)
 
     _, _, lgd, texts, g2lf = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
-                                                                                           scale_dict, x_start=x_start, y_bound=y_bound,
+                                                                                           final_scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
                            # split_fn=lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names)[0],
@@ -182,13 +187,14 @@ def plot_res_func(prefix_dir, regs, param_keys,
 
         from RLA.easy_log.const import LOG, OTHER_RESULTS
         dir_name = prefix_dir.replace(f"/{LOG}/", f"/{osp.join(OTHER_RESULTS, 'easy_plot')}/", 1)
-        os.makedirs(dir_name, exist_ok=True)
+        file_name = osp.join(dir_name, save_name)
+        os.makedirs(os.path.dirname(file_name), exist_ok=True)
 
         if lgd is not None:
-            plt.savefig(osp.join(dir_name, save_name), bbox_extra_artists=tuple([lgd] + texts), bbox_inches='tight')
+            plt.savefig(file_name, bbox_extra_artists=tuple([lgd] + texts), bbox_inches='tight')
         else:
-            plt.savefig(osp.join(dir_name, save_name), bbox_extra_artists=tuple(texts), bbox_inches='tight')
-        print("saved location: {}".format(osp.join(dir_name, save_name)))
+            plt.savefig(file_name, bbox_extra_artists=tuple(texts), bbox_inches='tight')
+        print("saved location: {}".format(file_name))
     plt.show()
     return g2lf
 
