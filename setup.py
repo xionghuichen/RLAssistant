@@ -19,6 +19,6 @@ setup(
             "pyyaml<=5.3.1",
             # "argparse<=1.4.0",
             "dill<=0.3.4",
-            "seaborn<=0.11.2"
+            "seaborn"
         ]
     )
