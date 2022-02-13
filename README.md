@@ -5,8 +5,18 @@ RLA is a tool for managing your RL experiments automatically (e.g., your hyper-p
 The logger function of RLA is forked from and compatible with the logger object in [openai/baselines](https://github.com/openai/baselines). You can transfer your logging system easily from the "baselines.logger" by modifying the import lines (i.e., ```from baselines import logger``` -> ```from RLA.easy_log import logger```).
 
 
-
+## Installation
+```angular2html
+git clone https://github.com/xionghuichen/RLAssistant.git
+cd RLAssistant
+python setup.py install
+```
+## 
 ## Quickstart
+
+We build a example project for integrating RLA, which can be seen in example
+
+Step1: 
 
 Step1: config config.yaml
 
