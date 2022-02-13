@@ -22,7 +22,7 @@ if __name__=='__main__':
     args = argsparser()
     filter = Filter()
     filter.config(type=args.delete_type, timstep_bound=args.timestep_bound)
-    dlt = DeleteLogTool(proj_root='./example/project_name/', sub_proj=args.sub_proj, task=args.task, regex=args.reg,
+    dlt = DeleteLogTool(proj_root='../example/project_name/', sub_proj=args.sub_proj, task=args.task, regex=args.reg,
                         filter=filter)
     if args.delete_type == Filter.ALL:
         dlt.delete_related_log()

@@ -10,7 +10,6 @@ import warnings
 import numpy as np
 from collections import defaultdict, deque
 
-import tensorflow as tf
 
 from contextlib import contextmanager
 from RLA.const import DEFAULT_X_NAME
@@ -203,6 +202,7 @@ def summary_val(key, value):
     :param value: (float)
     """
     kwargs = {'tag': key, 'simple_value': float(value)}
+    import tensorflow as tf
     return tf.Summary.Value(**kwargs)
 
 

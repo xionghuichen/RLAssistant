@@ -19,7 +19,7 @@ def get_param():
 kwargs = get_param()
 task_name = 'demo_task'
 log_root = '../'
-tester.configure(task_name, private_config_path='../../rla_config.yaml', run_file='main.py', log_root=log_root)
+tester.configure(task_name, private_config_path='../../../rla_config.yaml', run_file='main.py', log_root=log_root)
 tester.log_files_gen()
 tester.print_args()
 
