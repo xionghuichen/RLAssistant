@@ -127,31 +127,3 @@ class FTPHandler(object):
     def close(self):
         self.ftp.quit()
         self.ftp.close()
-
-
-
-if __name__ == "__main__":
-    # downloadfiles('./test', '~/Project/SRG/SRG/utils')
-    import json
-    # ftp_server = '114.212.85.224'
-    # username = 'amax'
-    # password = 'chenxh95'
-    # ftp = FTPHandler(ftp_server=ftp_server, username=username, password=password, ignore='../../.gitignore')
-    # files = []
-    # root_path = 'chenxh/SRG/SRG/utils' # note without last '/'
-    # ftp.all_file_search(root_path, files, len(root_path))
-    # print(json.dumps(files, indent=1))
-    # left_files = ftp.ignore_match(files)
-    # print(json.dumps(left_files, indent=1))
-    # ftp.download_files(left_files, root_path, './test')
-    # ---
-    ftp_server = '114.212.22.34'
-    username = 'amax'
-    password = 'chenxh95'
-    ftp = FTPHandler(ftp_server=ftp_server, username=username, password=password, ignore='../.gitignore')
-    remote_dir = 'chenxh/ftptest/'
-    local_dir = './'
-    local_file = 'auto_ftp.py'
-    print(" upload--- ---")
-    ftp.upload_file(remote_dir, local_dir, local_file)
-    # ftp.upload_file(remote_dir, local_dir, local_file)

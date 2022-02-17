@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='RLA',
-        version=0.3,
+        version=0.4,
         description=(
             'RL assistant'
         ),
@@ -16,10 +16,10 @@ setup(
                         if package.startswith("RLA")],
         platforms=["all"],
         install_requires=[
-            "pyyaml<=5.3.1",
-            # "argparse<=1.4.0",
-            "dill<=0.3.4",
-            "seaborn<=0.11.2",
+            "pyyaml<=5.4.1",
+            "argparse",
+            "dill",
+            "seaborn",
             "pathspec"
         ]
     )

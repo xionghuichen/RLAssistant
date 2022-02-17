@@ -98,7 +98,7 @@ def csv_to_xy(r, x_name, y_name, scale_dict, x_bound=None, x_start=None, y_bound
         x = x[filter_index]
         y = y[filter_index]
 
-    y = y * scale_dict[y_name]
+    y = scale_dict[y_name](y)
     return x, y
 
 def word_replace(string):
@@ -156,7 +156,7 @@ def plot_res_func(prefix_dir, regs, param_keys,
         # if i in misc_scale_index:
         #     scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
         # else:
-        final_scale_dict[value_keys[i]] = 1
+        final_scale_dict[value_keys[i]] = lambda x: x
     if scale_dict is not None:
         final_scale_dict.update(scale_dict)
     if replace_legend_keys is not None:

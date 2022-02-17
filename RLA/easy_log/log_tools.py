@@ -46,33 +46,6 @@ class DownloadLogTool(BasicLogTool):
             for root_dir in glob.glob(root_dir_regex):
 
                 pass
-        # try:
-        #     ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
-        #                      username=self.private_config["REMOTE_SETTING"]["username"],
-        #                      password=self.private_config["REMOTE_SETTING"]["password"])
-        #     for root, dirs, files in os.walk(self.log_dir):
-        #         suffix = root.split("/{}/".format(LOG))
-        #         assert len(suffix) == 2, "root should have only one pattern \"/log/\""
-        #         remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_log_root"], LOG, suffix[1])
-        #         local_root = root
-        #         print("sync {} <- {}".format(remote_root, local_root))
-        #         for file in files:
-        #             ftp.upload_file(remote_root, local_root, file)
-        #     # for root, dirs, files in os.walk(self.code_dir):
-        #     #     remote_root = osp.join(self.private_config.remote_porject_dir, root[3:])
-        #     #     local_root = root
-        #     #     logger.warn("sync {} <- {}".format(remote_root, local_root))
-        #     #     for file in files:
-        #     #         ftp.upload_file(remote_root, local_root, file)
-        #     # for root, dirs, files in os.walk(self.checkpoint_dir):
-        #     #     for file in files:
-        #     #         ftp.upload_file(remote_porject_dir + root[2:], root + '/', file)
-        #
-        #     print("sync: send success!")
-        # except Exception as e:
-        #     print("sending log file failed. {}".format(e))
-        #     import traceback
-        #     print(traceback.format_exc())
 
 class DeleteLogTool(BasicLogTool):
     def __init__(self, proj_root, sub_proj, task, regex, filter, *args, **kwargs):
@@ -142,6 +115,7 @@ class DeleteLogTool(BasicLogTool):
             for root_dir in glob.glob(root_dir_regex):
                 empty = False
                 if os.path.exists(root_dir):
+                    print("find a matched experiment", root_dir)
                     for file_list in os.walk(root_dir):
                         # walk into the leave of the file-tree.
                         for name in file_list[2]:
@@ -151,7 +125,8 @@ class DeleteLogTool(BasicLogTool):
                                     os.remove(os.path.join(file_list[0], name))
                                 except PermissionError as e:
                                     print("skip the permission error file")
-                        print("delete sub-dir {}".format(file_list[0]))
+                        if not show:
+                            print("delete sub-dir {}".format(file_list[0]))
                         # if not show:
                         #     if len(os.listdir(file_list[0])) == 0:
                         #         cur_dir = file_list[0]
@@ -165,15 +140,14 @@ class DeleteLogTool(BasicLogTool):
                     if os.path.isdir(root_dir):
                         if not show:
                             try:
+                                print("--- delete dir {} ---".format(root_dir))
                                 shutil.rmtree(root_dir, ignore_errors=True)
-
                             except PermissionError as e:
                                 print("skip the permission error file")
-                        print("--- delete dir {} ---".format(root_dir))
                     else:
                         if not show:
                             os.remove(root_dir)
-                        print("--- delete root file {} ---".format(root_dir))
+                            print("--- delete root file {} ---".format(root_dir))
                 else:
                     print("not dir {}".format(root_dir))
             if empty: print("empty regex {}".format(root_dir_regex))
