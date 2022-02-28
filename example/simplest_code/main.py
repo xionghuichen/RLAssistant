@@ -1,42 +1,48 @@
-from RLA.easy_log.tester import tester
+from RLA.easy_log.tester import exp_manager
 from RLA.easy_log import logger
 from RLA.easy_log.tools import time_record, time_record_end
 from RLA.easy_log.simple_mat_plot import simple_plot
+from RLA.rla_argparser import arg_parser_postprocess
 import numpy as np
 import argparse
 
+# phase 1: init your hyper-parameters
 def get_param():
     parser = argparse.ArgumentParser("Tensorflow Implementation of Variational Sequence")
     parser.add_argument('--seed', help='RNG seed', type=int, default=88)
-    parser.add_argument('--env_id', help='environment ID', default='Hopper-v4')
-    parser.add_argument('--load_date', default='')
+    parser.add_argument('--env_id', help='environment ID', default='Test-v1')
+    parser.add_argument('--hp1', help='a hyperparameter', default=1., type=float)
+    parser = arg_parser_postprocess(parser)
     args = parser.parse_args()
     kwargs = vars(args)
-    tester.set_hyper_param(**kwargs)
-    tester.add_record_param(["env_id"])
+    exp_manager.set_hyper_param(**kwargs)
+    exp_manager.add_record_param(["env_id"])
     return kwargs
 
+# phase 2: init the RLA experiment manager.
 kwargs = get_param()
 task_name = 'demo_task'
 log_root = '../'
-tester.configure(task_name, private_config_path='../../../rla_config.yaml', run_file='main.py', log_root=log_root)
-tester.log_files_gen()
-tester.print_args()
+exp_manager.configure(task_name, private_config_path='../../../rla_config.yaml', log_root=log_root)
+exp_manager.log_files_gen()
+exp_manager.print_args()
 
-if kwargs["load_date"] is not '':
-    from RLA.easy_log.tester import load_tester_from_record_date
-    load_tester_from_record_date(fork_hp=False, task_name=task_name, record_date=kwargs["load_ddate"])
-    start_epoch = tester.time_step_holder.get_time()
-else:
-    start_epoch = 0
+start_epoch = 0
+# phase 3: [optional] resume from a historical experiment.
+from RLA.easy_log.exp_loader import exp_loader
+exp_loader.fork_log_files()
+start_epoch, load_res, hist_variables = exp_loader.load_from_record_date(variable_list=['iv'])
 
+# phase 4: write your code.
 import tensorflow as tf
-
-X_ph = tf.placeholder(dtype=tf.float32, shape=[None, 32], name='x')
+X_ph = tf.placeholder(dtype=tf.float32, shape=[None, 2], name='x')
+r_ph = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='x')
 l = X_ph
 for _ in range(10):
     l = tf.layers.dense(l, 16, kernel_initializer=tf.keras.initializers.glorot_normal)
-
+out = tf.layers.dense(l, 1, kernel_initializer=tf.keras.initializers.glorot_normal)
+loss = tf.reduce_mean(np.square(l - r_ph))
+tf.train.Adam
 sess = tf.Session().__enter__()
 sess.run(tf.variables_initializer(tf.global_variables()))
 tester.new_saver(var_prefix='', max_to_keep=1)

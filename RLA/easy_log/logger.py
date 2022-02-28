@@ -12,7 +12,7 @@ from collections import defaultdict, deque
 
 
 from contextlib import contextmanager
-from RLA.const import DEFAULT_X_NAME
+from RLA.const import DEFAULT_X_NAME, FRAMEWORK
 
 DEBUG = 10
 INFO = 20
@@ -140,6 +140,7 @@ class JSONOutputFormat(KVWriter):
         closes the file
         """
         self.file.close()
+
 class CSVOutputFormat(KVWriter):
     def __init__(self, filename):
         """
@@ -220,34 +221,98 @@ def valid_float_value(value):
         return False
 
 
+
 class TensorBoardOutputFormat(KVWriter):
     """
     Dumps key/value pairs into TensorBoard's numeric format.
     """
-    def __init__(self, dir):
+    def __init__(self, dir, framework):
         os.makedirs(dir, exist_ok=True)
+        self.framework = framework
         self.dir = dir
         self.step = 1
         prefix = 'events'
         path = osp.join(osp.abspath(dir), prefix)
-        import tensorflow as tf
-        from tensorflow.python import pywrap_tensorflow
-        from tensorflow.core.util import event_pb2
-        from tensorflow.python.util import compat
-        self.tf = tf
-        self.event_pb2 = event_pb2
-        self.pywrap_tensorflow = pywrap_tensorflow
-        self.writer = tf.summary.FileWriter(path) # pywrap_tensorflow.EventsWriter(compat.as_bytes(path))
+        if self.framework == FRAMEWORK.tensorflow:
+            import tensorflow as tf
+            self.tf_writer = tf.summary.FileWriter(path)
+            self.tfx_writer = None
+            from tensorflow.python import pywrap_tensorflow
+            from tensorflow.core.util import event_pb2
+            from tensorflow.python.util import compat
+            self.tf = tf
+            self.event_pb2 = event_pb2
+            self.pywrap_tensorflow = pywrap_tensorflow
+        elif self.framework == FRAMEWORK.torch:
+            self.tf_writer = None
+            from tensorboardX import SummaryWriter
+            self.tfx_writer = SummaryWriter(path)
+        else:
+            raise NotImplementedError
+        # try:
+        #     # self.writer = tf.summary.FileWriter(path) # pywrap_tensorflow.EventsWriter(compat.as_bytes(path))
+        # except Exception:
+        #     self.tf_writer = None
+        #     from tensorboardX import SummaryWriter
+        #     self.tfx_writer = SummaryWriter(path)
+
+        # import tensorflow as tf
+
+    @property
+    def writer(self):
+        return self.tfx_writer if self.tf_writer is None else self.tf_writer
+
+    def add_hyper_params_to_tb(self, hyper_param, metric_dict=None):
+        if self.framework == FRAMEWORK.tensorflow:
+            import tensorflow as tf
+            with tf.Session(graph=tf.Graph()) as sess:
+                hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in hyper_param.items()]
+                summary = sess.run(tf.summary.text('hyperparameters', tf.stack(hyperparameters)))
+                self.tf_writer.add_summary(summary, self.step)
+        elif self.framework == FRAMEWORK.torch:
+            import pprint
+            if metric_dict is None:
+                pp = pprint.PrettyPrinter(indent=4)
+                self.writer.add_text('hyperparameters', pp.pformat(hyper_param))
+            else:
+                self.writer.add_hparams(hyper_param, metric_dict)
+        else:
+            raise NotImplementedError
 
     def writekvs(self, kvs):
-        def summary_val(k, v):
-            kwargs = {'tag': k, 'simple_value': float(v)}
-            return self.tf.Summary.Value(**kwargs)
-        summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
-        event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
-        event.step = self.step # is there any reason why you'd want to specify the step?
-        self.writer.add_event(event)
-        self.writer.flush()
+        if self.framework == FRAMEWORK.tensorflow:
+            def summary_val(k, v):
+                kwargs = {'tag': k, 'simple_value': float(v)}
+                return self.tf.Summary.Value(**kwargs)
+            summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
+            event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
+            event.step = self.step  # is there any reason why you'd want to specify the step?
+            self.writer.add_event(event)
+            self.writer.flush()
+        elif self.framework == FRAMEWORK.torch:
+            def summary_val(k, v):
+                kwargs = {'tag': k, 'scalar_value': float(v), 'global_step': self.step}
+                self.writer.add_scalar(**kwargs)
+                # return self.tf.Summary.Value(**kwargs)
+            for k, v in kvs.items():
+                summary_val(k, v)
+        else:
+            raise NotImplementedError
+
+
+    #
+    # def writekvs(self, kvs):
+    #     def summary_val(k, v):
+    #         kwargs = {'tag': k, 'scalar_value': float(v), 'global_step': self.step}
+    #         self.writer.add_scalar(**kwargs)
+    #         # return self.tf.Summary.Value(**kwargs)
+    #     for k, v in kvs.items():
+    #         summary_val(k, v)
+        # summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
+        # event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
+        # event.step = self.step # is there any reason why you'd want to specify the step?
+        # self.writer.add_event(event)
+        # self.writer.flush()
 
     def close(self):
         if self.writer:
@@ -255,7 +320,7 @@ class TensorBoardOutputFormat(KVWriter):
             self.writer = None
 
 
-def make_output_format(format, ev_dir, log_suffix=''):
+def make_output_format(format, ev_dir, log_suffix='', framework='tensorflow'):
     """
     return a logger for the requested format
 
@@ -276,7 +341,7 @@ def make_output_format(format, ev_dir, log_suffix=''):
     elif format == 'csv':
         return CSVOutputFormat(osp.join(ev_dir, 'progress%s.csv' % log_suffix))
     elif format == 'tensorboard':
-        return TensorBoardOutputFormat(osp.join(ev_dir, 'tb%s' % log_suffix))
+        return TensorBoardOutputFormat(osp.join(ev_dir, 'tb%s' % log_suffix), framework)
     else:
         raise ValueError('Unknown format specified: %s' % (format,))
 
@@ -318,6 +383,34 @@ def logkv(key, val):
     """
     get_current().logkv(key, val)
 
+
+def log_from_tf_summary(summary):
+    """
+    add summary of tensorflow to the logger system
+    """
+    from tensorflow.core.framework import summary_pb2
+    summ = summary_pb2.Summary()
+    summ.ParseFromString(summary)
+    list_field = summ.ListFields()
+    # log scale values
+    def recursion_util(inp_field):
+        if hasattr(inp_field, "__getitem__"):
+            for inp in inp_field:
+                recursion_util(inp)
+        elif hasattr(inp_field, 'simple_value'):
+            record_tabular(inp_field.tag, inp_field.simple_value)
+        else:
+            pass
+    recursion_util(list_field)
+    # log other format of values
+    for fmt in Logger.CURRENT.output_formats:
+        if isinstance(fmt, TensorBoardOutputFormat):
+            if fmt.tf_writer is not None:
+                fmt.tf_writer.add_summary(summary, fmt.step)
+                fmt.tf_writer.flush()
+            else:
+                warn("Failed to find tf_writer.")
+
 def logkv_mean(key, val):
     """
     The same as logkv(), but if called many times, values averaged.
@@ -330,6 +423,7 @@ def logkvs(d):
     """
     for (k, v) in d.items():
         logkv(k, v)
+
 
 def log_key_value(keys, values, prefix_name=''):
     """
@@ -530,7 +624,7 @@ class Logger(object):
             if isinstance(fmt, SeqWriter):
                 fmt.writeseq(map(str, args))
 
-def configure(dir=None, format_strs=None, comm=None):
+def configure(dir=None, format_strs=None, comm=None, framework='tensorflow'):
     """
     configure the current logger
 
@@ -551,9 +645,10 @@ def configure(dir=None, format_strs=None, comm=None):
         format_strs = os.getenv('OPENAI_LOG_FORMAT', 'stdout,log,csv').split(',')
     format_strs = filter(None, format_strs)
     output_formats = [make_output_format(f, dir, log_suffix) for f in format_strs]
-    warn_output_formats = make_output_format('warn', dir, log_suffix)
+    warn_output_formats = make_output_format('warn', dir, log_suffix, framework)
 
-    Logger.CURRENT = Logger(dir=dir, output_formats=output_formats, warn_output_formats=warn_output_formats, comm=comm)
+    Logger.CURRENT = Logger(dir=dir, output_formats=output_formats, warn_output_formats=warn_output_formats,
+                            comm=comm)
     log('Logging to %s'%dir)
 
 def _configure_default_logger():

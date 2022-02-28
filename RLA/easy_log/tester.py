@@ -7,11 +7,16 @@
 # Version     :   1.0
 from collections import deque
 import dill
+import copy
 import time
 import os
 
 import datetime
 import os.path as osp
+import pprint
+
+import tensorboardX
+
 from RLA.easy_log.const import *
 from RLA.easy_log.time_step import time_step_holder
 from RLA.easy_log import logger
@@ -19,75 +24,9 @@ from RLA.easy_log.const import *
 import yaml
 import shutil
 import argparse
+from typing import Optional, Union, Dict, Any
+from RLA.const import DEFAULT_X_NAME
 
-
-class ExperimentLoader(object):
-    def __init__(self):
-        self.task_name = None
-        self.record_date = None
-        self.root = None
-        self.inherit_hp = None
-        pass
-
-    def config(self, task_name, record_date, root, inherit_hp):
-        self.task_name = task_name
-        self.record_date = record_date
-        self.root = root
-        self.inherit_hp = inherit_hp
-
-    @property
-    def is_valid_config(self):
-        if self.record_date is not None and self.task_name is not None and self.root is not None:
-            return True
-        else:
-            logger.warn("meet invalid loader config when use it")
-            logger.warn("record_date", self.record_date)
-            logger.warn("task_name", self.task_name)
-            logger.warn("root", self.root)
-            return False
-
-    def import_hyper_parameters(self):
-        if self.is_valid_config:
-            load_tester = Tester.load_tester(self.record_date, self.task_name, self.root)
-            args = argparse.Namespace(**load_tester.hyper_param)
-            return args
-        else:
-            return None
-
-    def load_from_record_date(self, var_prefix=''):
-        if self.is_valid_config:
-            loaded_tester = Tester.load_tester(self.record_date, self.task_name, self.root)
-            # load checkpoint
-            loaded_tester.new_saver(var_prefix=var_prefix, max_to_keep=1)
-            load_iter, load_res = loaded_tester.load_checkpoint()
-            tester.time_step_holder.set_time(load_iter)
-            tester.print_log_dir()
-            if self.inherit_hp:
-                return load_iter, load_res
-            else:
-                return 0, load_res
-        else:
-            return 0, {}
-
-    def fork_tester_log_files(self):
-        """
-        copy the log files in task_name/record_date to the new experiment.
-        :param task_name:
-        :param record_date:
-        :return:
-        """
-        if self.is_valid_config:
-            global tester
-            assert isinstance(tester, Tester)
-            loaded_tester = Tester.load_tester(self.record_date, self.task_name, self.root)
-            # copy log file
-            tester.log_file_copy(loaded_tester)
-            # copy attribute
-            tester.hyper_param = loaded_tester.hyper_param
-            tester.hyper_param_record = loaded_tester.hyper_param_record
-            tester.private_config = loaded_tester.private_config
-
-experimental_loader = ExperimentLoader()
 
 def import_hyper_parameters(task_name, record_date):
     """
@@ -143,6 +82,7 @@ def fork_tester_log_files(task_name, record_date):
     tester.hyper_param_record = load_tester.hyper_param_record
     tester.private_config = load_tester.private_config
 
+
 class Tester(object):
 
     def __init__(self):
@@ -175,10 +115,14 @@ class Tester(object):
         :return:
         """
         fs = open(private_config_path, encoding="UTF-8")
-        self.private_config = yaml.load(fs)
+        try:
+            self.private_config = yaml.load(fs)
+        except TypeError:
+            self.private_config = yaml.safe_load(fs)
+
         self.run_file = run_file
         self.task_name = task_name
-        self.root = log_root
+        self.log_root = log_root
         logger.info("private_config: ")
         self.dl_framework = self.private_config["DL_FRAMEWORK"]
         self.project_root = "/".join(private_config_path.split("/")[:-1])
@@ -216,11 +160,11 @@ class Tester(object):
             info = self.auto_parse_info()
             info = '&' + info
         self.info = info
-        code_dir, _ = self.__create_file_directory(osp.join(self.root, CODE, self.task_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.root, LOG, self.task_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.root, ARCHIVE_TESTER, self.task_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.root, CHECKPOINT, self.task_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.root, OTHER_RESULTS, self.task_name), is_file=False)
+        code_dir, _ = self.__create_file_directory(osp.join(self.log_root, CODE, self.task_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.log_root, LOG, self.task_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.log_root, ARCHIVE_TESTER, self.task_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.log_root, CHECKPOINT, self.task_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.log_root, OTHER_RESULTS, self.task_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
 
@@ -231,12 +175,12 @@ class Tester(object):
         self.print_log_dir()
 
     def update_log_files_location(self, root):
-        self.root = root
-        code_dir, _ = self.__create_file_directory(osp.join(self.root, CODE, self.task_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.root, LOG, self.task_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.root, ARCHIVE_TESTER, self.task_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.root, CHECKPOINT, self.task_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.root, OTHER_RESULTS, self.task_name), is_file=False)
+        self.log_root = root
+        code_dir, _ = self.__create_file_directory(osp.join(self.log_root, CODE, self.task_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.log_root, LOG, self.task_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.log_root, ARCHIVE_TESTER, self.task_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.log_root, CHECKPOINT, self.task_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.log_root, OTHER_RESULTS, self.task_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
         self.print_log_dir()
@@ -306,6 +250,10 @@ class Tester(object):
                 self.hyper_param_record.append(str(k) + '=' + str(self.hyper_param[k]).replace('[', '{').replace(']', '}').replace('/', '_'))
 
     def add_summary_to_logger(self, summary, name='', simple_val=False, freq=20):
+        """
+        [deprecated] see RLA.logger.log_from_tf_summary
+        """
+        logger.warn("add_summary_to_logger is deprecated. See RLA.logger.log_from_tf_summary.")
         if "tensorboard" not in self.private_config["LOG_USED"]:
             logger.info("skip adding summary to tb")
             return
@@ -337,16 +285,14 @@ class Tester(object):
                 self.writer.flush()
             self.summary_add_dict[name].append(summary_ts)
 
-    def _feed_hyper_params_to_tb(self):
+    def _feed_hyper_params_to_tb(self, metric_dict=None):
         if "tensorboard" not in self.private_config["LOG_USED"]:
             logger.info("skip feeding hyper-param to tb")
             return
+        for fmt in logger.Logger.CURRENT.output_formats:
+            if isinstance(fmt, logger.TensorBoardOutputFormat):
+                fmt.add_hyper_params_to_tb(self.hyper_param, metric_dict)
 
-        import tensorflow as tf
-        with tf.Session(graph=tf.Graph()) as sess:
-            hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in self.hyper_param.items()]
-            summary = sess.run(tf.summary.text('hyperparameters', tf.stack(hyperparameters)))
-        self.add_summary_to_logger(summary, 'hyperparameters', freq=1)
 
     def sync_log_file(self):
         """
@@ -513,7 +459,7 @@ class Tester(object):
         else:
             raise NotImplementedError
 
-    def save_checkpoint(self, model_dict=None):
+    def save_checkpoint(self, model_dict: Optional[dict]=None, related_variable: Optional[dict]=None):
         if self.dl_framework == 'tensorflow':
             import tensorflow as tf
             iter = self.time_step_holder.get_time()
@@ -533,6 +479,10 @@ class Tester(object):
                 self.checkpoint_keep_list = self.checkpoint_keep_list[-1 * self.max_to_keep:]
         else:
             raise NotImplementedError
+        if related_variable is not None:
+            for k, v in related_variable.items():
+                self.add_custom_data(k, v, type(v), mode='replace')
+        self.add_custom_data(DEFAULT_X_NAME, time_step_holder.get_time(), int, mode='replace')
 
     def load_checkpoint(self):
         if self.dl_framework == 'tensorflow':
@@ -557,23 +507,27 @@ class Tester(object):
         assert self.writer is not None
         self.writer.add_graph(sess.graph)
 
-    # --- custom data manager --
-    def add_custom_data(self, key, data, dtype=list, max_len=-1):
-        if key not in self.custom_data:
-            if issubclass(dtype, deque):
-                assert max_len > 0
+    def add_custom_data(self, key, data, dtype=list, max_len=-1, mode='append'):
+        if mode == 'replace':
+            self.custom_data[key] = data
+        elif mode == 'append':
+            if key not in self.custom_data:
+                if issubclass(dtype, deque):
+                    assert max_len > 0
 
-                self.custom_data[key] = deque(maxlen=max_len)
-                self.custom_data[key].append(data)
-            elif issubclass(dtype, list):
-                self.custom_data[key] = [data]
+                    self.custom_data[key] = deque(maxlen=max_len)
+                    self.custom_data[key].append(data)
+                elif issubclass(dtype, list):
+                    self.custom_data[key] = [data]
+                else:
+                    self.custom_data[key] = data
             else:
-                self.custom_data[key] = data
+                if issubclass(dtype, list) or issubclass(dtype, deque):
+                    self.custom_data[key].append(data)
+                else:
+                    self.custom_data[key] = data
         else:
-            if issubclass(dtype, list) or issubclass(dtype, deque):
-                self.custom_data[key].append(data)
-            else:
-                self.custom_data[key] = data
+            raise NotImplementedError
 
     def print_custom_data(self, key, prefix=''):
         assert key in self.custom_data
@@ -642,4 +596,4 @@ class Tester(object):
             return sess.run(tf.summary.text(name, tf.stack(to_tensor)))
 
 
-tester = Tester()
+exp_manager = tester = Tester()

@@ -110,6 +110,7 @@ class DeleteLogTool(BasicLogTool):
 
     def _delete_related_log(self, regex, show=False):
         for log_type in self.log_types:
+            print(f"--- search {log_type} ---")
             root_dir_regex = osp.join(self.proj_root, self.sub_proj, log_type, self.task, regex)
             empty = True
             for root_dir in glob.glob(root_dir_regex):
