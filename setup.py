@@ -20,5 +20,6 @@ setup(
             "argparse",
             "dill",
             "seaborn",
+            "pathspec"
         ]
     )

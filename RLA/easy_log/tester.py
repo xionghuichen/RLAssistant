@@ -26,7 +26,7 @@ import shutil
 import argparse
 from typing import Optional, Union, Dict, Any
 from RLA.const import DEFAULT_X_NAME
-
+import pathspec
 
 def import_hyper_parameters(task_name, record_date):
     """
@@ -107,7 +107,7 @@ class Tester(object):
         self.saver = None
         self.dl_framework = None
 
-    def configure(self, task_name, private_config_path, log_root=None, data_root=None, run_file=None):
+    def configure(self, task_name, private_config_path, log_root=None, data_root=None, ignore_file_path=None, run_file=None):
         fs = open(private_config_path, encoding="UTF-8")
         try:
             self.private_config = yaml.load(fs)
@@ -115,6 +115,7 @@ class Tester(object):
             self.private_config = yaml.safe_load(fs)
 
         self.run_file = run_file
+        self.ignore_file_path = ignore_file_path
         self.task_name = task_name
         if log_root is not None:
             self.data_root = log_root
@@ -371,6 +372,30 @@ class Tester(object):
             ip = 'noip'
         return ip
 
+    def get_ignore_files(self, src, names):
+        if self.ignore_file_path is None:
+            return []
+        with open(self.ignore_file_path) as f:
+            lines = f.readlines()
+            ret_lines = []
+            for i in range(len(lines)):
+                line = lines[i].strip()
+                if '#' in line or '' == line:
+                    continue
+                ret_lines.append(line)
+
+        spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, ret_lines)
+        paths = []
+        for name in names:
+            paths.append(osp.join(src, name))
+        match_paths = list(set(spec.match_files(paths)))
+        match_names = []
+        for idx, path in enumerate(paths):
+            if path in match_paths:
+                match_names.append(names[idx])
+        return match_names
+
+
     def __copy_source_code(self, run_file, code_dir):
         import shutil
         if self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'lib':
@@ -381,7 +406,8 @@ class Tester(object):
             shutil.copy(run_file, code_dir)
         elif self.private_config["PROJECT_TYPE"]["backup_code_by"] == 'source':
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:
-                shutil.copytree(osp.join(self.project_root, dir_name), osp.join(code_dir, dir_name))
+                shutil.copytree(osp.join(self.project_root, dir_name), osp.join(code_dir, dir_name),
+                                ignore=self.get_ignore_files)
         else:
             raise NotImplementedError
 
