@@ -107,13 +107,7 @@ class Tester(object):
         self.saver = None
         self.dl_framework = None
 
-    def configure(self, task_name, private_config_path, log_root, run_file=None):
-        """
-
-        :param task_name:
-        :param private_config_path:
-        :return:
-        """
+    def configure(self, task_name, private_config_path, log_root=None, data_root=None, run_file=None):
         fs = open(private_config_path, encoding="UTF-8")
         try:
             self.private_config = yaml.load(fs)
@@ -122,7 +116,9 @@ class Tester(object):
 
         self.run_file = run_file
         self.task_name = task_name
-        self.log_root = log_root
+        if log_root is not None:
+            self.data_root = log_root
+        self.data_root = data_root
         logger.info("private_config: ")
         self.dl_framework = self.private_config["DL_FRAMEWORK"]
         self.project_root = "/".join(private_config_path.split("/")[:-1])
@@ -160,11 +156,11 @@ class Tester(object):
             info = self.auto_parse_info()
             info = '&' + info
         self.info = info
-        code_dir, _ = self.__create_file_directory(osp.join(self.log_root, CODE, self.task_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.log_root, LOG, self.task_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.log_root, ARCHIVE_TESTER, self.task_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.log_root, CHECKPOINT, self.task_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.log_root, OTHER_RESULTS, self.task_name), is_file=False)
+        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
 
@@ -175,12 +171,12 @@ class Tester(object):
         self.print_log_dir()
 
     def update_log_files_location(self, root):
-        self.log_root = root
-        code_dir, _ = self.__create_file_directory(osp.join(self.log_root, CODE, self.task_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.log_root, LOG, self.task_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.log_root, ARCHIVE_TESTER, self.task_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.log_root, CHECKPOINT, self.task_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.log_root, OTHER_RESULTS, self.task_name), is_file=False)
+        self.data_root = root
+        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
         self.print_log_dir()
@@ -565,7 +561,8 @@ class Tester(object):
     def print_args(self):
         sort_list = sorted(self.hyper_param.items(), key=lambda i: i[0])
         for key, value in sort_list:
-            logger.info("key: %s, value: %s" % (key, value))
+            # logger.info("key: %s, value: %s" % (key, value))
+            logger.backup("key: %s, value: %s" % (key, value))
 
     def print_large_memory_variable(self):
         import sys

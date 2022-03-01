@@ -1,3 +1,7 @@
+"""
+[deprecated] See RLA.easy_log.complex_data_recorder.
+"""
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt

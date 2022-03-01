@@ -33,16 +33,17 @@ class ExperimentLoader(object):
         self.task_name = exp_manager.hyper_param.get('loaded_task_name', None)
         self.load_date = exp_manager.hyper_param.get('loaded_date', None)
         self.root = getattr(exp_manager, 'root', None)
+        self.data_root = None
         pass
 
     def config(self, task_name, record_date, root):
         self.task_name = task_name
         self.load_date = record_date
-        self.log_root = root
+        self.data_root = root
 
     @property
     def is_valid_config(self):
-        if self.load_date is not None and self.task_name is not None and self.log_root is not None:
+        if self.load_date is not None and self.task_name is not None and self.data_root is not None:
             return True
         else:
             logger.warn("meet invalid loader config when use it")

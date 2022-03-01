@@ -8,28 +8,31 @@ RLA has decoupled to the training code and only some additional configuration ar
 The project is still in developing. Welcome to join us. :)
 
 ## Design Principles of RLA
+![img.png](resource/framework.png)
+
 The core design principle of RLA is regarding all related information of each Experiment As A complex item in a Database (EaaD). 
 We design RLA to manage the experiments dataset by 
-1. formulating and structuring the item, table and the database；
-2. provide tools for adding, deleting, modifying and querying the items in the database.
+1. formulating, standardizing, and structuring the data item, table, and database;
+2. provide tools for adding, deleting, modifying, and querying the items in the database.
 
-The following is the detailed designs of EaaD and the implementation of RLA.
-### Formulating and Structuring the Experiment Database
+The following are the detailed designs of EaaD and the implementation of RLA.
+### Standardizing and Structuring the Experiment Database
 After integrating RLA into your project, we create a "database" implicitly configured by `rla_config.yaml`. 
-Each experiment we run will be indexed and written as an item into a "table". There include several elements of the system.
-1. **Database**: A database is configured by a YAML file `rla_config.yaml`. In our practice, we only create one database in one subject.
-2. **Table**: We map the concept of Table in standard database system into the concept of "task" in our research process. There are many similarities between the two concepts. For example, we will create another Table often when:
-   1. the structure of two tables are different, e.g., they have different keys and logic for organization. In the research process, different tasks often have total different types of log to record. For example, in offline model-based RL, the first task might pretrain a dynamics model the second task might be policy learning with the learned model. In model learning, we concern the MSE of the model; In policy learning, we concern the rewards of policy. 
-   2. The content of a table is too large which might hurt the speed of querying. In the research process, we need large memory to load a Tensorboard if the logdir have many runs.
+Each experiment we run will be indexed and written as an item into a "table". There are several elements of the database system.
+1. **Database**: A database is configured by a YAML file `rla_config.yaml`. In our practice, we only create one database in one research subject.
+2. **Table**: We map the concept of Table in standard database systems into the concept of "task" in our research process. There are many similarities between the two concepts. For example, we will create another table/task often when:
+   1. the structures of tables are different, e.g., they have different keys. In the research process, different tasks often have totally different types of logs to record. For example, in offline model-based RL, the first task might pretrain a dynamics model the second task might be policy learning with the learned model. In model learning, we are concerned with the MSE of the model; In policy learning, we are concerned with the rewards of policy. 
+   2. The content of a table is too large which might hurt the speed of querying.  Table splitting is a common solution. In the research process, we need large memory to load a Tensorboard if the logdir has many runs. We can solve the problem by splitting the runs into different sub-directories.
 3. **Data Item**:  We map the concept of the data item to the generated data in an experiment. For each data item, we need to define the index and the value (e.g., columns and values) for each item.
-   1. Index: We need a unique index to define the item in a table for item adding, deleting, modifying and querying. In RLA, we define the index of each experiment as: `datetime of the experiment (for uniqueness) + ip address (for keeping uniqueness in distributed training) + tracked hyper-parameters (easy to identify and easy to search)`.
-   2. Value: when running an experiment, we generate many data with different structure. Based on our research practice, currently we formulate and store the following data
-      1. Codes and hyper-parameters: Every line of the code and the select hyper-parameters to run the experiment. This is a backup for experiment reproducibility.    
-      2. Recorded variables: We often record many intermediate variables in the process of experiment, e.g., the rewards, some losses or learning rates. We record the variables in key-value formulation and store them in a tensorboard event and a csv file.   
-      3. Model checkpoints: We support weights saving of neural networks and related custom variables in Tensorflow and Pytorch framework. We can use the checkpoints to resume an experiments or use the results of the experiment to complete downstream tasks.
+   1. Index: We need a unique index to define the item in a table for item adding, deleting, modifying, and querying. In RLA, we define the index of each experiment as: `datetime of the experiment (for uniqueness) + ip address (for keeping uniqueness in distributed training) + tracked hyper-parameters (easy to identify and easy to search).
+   2. Value: when running an experiment, we generate many data with different structures. Based on our research practice, currently, we formulate and store the following data
+      1. Codes and hyper-parameters: Every line of the code and select hyper-parameters to run the experiment. This is a backup for experiment reproducibility.    
+      2. Recorded variables: We often record many intermediate variables in the process of the experiment, e.g., the rewards, some losses, or learning rates. We record the variables in the key-value formulation and store them in a tensorboard event and a CSV file.   
+      3. Model checkpoints: We support weights saving of neural networks and related custom variables in Tensorflow and Pytorch framework. We can use the checkpoints to resume experiments or use the results of the experiment to complete downstream tasks.
       4. Other data like figures or videos: It essentially is unstructured intermediate variables in the process of the experiment. We might plot the frame-to-frame video of your agent behavior or some curves to check the process of training. We give some common tools in the RL scenario to generate the related variables and store them in a directory. 
 
-Currently, we store the data items in standard file system and manage the relation among data items, tables and database via a predefined directory structure. After running some experiments, the database will be something like this:
+
+Currently, we store the data items in standard file systems and manage the relationships among data items, tables, and database via a predefined directory structure. After running some experiments, the database will be something like this:
 ![img.png](resource/run-res.png)
 - Here we construct a database in the project "sb_ppo_example". 
 - The directory "archive_tester" is to store hyper-parameters and related variables for experiment resuming. 
@@ -40,12 +43,12 @@ Currently, we store the data items in standard file system and manage the relati
 - We have a table named "demo_task", which is the root directory of log/archive_tester/checkpoint/code/results. 
 
 
-### Tools to Operate the Database
+### Tools to Manage the Database
 
-In standard database systems, the common used operations to manage a database is adding, deleting modifying and querying. We also give similar tools to manage RLA database.
+In standard database systems, the commonly used operations to manage a database are adding, deleting modifying, and querying. We also give similar tools to manage the RLA database.
 
 Adding:
-1. RLA.easy_log.tester.exp_manager is a global object to create an experiments and manger the data in the process of experiments.
+1. RLA.easy_log.tester.exp_manager is a global object to create experiments and manger the data in the process of experiments.
 2. RLA.easy_log.logger is a module to add recorded variables.
 3. RLA.easy_log.simple_mat_plot is a module to construct other data like figures or videos
 
@@ -56,15 +59,17 @@ Modifying:
 1. resume: RLA.easy_log.exp_loader.ExperimentLoader: a class to resume an experiments with different flexible settings. 
 
 Querying:
-1. tensorboard: the recorded variables is added to tensorboard events and can be loaded via standard tensorboard tools.
+1. tensorboard: the recorded variables are added to tensorboard events and can be loaded via standard tensorboard tools.
   ![img.png](resource/tb-img.png)
-2. easy_plot: We give some APIs to load and visualize the data in csv files. The results will be something like this: 
+2. easy_plot: We give some APIs to load and visualize the data in CSV files. The results will be something like this: 
     ![](resource/sample-plot.png)
 
 
 ### Other principles
 
-The second design principle is easy for integration. It still has long way to go to achieve it. We give several example project integrating with RLA in the directory example. 
+The second design principle is easy for integration. It still has a long way to go to achieve it. We give several example projects integrating with RLA in the directory example. 
+1. PPO with RL based on the stable_baselines framework: example/sb_ppo_example
+2. [TODO] torch example.
 
 We also list the RL projects using RLA as follows:
 1. https://github.com/xionghuichen/MAPLE
@@ -77,104 +82,133 @@ cd RLAssistant
 python setup.py install
 ```
 
+
 ## Quickstart
 
 
-We build a example project for integrating RLA, which can be seen in ./example/simplest_code.
+We build an example project for integrating RLA, which can be seen in ./example/simplest_code. Now we summarize the steps to use it.
 
-Step1: 
+### Step1: Configuration. 
+1. We define the property of the database in `rla_config.yaml`. You can construct your YAML file based on the template in ./example/simplest_code/rla_config.yaml. 
+2. We define the property of the table in exp_manager.config. Before starting your experiment, you should configure the global object RLA.easy_log.tester.exp_manager like this.
+    ```python
+    from RLA.easy_log.tester import exp_manager
+    kwargs = {'env_id': 'Hopper-v2', 'lr': 1e-3}
+    exp_manager.set_hyper_param(**kwargs) # kwargs are the hyper-parameters for your experiment
+    exp_manager.add_record_param(["env_id"]) # add parts of hyper-parameters to name the index of data items for better readability.
+    task_name = 'demo_task' # define your task
+    rla_data_root = '../' # the place to store the data items.
+    exp_manager.configure(task_name, private_config_path='../../../rla_config.yaml', data_root=rla_data_root)
+    exp_manager.log_files_gen() # initialize the data items.
+    exp_manager.print_args()
+   ```
+3. We add the generated data items to .gitignore to avoid pushing them into our git repo.
+   ```gitignore
+   **/archive_tester/**
+   **/checkpoint/**
+   **/code/**
+   **/results/**
+   **/log/**
+   ```
+### Step2: record intermediate variables/checkpoints/other types of data.
 
-Step1: config config.yaml
+**Record intermediate scalars**
 
-config.yaml is used to define the workflow of easy_log. It is necessary to config before use RLA.
-
-See ./example/config.yaml for more details.
-
-Step2: config the Tester object in your main file, which is a manager of RLA.
-
-```python
-from RLA.easy_log.tester import tester
-task_name = 'demo_task'
-private_config_path = '../../../rla_config.yaml'
-your_main_file_name = 'main.py'
-log_root_path = '../'
-tester.configure(task_name=task_name, private_config_path=private_config_path, 
-run_file=your_main_file_name, log_root=log_root_path)
-```
-
-Step3: record hyperparameters
-
-```python
-from RLA.easy_log.tester import tester
-kwargs = {"hp_a": 1, "hp_b": 2, "info": "description of the experiment"}
-
-tester.set_hyper_param(**kwargs)
-# add the hyperparameters to track.
-tester.add_record_param(["info", "hp_a"])
-```
-
-Step4: initialize log files:
-
-```python
-from RLA.easy_log.tester import tester
-tester.log_files_gen()
-
-```
-
-### Structure of logs and usages
-In RLA, we name each experiment with a formatted string containing: task_name (named by programmers), datetime of the experiment, ip address, and tracked hyper-param. We call it "log_name".  See the example project for more details. For each experiment, RLA generates the following logs:
-
-
-**Source code**: Back up the source code of your project, which can config in "BACKUP_CONFIG" of config.yaml. 
-Then you can trace back the code-level implementation details for the historical experiment. As we know, any code-level tricks may make big difference to the final performance especially in RL. 
-
-The source code can be found in "LOG_ROOT/code/log_name/".
-
-The backup process is done by "tester.log_files_gen()".
-
-
-**Checkpoint**: The model parameters is saved in "LOG_ROOT/checkpoint/log_name/". You can update/initialze your checkpoint by:
-
-```python
-from RLA.easy_log.tester import tester
-# after graph initialized
-tester.new_saver(var_prefix='', max_to_keep=1)
-# after training
-tester.save_checkpoint()
-```
-NOTE: We only implement the checkpoint in Tensorflow.
-
-**Record variables**: You can record any scale into tensorboard, csv file and standard output by the flowing code:
-
+We record scalars by `RLA.easy_log.logger`: 
 ```python
 from RLA.easy_log import logger
-reward = 10
-logger.record_tabular("performance/reward", reward)
-logger.dump_tabular()
+
+# scalar variable
+value = 1
+logger.record_tabular("k", value)
+
+# tensorflow summary
+import tensorflow as tf
+summary = tf.Summary()
+logger.log_from_tf_summary(summary)
+
+# matplotlib figures.
+import matplotlib.pyplot as plt
+
+
+```
+**Record checkpoints**
+
+We save checkpoints of neural networks by `exp_manager.save_checkpoint`.
+```python
+from RLA.easy_log.tester import exp_manager
+exp_manager.new_saver()
+
+for i in range(1000):
+    if i % 10 == 0:
+        exp_manager.save_checkpoint()
 ```
 
-these files are stored in "LOG_ROOT/log/log_name/"
+**Record other type of data** [under developing]
 
-**Figures**: you can record figures easily by the api in RLA.easy_log.simple_mat_plot
+Currently we can record complex-structure data based on tensorboard: 
+```python
+# from tensorflow summary
+import tensorflow as tf
+from RLA.easy_log import logger
+summary = tf.Summary()
+logger.log_from_tf_summary(summary)
+# from tensorboardX writer
+kwargs = {'tag': 'aa'}
+logger.get_tbx_writer().add_audio(**kwargs)
+```
+
+We will develop APIs to record common-used complex-structure data in RLA.easy_log.complex_data_recorder.
+Now we give a MatplotlibRecorder tool to manage your figures generated by matplotlib:
 
 ```python
-from RLA.easy_log.simple_mat_plot import *
-simple_plot(name="test_plot", data=[[1,2,3,4,5,6]])
+from RLA.easy_log.complex_data_recorder import MatplotlibRecorder as mpr
+def plot_func():
+   import matplotlib.pyplot as plt
+   plt.plot([1,1,1], [2,2,2])
+mpr.pretty_plot_wrapper('func', plot_func, xlabel='x', ylabel='y', title='react test', )
 ```
-the figure will be stored in "LOG_ROOT/results/log_name/"
+The figure plotted by plot_func will be saved in the "results" directory.
 
-**Hyper-parameters**: the hyperparameters will be recorded in the "text" tab of Tensorboard and a pickle file of Tester object.
-The Tester object is stored in "LOG_ROOT/archive_tester/log_name/"
+### Step3: handle your historical experiments. 
+
+**Query**
+
+Currently, we develop the query tools based on two common scenarios: result visualization and experiment review. 
+
+Result visualization:
+   1. Tensorboard: We can use tensorboard/tensorboardX to view the recorded logs. The event of tensorboard will be saved in `${data_root}/log/${task_name}/${index_name}/tb/events`. 
+      We can view the results in tensorboard by: `tensorboard --logdir ${data_root}/log/${task_name}` 
+   2. Easy_plot toolkit: The intermediate scalar variables are saved in a CSV file in `${data_root}/log/${task_name}/${index_name}/progress.csv`. 
+      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in example/plot_res.ipynb.
+   3. View data in "results" directory directly: other type of data are stored in `${data_root}/results/${task_name}/${index_name}`
+
+Experiment review: 
+1. Given any experiment named as `${task_name}/${index_name}`, we can find the line-by-line code in `${data_root}/code/${task_name}/${index_name}`. We can configure the files to be stored in BACKUP_CONFIG in rla_config.yaml.
+2. The corresponding hyper-parameters (recorded by `exp_manager.set_hyper_param`) can be found in `${data_root}/log/${task_name}/${index_name}/backup.txt`.
+
+**Modify**
+
+Usually, it is unnecessary to change the content of experiment logs. In our practice, a common scenario is to load the historical experiment/results to resume the training or give to downstream tasks. In RLA, we develop a tool for different requirements of experiment loading, which is in `RLA.easy_log.exp_loader`. It can be easily used to:
+1. load a pretrained model for another task (e.g., validation);
+2. resume an experiment;
+3. resume an experiment with other settings.
 
 
+**Bath Management**
 
-## An example
-you can find a project demo from the "example" directory.
+We manage the items in the database via toolkits in rla_scripts. Currently, the rla_scripts includes
+1. Archive: archive some important results into another table.
+2. Delete: delete all useless experiments at once.
+3. Send to remote [TODO]
+4. Download from remote [TODO]
+
+We can use the above tools after copying the rla_scripts to our research project and modifying the DATA_ROOT in config.py to locate the root of the RLA database.
+
+
 
 # TODO
-- [ ] add a video to visualize the workflow of RLA.
-- [ ] add comments and documents to other functions.
+- [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp;
-- [ ] config default hyper-parameters of RLA automatically. 
 

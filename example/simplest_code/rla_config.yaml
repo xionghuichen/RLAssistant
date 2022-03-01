@@ -9,7 +9,7 @@ PROJECT_TYPE:
 # When the following path is set to relative path, the current working directory is the path which rla_config.yaml in.
 BACKUP_CONFIG:
   backup_code_dir:
-    - 'ppo2'
+    - 'project'
   lib_dir: './build/lib/'
 
 LOG_USED:

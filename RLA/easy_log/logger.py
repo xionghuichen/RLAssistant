@@ -18,6 +18,7 @@ DEBUG = 10
 INFO = 20
 WARN = 30
 ERROR = 40
+BACKUP = 60
 
 DISABLED = 50
 
@@ -221,6 +222,16 @@ def valid_float_value(value):
         return False
 
 
+def get_tbx_writer():
+    tb_fmt = None
+    for fmt in Logger.CURRENT.output_formats:
+        if isinstance(fmt, TensorBoardOutputFormat):
+            tb_fmt = fmt 
+    assert tb_fmt is not None, "cannot find TensorBoard-format output in the database. " \
+                               "Please check the key LOG_USED in rla_config.yaml"
+    assert tb_fmt.framework == FRAMEWORK.torch, "tensorboardX writer is constructed in torch framework"
+    return tb_fmt.tbx_writer
+
 
 class TensorBoardOutputFormat(KVWriter):
     """
@@ -235,8 +246,8 @@ class TensorBoardOutputFormat(KVWriter):
         path = osp.join(osp.abspath(dir), prefix)
         if self.framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
-            self.tf_writer = tf.summary.FileWriter(path)
-            self.tfx_writer = None
+            self.tb_writer = tf.summary.FileWriter(path)
+            self.tbx_writer = None
             from tensorflow.python import pywrap_tensorflow
             from tensorflow.core.util import event_pb2
             from tensorflow.python.util import compat
@@ -244,23 +255,23 @@ class TensorBoardOutputFormat(KVWriter):
             self.event_pb2 = event_pb2
             self.pywrap_tensorflow = pywrap_tensorflow
         elif self.framework == FRAMEWORK.torch:
-            self.tf_writer = None
+            self.tb_writer = None
             from tensorboardX import SummaryWriter
-            self.tfx_writer = SummaryWriter(path)
+            self.tbx_writer = SummaryWriter(path)
         else:
             raise NotImplementedError
         # try:
         #     # self.writer = tf.summary.FileWriter(path) # pywrap_tensorflow.EventsWriter(compat.as_bytes(path))
         # except Exception:
-        #     self.tf_writer = None
+        #     self.tb_writer = None
         #     from tensorboardX import SummaryWriter
-        #     self.tfx_writer = SummaryWriter(path)
+        #     self.tbx_writer = SummaryWriter(path)
 
         # import tensorflow as tf
 
     @property
     def writer(self):
-        return self.tfx_writer if self.tf_writer is None else self.tf_writer
+        return self.tbx_writer if self.tb_writer is None else self.tb_writer
 
     def add_hyper_params_to_tb(self, hyper_param, metric_dict=None):
         if self.framework == FRAMEWORK.tensorflow:
@@ -268,7 +279,7 @@ class TensorBoardOutputFormat(KVWriter):
             with tf.Session(graph=tf.Graph()) as sess:
                 hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in hyper_param.items()]
                 summary = sess.run(tf.summary.text('hyperparameters', tf.stack(hyperparameters)))
-                self.tf_writer.add_summary(summary, self.step)
+                self.tb_writer.add_summary(summary, self.step)
         elif self.framework == FRAMEWORK.torch:
             import pprint
             if metric_dict is None:
@@ -336,6 +347,8 @@ def make_output_format(format, ev_dir, log_suffix='', framework='tensorflow'):
         return HumanOutputFormat(osp.join(ev_dir, 'log%s.txt' % log_suffix))
     elif format == 'warn':
         return HumanOutputFormat(osp.join(ev_dir, 'warn%s.txt' % log_suffix))
+    elif format == 'backup':
+        return HumanOutputFormat(osp.join(ev_dir, 'backup%s.txt' % log_suffix))
     elif format == 'json':
         return JSONOutputFormat(osp.join(ev_dir, 'progress%s.json' % log_suffix))
     elif format == 'csv':
@@ -405,11 +418,11 @@ def log_from_tf_summary(summary):
     # log other format of values
     for fmt in Logger.CURRENT.output_formats:
         if isinstance(fmt, TensorBoardOutputFormat):
-            if fmt.tf_writer is not None:
-                fmt.tf_writer.add_summary(summary, fmt.step)
-                fmt.tf_writer.flush()
+            if fmt.tb_writer is not None:
+                fmt.tb_writer.add_summary(summary, fmt.step)
+                fmt.tb_writer.flush()
             else:
-                warn("Failed to find tf_writer.")
+                warn("Failed to find tb_writer.")
 
 def logkv_mean(key, val):
     """
@@ -470,6 +483,13 @@ def warn(*args):
     args[0] = "[WARN] {} : {}".format(timestep(), args[0])
     args = tuple(args)
     log(*args, level=WARN)
+
+def backup(*args):
+    args = list(args)
+    get_current()
+    args[0] = "[BACKUP] {} : {}".format(timestep(), args[0])
+    args = tuple(args)
+    log(*args, level=BACKUP)
 
 def error(*args):
 
@@ -549,13 +569,14 @@ class Logger(object):
                     # So that you can still log to the terminal without setting up any output files
     CURRENT = None  # Current logger being used by the free functions above
 
-    def __init__(self, dir, output_formats, warn_output_formats, comm=None):
+    def __init__(self, dir, output_formats, warn_output_formats, backup_output_formats, comm=None):
         self.name2val = defaultdict(float)  # values this iteration
         self.name2cnt = defaultdict(int)
         self.level = INFO
         self.dir = dir
         self.output_formats = output_formats
         self.warn_output_log = warn_output_formats
+        self.backup_output_log = backup_output_formats
         self.comm = comm
 
     # Logging API, forwarded
@@ -598,8 +619,12 @@ class Logger(object):
     def log(self, *args, level=INFO):
         if self.level <= level:
             self._do_log(args)
-        if level > INFO:
+        if level > INFO and level < BACKUP:
             self.warn_output_log.writeseq(map(str, args))
+        elif level == BACKUP:
+            self.backup_output_log.writeseq(map(str, args))
+        # else:
+        #     raise NotImplementedError
 
 
     # Configuration
@@ -646,8 +671,10 @@ def configure(dir=None, format_strs=None, comm=None, framework='tensorflow'):
     format_strs = filter(None, format_strs)
     output_formats = [make_output_format(f, dir, log_suffix) for f in format_strs]
     warn_output_formats = make_output_format('warn', dir, log_suffix, framework)
+    backup_output_formats = make_output_format('backup', dir, log_suffix, framework)
 
     Logger.CURRENT = Logger(dir=dir, output_formats=output_formats, warn_output_formats=warn_output_formats,
+                            backup_output_formats=backup_output_formats,
                             comm=comm)
     log('Logging to %s'%dir)
 
