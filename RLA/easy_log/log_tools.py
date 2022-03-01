@@ -29,11 +29,10 @@ class BasicLogTool(object):
             self.log_types.extend(optional_log_type)
 
 class DownloadLogTool(BasicLogTool):
-    def __init__(self, rla_config_path, proj_root, sub_proj, task, regex, *args, **kwargs):
+    def __init__(self, rla_config_path, proj_root, task, regex, *args, **kwargs):
         fs = open(rla_config_path, encoding="UTF-8")
         self.private_config = yaml.load(fs)
         self.proj_root = proj_root
-        self.sub_proj = sub_proj
         self.task = task
         self.regex = regex
 
@@ -41,16 +40,15 @@ class DownloadLogTool(BasicLogTool):
         from RLA.auto_ftp import FTPHandler
 
         for log_type in self.log_types:
-            root_dir_regex = osp.join(self.proj_root, self.sub_proj, log_type, self.task, self.regex)
+            root_dir_regex = osp.join(self.proj_root, log_type, self.task, self.regex)
             empty = True
             for root_dir in glob.glob(root_dir_regex):
 
                 pass
 
 class DeleteLogTool(BasicLogTool):
-    def __init__(self, proj_root, sub_proj, task, regex, filter, *args, **kwargs):
+    def __init__(self, proj_root, task, regex, filter, *args, **kwargs):
         self.proj_root = proj_root
-        self.sub_proj = sub_proj
         self.task = task
         self.regex = regex
         assert isinstance(filter, Filter)
@@ -59,7 +57,7 @@ class DeleteLogTool(BasicLogTool):
         super(DeleteLogTool, self).__init__(*args, **kwargs)
 
     def _find_small_timestep_log(self):
-        root_dir_regex = osp.join(self.proj_root, self.sub_proj, LOG, self.task, self.regex)
+        root_dir_regex = osp.join(self.proj_root, LOG, self.task, self.regex)
         for root_dir in glob.glob(root_dir_regex):
             print("searching dirs", root_dir)
             if os.path.exists(root_dir):
@@ -110,7 +108,8 @@ class DeleteLogTool(BasicLogTool):
 
     def _delete_related_log(self, regex, show=False):
         for log_type in self.log_types:
-            root_dir_regex = osp.join(self.proj_root, self.sub_proj, log_type, self.task, regex)
+            print(f"--- search {log_type} ---")
+            root_dir_regex = osp.join(self.proj_root, log_type, self.task, regex)
             empty = True
             for root_dir in glob.glob(root_dir_regex):
                 empty = False
@@ -175,9 +174,8 @@ class DeleteLogTool(BasicLogTool):
 
 
 class ArchiveLogTool(BasicLogTool):
-    def __init__(self, proj_root, sub_proj, task, regex, archive_name_as_task, remove, *args, **kwargs):
+    def __init__(self, proj_root, task, regex, archive_name_as_task, remove, *args, **kwargs):
         self.proj_root = proj_root
-        self.sub_proj = sub_proj
         self.task = task
         self.regex = regex
         self.remove = remove
@@ -186,9 +184,9 @@ class ArchiveLogTool(BasicLogTool):
 
     def _archive_log(self, show=False):
         for log_type in self.log_types:
-            root_dir_regex = osp.join(self.proj_root, self.sub_proj, log_type, self.task, self.regex)
-            archive_root_dir = osp.join(self.proj_root, self.sub_proj, log_type, self.archive_name_as_task)
-            prefix_dir = osp.join(self.proj_root, self.sub_proj, log_type, self.task)
+            root_dir_regex = osp.join(self.proj_root, log_type, self.task, self.regex)
+            archive_root_dir = osp.join(self.proj_root, log_type, self.archive_name_as_task)
+            prefix_dir = osp.join(self.proj_root, log_type, self.task)
             prefix_len = len(prefix_dir)
             empty = True
             # os.system("chmod +x -R \"{}\"".format(prefix_dir))
@@ -229,6 +227,6 @@ class ArchiveLogTool(BasicLogTool):
             print("do archive ...")
             self._archive_log(show=False)
 
-if __name__ == '__main__':
-    dlt = DeleteLogTool("../", "var_seq_imitation", "self-transfer", "2019/11/29/01-11*")
-    dlt.delete_related_log()
+# if __name__ == '__main__':
+#     dlt = DeleteLogTool("../", "var_seq_imitation", "self-transfer", "2019/11/29/01-11*")
+#     dlt.delete_related_log()
