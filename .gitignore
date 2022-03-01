@@ -8,3 +8,4 @@ RLA.egg-info**
 **/code/**
 **/results/**
 **/log/**
+**/.ipynb_checkpoints/*

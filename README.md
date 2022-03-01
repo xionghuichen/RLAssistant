@@ -178,11 +178,15 @@ Currently, we develop the query tools based on two common scenarios: result visu
 
 Result visualization:
    1. Tensorboard: We can use tensorboard/tensorboardX to view the recorded logs. The event of tensorboard will be saved in `${data_root}/log/${task_name}/${index_name}/tb/events`. 
-      We can view the results in tensorboard by: `tensorboard --logdir ${data_root}/log/${task_name}` 
+      We can view the results in tensorboard by: `tensorboard --logdir ${data_root}/log/${task_name}`.
+      For example, lanuch tensorboard by `tensorboard --logdir ./example/simplest_code/log/demo_task/2022/03`. We can see results:
+        ![img.png](resource/demo-tb-res.png)
    2. Easy_plot toolkit: The intermediate scalar variables are saved in a CSV file in `${data_root}/log/${task_name}/${index_name}/progress.csv`. 
-      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in example/plot_res.ipynb.
+      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in example/plot_res.ipynb. 
+      The result will be something like this:
+        ![img.png](resource/demo-easy-to-plot-res.png)
    3. View data in "results" directory directly: other type of data are stored in `${data_root}/results/${task_name}/${index_name}`
-
+    ![img.png](resource/demo-results-res.png)
 Experiment review: 
 1. Given any experiment named as `${task_name}/${index_name}`, we can find the line-by-line code in `${data_root}/code/${task_name}/${index_name}`. We can configure the files to be stored in BACKUP_CONFIG in rla_config.yaml.
 2. The corresponding hyper-parameters (recorded by `exp_manager.set_hyper_param`) can be found in `${data_root}/log/${task_name}/${index_name}/backup.txt`.

@@ -1,1 +1,1 @@
-DATA_ROOT = '../'
+DATA_ROOT = '../example/simplest_code/'
