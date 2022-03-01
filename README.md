@@ -31,7 +31,6 @@ Each experiment we run will be indexed and written as an item into a "table". Th
       3. Model checkpoints: We support weights saving of neural networks and related custom variables in Tensorflow and Pytorch framework. We can use the checkpoints to resume experiments or use the results of the experiment to complete downstream tasks.
       4. Other data like figures or videos: It essentially is unstructured intermediate variables in the process of the experiment. We might plot the frame-to-frame video of your agent behavior or some curves to check the process of training. We give some common tools in the RL scenario to generate the related variables and store them in a directory. 
 
-
 Currently, we store the data items in standard file systems and manage the relationships among data items, tables, and database via a predefined directory structure. After running some experiments, the database will be something like this:
 ![img.png](resource/run-res.png)
 - Here we construct a database in the project "sb_ppo_example". 
