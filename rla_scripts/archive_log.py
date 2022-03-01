@@ -9,6 +9,7 @@ tensorboard --logdir ./log/your_task/,./log/archived/
 
 from RLA.easy_log.log_tools import ArchiveLogTool
 import argparse
+from config import *
 
 def argsparser():
     parser = argparse.ArgumentParser("Archive Log")
@@ -25,6 +26,6 @@ def argsparser():
 
 if __name__=='__main__':
     args = argsparser()
-    dlt = ArchiveLogTool(proj_root='../example/project_name/', sub_proj=args.sub_proj, task=args.task, regex=args.reg,
+    dlt = ArchiveLogTool(proj_root=DATA_ROOT, task=args.task, regex=args.reg,
                          archive_name_as_task=args.archive_name_as_task, remove=args.remove)
     dlt.archive_log()

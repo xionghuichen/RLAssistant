@@ -22,8 +22,8 @@ def get_param():
 # phase 2: init the RLA experiment manager.
 kwargs = get_param()
 task_name = 'demo_task'
-log_root = '../'
-exp_manager.configure(task_name, private_config_path='../../../rla_config.yaml', log_root=log_root)
+rla_data_root = '../'
+exp_manager.configure(task_name, private_config_path='../../../rla_config.yaml', data_root=rla_data_root)
 exp_manager.log_files_gen()
 exp_manager.print_args()
 
