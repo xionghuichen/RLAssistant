@@ -1,4 +1,4 @@
-# RL experiment Assistant
+# RL experiment Assistant (RLA)
 
 RLA is a tool for managing your RL experiments automatically (e.g., your hyper-parameters, logs, checkpoints, figures, and code, etc.). 
 RLA has decoupled to the training code and only some additional configuration are needed. Before using RLA, we recommend you to read the section "Design Principles of RLA", which will be helpful for you to understand the basic logic of the repo. 
