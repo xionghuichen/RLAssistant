@@ -7,25 +7,29 @@ RLA has decoupled to the training code and only some additional configuration ar
 
 The project is still in developing. Welcome to join us. :)
 
+
+
 ## Design Principles of RLA
 ![img.png](resource/framework.png)
 
 The core design principle of RLA is regarding all related information of each Experiment As A complex item in a Database (EaaD). 
 We design RLA to manage the experiments dataset by 
-1. formulating, standardizing, and structuring the data item, table, and database;
+1. formulating, standardizing, and structuring the data items and tables of the "RL experiment database";
 2. provide tools for adding, deleting, modifying, and querying the items in the database.
 
 The following are the detailed designs of EaaD and the implementation of RLA.
 ### Standardizing and Structuring the Experiment Database
 After integrating RLA into your project, we create a "database" implicitly configured by `rla_config.yaml`. 
-Each experiment we run will be indexed and written as an item into a "table". There are several elements of the database system.
+Each experiment we run will be indexed and stored as an item into a "table". In particular, RLA includes the following elelments to construct an "RL experiment database".
 1. **Database**: A database is configured by a YAML file `rla_config.yaml`. In our practice, we only create one database in one research subject.
 2. **Table**: We map the concept of Table in standard database systems into the concept of "task" in our research process. There are many similarities between the two concepts. For example, we will create another table/task often when:
    1. the structures of tables are different, e.g., they have different keys. In the research process, different tasks often have totally different types of logs to record. For example, in offline model-based RL, the first task might pretrain a dynamics model the second task might be policy learning with the learned model. In model learning, we are concerned with the MSE of the model; In policy learning, we are concerned with the rewards of policy. 
-   2. The content of a table is too large which might hurt the speed of querying.  Table splitting is a common solution. In the research process, we need large memory to load a Tensorboard if the logdir has many runs. We can solve the problem by splitting the runs into different sub-directories.
-3. **Data Item**:  We map the concept of the data item to the generated data in an experiment. For each data item, we need to define the index and the value (e.g., columns and values) for each item.
-   1. Index: We need a unique index to define the item in a table for item adding, deleting, modifying, and querying. In RLA, we define the index of each experiment as: `datetime of the experiment (for uniqueness) + ip address (for keeping uniqueness in distributed training) + tracked hyper-parameters (easy to identify and easy to search).
-   2. Value: when running an experiment, we generate many data with different structures. Based on our research practice, currently, we formulate and store the following data
+   2. The content of a table is too large which might hurt the speed of querying.  Table partition is a common solution. In the research process, we need large memory to load a Tensorboard if the logdir has many runs. We can solve the problem by splitting the runs into different sub-directories.
+   
+   In RLA, we need to assign a "task" for each experiment to run.
+3. **Data Item**:  We map the concept of the data item to the complex generated data in an experiment. For each data item, we need to define the index and the value for each item.
+   1. **Index**: We need a unique index to define the item in a table for item adding, deleting, modifying, and querying. In RLA, we define the index of each experiment as: `datetime of the experiment (for uniqueness) + ip address (for keeping uniqueness in distributed training) + tracked hyper-parameters (easy to identify and easy to search)`.
+   2. **Value**: when running an experiment, we generate many data with different structures. Based on our research practice, currently, we formulate and store the following data
       1. Codes and hyper-parameters: Every line of the code and select hyper-parameters to run the experiment. This is a backup for experiment reproducibility.    
       2. Recorded variables: We often record many intermediate variables in the process of the experiment, e.g., the rewards, some losses, or learning rates. We record the variables in the key-value formulation and store them in a tensorboard event and a CSV file.   
       3. Model checkpoints: We support weights saving of neural networks and related custom variables in Tensorflow and Pytorch framework. We can use the checkpoints to resume experiments or use the results of the experiment to complete downstream tasks.
@@ -40,6 +44,7 @@ Currently, we store the data items in standard file systems and manage the relat
 - The directory "code" is a backup of code for experiment reproducibility.
 - The directory "checkpoint" save weights of neural networks.
 - We have a table named "demo_task", which is the root directory of log/archive_tester/checkpoint/code/results. 
+- The "index" of experiments in named in the formulation of `${%Y}/${%m}/${%d}/${%H-%M-%S-%f} ${ip address} ${tracked hyper-parameters}`.
 
 
 ### Tools to Manage the Database
@@ -67,12 +72,12 @@ Querying:
 ### Other principles
 
 The second design principle is easy for integration. It still has a long way to go to achieve it. We give several example projects integrating with RLA in the directory example. 
-1. PPO with RL based on the stable_baselines framework: example/sb_ppo_example
+1. PPO with RL based on the [stable_baselines](https://github.com/Stable-Baselines-Team/stable-baselines) framework: example/sb_ppo_example
 2. [TODO] torch example.
 
-We also list the RL projects using RLA as follows:
-1. https://github.com/xionghuichen/MAPLE
-2. https://github.com/xionghuichen/CODAS
+We also list the RL research projects using RLA as follows:
+1. [MAPLE](https://github.com/xionghuichen/MAPLE)
+2. [CODAS](https://github.com/xionghuichen/CODAS)
 
 ## Installation
 ```angular2html
@@ -82,7 +87,7 @@ python setup.py install
 ```
 
 
-## Quickstart
+## Workflow
 
 
 We build an example project for integrating RLA, which can be seen in ./example/simplest_code. Now we summarize the steps to use it.
@@ -126,10 +131,6 @@ import tensorflow as tf
 summary = tf.Summary()
 logger.log_from_tf_summary(summary)
 
-# matplotlib figures.
-import matplotlib.pyplot as plt
-
-
 ```
 **Record checkpoints**
 
@@ -171,6 +172,8 @@ The figure plotted by plot_func will be saved in the "results" directory.
 
 ### Step3: handle your historical experiments. 
 
+The methods to handle the experiments can be splitted into the following modules:
+
 **Query**
 
 Currently, we develop the query tools based on two common scenarios: result visualization and experiment review. 
@@ -186,6 +189,7 @@ Result visualization:
         ![img.png](resource/demo-easy-to-plot-res.png)
    3. View data in "results" directory directly: other type of data are stored in `${data_root}/results/${task_name}/${index_name}`
     ![img.png](resource/demo-results-res.png)
+
 Experiment review: 
 1. Given any experiment named as `${task_name}/${index_name}`, we can find the line-by-line code in `${data_root}/code/${task_name}/${index_name}`. We can configure the files to be stored in BACKUP_CONFIG in rla_config.yaml.
 2. The corresponding hyper-parameters (recorded by `exp_manager.set_hyper_param`) can be found in `${data_root}/log/${task_name}/${index_name}/backup.txt`.
@@ -209,6 +213,29 @@ We manage the items in the database via toolkits in rla_scripts. Currently, the 
 We can use the above tools after copying the rla_scripts to our research project and modifying the DATA_ROOT in config.py to locate the root of the RLA database.
 
 
+## Distributed training & centralized logs
+
+In practice, we might conduct our experiments in multiple physical machines for the same project. Different physical machines separate the experiment data in the database.  We develop a simple log-sending tools based on ftplib. We split the physical machines into a main node and slave nodes. For each slave node, we should extra configure the following setign in `rla_config.yaml`:
+```
+SEND_LOG_FILE: True
+REMOTE_SETTING:
+  ftp_server: ''
+  username: ''
+  password: ''
+  remote_data_root: ''
+```
+where we set `SEND_LOG_FILE` to True and `ftp_server`, `username` and `password` are the ip address, username and passward of the master node.  `remote_data_root` define the data_root of the database in the main node. For the main node, just keep `SEND_LOG_FILE` to False. In our experiment code, we should call the function `RLA.easy_log.tester.exp_manager.sync_log_file` periodically, then the data items we be sent to the `remote_data_root`  of the main node. For example, 
+```
+for i in range(1000):
+    # your trianing code.
+    exp_manager.sync_log_file()
+```
+Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
+
+PS: 
+1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/questions/16428401/unable-to-use-ip-address-with-ftplib-python).
+
+2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
 # TODO
 - [ ] add comments and documents to the functions.
