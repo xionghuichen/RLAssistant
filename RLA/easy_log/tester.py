@@ -317,7 +317,7 @@ class Tester(object):
                 for root, dirs, files in os.walk(self.log_dir):
                     suffix = root.split("/{}/".format(LOG))
                     assert len(suffix) == 2, "root should only have one pattern \"/log/\""
-                    remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_log_root"], LOG, suffix[1])
+                    remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_data_root"], LOG, suffix[1])
                     local_root = root
                     logger.warn("sync {} <- {}".format(remote_root, local_root))
                     for file in files:

@@ -9,7 +9,7 @@ PROJECT_TYPE:
 # When the following path is set to relative path, the current working directory is the path which rla_config.yaml in.
 BACKUP_CONFIG:
   backup_code_dir:
-    - 'project'
+    - 'ppo2'
   lib_dir: './build/lib/'
 
 LOG_USED:
@@ -26,5 +26,5 @@ REMOTE_SETTING:
   ftp_server: ''
   username: ''
   password: ''
-  remote_data_root: ''
+  remote_log_root: ''
 
