@@ -1,0 +1,30 @@
+PROJECT_TYPE:
+  # lib: backup the project in YOUR_PROJECT_ROOT/build/lib.
+  # It suit to the situation when you run the code by building a package. (e.g., "python setup.py install")
+  # source: backup the project in YOUR_PROJECT_ROOT/{backup_code_dir}.
+  # It suit to the situation when you run your code directly.
+  # and all log files in easy_log.
+  backup_code_by: 'source'
+
+# When the following path is set to relative path, the current working directory is the path which rla_config.yaml in.
+BACKUP_CONFIG:
+  backup_code_dir:
+    - 'ppo'
+  lib_dir: './build/lib/'
+
+LOG_USED:
+  - 'stdout'
+  - 'log'
+  - 'tensorboard'
+  - 'csv'
+
+# select a DL framework: tensorflow or pytorch.
+DL_FRAMEWORK: 'pytorch'
+
+SEND_LOG_FILE: False
+REMOTE_SETTING:
+  ftp_server: ''
+  username: ''
+  password: ''
+  remote_data_root: ''
+

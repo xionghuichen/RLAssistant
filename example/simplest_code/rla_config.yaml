@@ -26,5 +26,5 @@ REMOTE_SETTING:
   ftp_server: ''
   username: ''
   password: ''
-  remote_log_root: ''
+  remote_data_root: ''
 

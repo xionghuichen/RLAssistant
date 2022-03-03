@@ -1,0 +1,7 @@
+[BACKUP] 0 : key: env, value: CartPole-v1
+[BACKUP] 0 : key: info, value: default exp info
+[BACKUP] 0 : key: loaded_date, value: True
+[BACKUP] 0 : key: loaded_task_name, value: 
+[BACKUP] 0 : key: policy_type, value: MlpPolicy
+[BACKUP] 0 : key: seed, value: 0
+[BACKUP] 0 : key: total_timesteps, value: 100000

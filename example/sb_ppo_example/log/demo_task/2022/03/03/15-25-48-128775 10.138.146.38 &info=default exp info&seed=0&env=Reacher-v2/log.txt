@@ -1,0 +1,1606 @@
+Logging to ../log/demo_task/2022/03/03/15-25-48-128775 10.138.146.38 &info=default exp info&seed=0&env=Reacher-v2/
+log dir: ../log/demo_task/2022/03/03/15-25-48-128775 10.138.146.38 &info=default exp info&seed=0&env=Reacher-v2/
+pkl_file: ../archive_tester/demo_task/2022/03/03/15-25-48-128775 10.138.146.38 &info=default exp info&seed=0&env=Reacher-v2.pkl
+checkpoint_dir: ../checkpoint/demo_task/2022/03/03/15-25-48-128775 10.138.146.38 &info=default exp info&seed=0&env=Reacher-v2/
+results_dir: ../results/demo_task/2022/03/03/15-25-48-128775 10.138.146.38 &info=default exp info&seed=0&env=Reacher-v2/
+[BACKUP] 0 : key: env, value: Reacher-v2
+[BACKUP] 0 : key: info, value: default exp info
+[BACKUP] 0 : key: loaded_date, value: True
+[BACKUP] 0 : key: loaded_task_name, value: 
+[BACKUP] 0 : key: num_timesteps, value: 1000000
+[BACKUP] 0 : key: play, value: False
+[BACKUP] 0 : key: seed, value: 0
+save variable :
+<tf.Variable 'model/pi_fc0/w:0' shape=(11, 64) dtype=float32_ref>
+<tf.Variable 'model/pi_fc0/b:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf_fc0/w:0' shape=(11, 64) dtype=float32_ref>
+<tf.Variable 'model/vf_fc0/b:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/pi_fc1/w:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'model/pi_fc1/b:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf_fc1/w:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'model/vf_fc1/b:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf/w:0' shape=(64, 1) dtype=float32_ref>
+<tf.Variable 'model/vf/b:0' shape=(1,) dtype=float32_ref>
+<tf.Variable 'model/pi/w:0' shape=(64, 2) dtype=float32_ref>
+<tf.Variable 'model/pi/b:0' shape=(2,) dtype=float32_ref>
+<tf.Variable 'model/pi/logstd:0' shape=(1, 2) dtype=float32_ref>
+<tf.Variable 'model/q/w:0' shape=(64, 2) dtype=float32_ref>
+<tf.Variable 'model/q/b:0' shape=(2,) dtype=float32_ref>
+<tf.Variable 'beta1_power:0' shape=() dtype=float32_ref>
+<tf.Variable 'beta2_power:0' shape=() dtype=float32_ref>
+<tf.Variable 'model/pi_fc0/w/Adam:0' shape=(11, 64) dtype=float32_ref>
+<tf.Variable 'model/pi_fc0/w/Adam_1:0' shape=(11, 64) dtype=float32_ref>
+<tf.Variable 'model/pi_fc0/b/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/pi_fc0/b/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf_fc0/w/Adam:0' shape=(11, 64) dtype=float32_ref>
+<tf.Variable 'model/vf_fc0/w/Adam_1:0' shape=(11, 64) dtype=float32_ref>
+<tf.Variable 'model/vf_fc0/b/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf_fc0/b/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/pi_fc1/w/Adam:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'model/pi_fc1/w/Adam_1:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'model/pi_fc1/b/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/pi_fc1/b/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf_fc1/w/Adam:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'model/vf_fc1/w/Adam_1:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'model/vf_fc1/b/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf_fc1/b/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'model/vf/w/Adam:0' shape=(64, 1) dtype=float32_ref>
+<tf.Variable 'model/vf/w/Adam_1:0' shape=(64, 1) dtype=float32_ref>
+<tf.Variable 'model/vf/b/Adam:0' shape=(1,) dtype=float32_ref>
+<tf.Variable 'model/vf/b/Adam_1:0' shape=(1,) dtype=float32_ref>
+<tf.Variable 'model/pi/w/Adam:0' shape=(64, 2) dtype=float32_ref>
+<tf.Variable 'model/pi/w/Adam_1:0' shape=(64, 2) dtype=float32_ref>
+<tf.Variable 'model/pi/b/Adam:0' shape=(2,) dtype=float32_ref>
+<tf.Variable 'model/pi/b/Adam_1:0' shape=(2,) dtype=float32_ref>
+<tf.Variable 'model/pi/logstd/Adam:0' shape=(1, 2) dtype=float32_ref>
+<tf.Variable 'model/pi/logstd/Adam_1:0' shape=(1, 2) dtype=float32_ref>
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 9.69e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -0.945   |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.69     |
+| input_info/old_value_pred                | 0.0376   |
+| loss/approximate_kullback-leibler        | 0.00749  |
+| loss/clip_factor                         | 0.0312   |
+| loss/entropy_loss                        | 2.78     |
+| loss/loss                                | 0.186    |
+| loss/policy_gradient_loss                | -0.00429 |
+| loss/value_function_loss                 | 0.38     |
+| perf/episode_reward                      | -4.45    |
+| time-step                                | 4048     |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0049904943 |
+| clipfrac           | 0.05493164   |
+| explained_variance | -0.0105      |
+| fps                | 326          |
+| n_updates          | 1            |
+| policy_entropy     | 2.8037262    |
+| policy_loss        | -0.008584764 |
+| serial_timesteps   | 2048         |
+| time-step          | 4048         |
+| time_elapsed       | 1.79e-05     |
+| total_timesteps    | 2048         |
+| value_loss         | 0.51005226   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 4.47e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.03    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.79     |
+| input_info/old_value_pred                | -0.161   |
+| loss/approximate_kullback-leibler        | 0.00634  |
+| loss/clip_factor                         | 0.0625   |
+| loss/entropy_loss                        | 2.75     |
+| loss/loss                                | 0.144    |
+| loss/policy_gradient_loss                | -0.0186  |
+| loss/value_function_loss                 | 0.326    |
+| perf/episode_reward                      | -4.47    |
+| time-step                                | 6098     |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.004329679  |
+| clipfrac           | 0.05258789   |
+| explained_variance | 0.0453       |
+| fps                | 366          |
+| n_updates          | 2            |
+| policy_entropy     | 2.762903     |
+| policy_loss        | -0.008673402 |
+| serial_timesteps   | 4096         |
+| time-step          | 6098         |
+| time_elapsed       | 6.34         |
+| total_timesteps    | 4096         |
+| value_loss         | 0.36177915   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 0        |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.1     |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.63     |
+| input_info/old_value_pred                | -0.356   |
+| loss/approximate_kullback-leibler        | 0.00634  |
+| loss/clip_factor                         | 0.0469   |
+| loss/entropy_loss                        | 2.7      |
+| loss/loss                                | 0.134    |
+| loss/policy_gradient_loss                | -0.0102  |
+| loss/value_function_loss                 | 0.288    |
+| perf/episode_reward                      | -4.65    |
+| time-step                                | 8148     |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.005885222  |
+| clipfrac           | 0.06552734   |
+| explained_variance | 0.159        |
+| fps                | 361          |
+| n_updates          | 3            |
+| policy_entropy     | 2.7211626    |
+| policy_loss        | -0.008563396 |
+| serial_timesteps   | 6144         |
+| time-step          | 8148         |
+| time_elapsed       | 11.9         |
+| total_timesteps    | 6144         |
+| value_loss         | 0.28230602   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 0        |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.29    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.71     |
+| input_info/old_value_pred                | -0.62    |
+| loss/approximate_kullback-leibler        | 0.00496  |
+| loss/clip_factor                         | 0.0469   |
+| loss/entropy_loss                        | 2.65     |
+| loss/loss                                | 0.124    |
+| loss/policy_gradient_loss                | 0.0123   |
+| loss/value_function_loss                 | 0.223    |
+| perf/episode_reward                      | -4.35    |
+| time-step                                | 10198    |
+----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------
+| approxkl           | 0.004689827   |
+| clipfrac           | 0.047949217   |
+| explained_variance | 0.132         |
+| fps                | 358           |
+| n_updates          | 4             |
+| policy_entropy     | 2.6721654     |
+| policy_loss        | -0.0077538327 |
+| serial_timesteps   | 8192          |
+| time-step          | 10198         |
+| time_elapsed       | 17.6          |
+| total_timesteps    | 8192          |
+| value_loss         | 0.25542396    |
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -2.98e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.55     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.59      |
+| input_info/old_value_pred                | -0.923    |
+| loss/approximate_kullback-leibler        | 0.00667   |
+| loss/clip_factor                         | 0.0781    |
+| loss/entropy_loss                        | 2.59      |
+| loss/loss                                | 0.0959    |
+| loss/policy_gradient_loss                | -0.0058   |
+| loss/value_function_loss                 | 0.203     |
+| perf/episode_reward                      | -4.63     |
+| time-step                                | 12248     |
+-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------
+| approxkl           | 0.00609043  |
+| clipfrac           | 0.06660156  |
+| explained_variance | 0.0857      |
+| fps                | 357         |
+| n_updates          | 5           |
+| policy_entropy     | 2.6169298   |
+| policy_loss        | -0.00968176 |
+| serial_timesteps   | 10240       |
+| time-step          | 12248       |
+| time_elapsed       | 23.3        |
+| total_timesteps    | 10240       |
+| value_loss         | 0.21251087  |
+---------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.86e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.48     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.74      |
+| input_info/old_value_pred                | -1.03     |
+| loss/approximate_kullback-leibler        | 0.00608   |
+| loss/clip_factor                         | 0.0625    |
+| loss/entropy_loss                        | 2.55      |
+| loss/loss                                | 0.0576    |
+| loss/policy_gradient_loss                | -0.00842  |
+| loss/value_function_loss                 | 0.132     |
+| perf/episode_reward                      | -4.48     |
+| time-step                                | 14298     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0034151599 |
+| clipfrac           | 0.032128908  |
+| explained_variance | 0.283        |
+| fps                | 361          |
+| n_updates          | 6            |
+| policy_entropy     | 2.5684655    |
+| policy_loss        | -0.006126181 |
+| serial_timesteps   | 12288        |
+| time-step          | 14298        |
+| time_elapsed       | 29.1         |
+| total_timesteps    | 12288        |
+| value_loss         | 0.16783151   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -7.45e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.67     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.56      |
+| input_info/old_value_pred                | -1.34     |
+| loss/approximate_kullback-leibler        | 0.00781   |
+| loss/clip_factor                         | 0.0781    |
+| loss/entropy_loss                        | 2.49      |
+| loss/loss                                | 0.0456    |
+| loss/policy_gradient_loss                | -0.0237   |
+| loss/value_function_loss                 | 0.139     |
+| perf/episode_reward                      | -4.33     |
+| time-step                                | 16348     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0058328947 |
+| clipfrac           | 0.06323242   |
+| explained_variance | 0.323        |
+| fps                | 372          |
+| n_updates          | 7            |
+| policy_entropy     | 2.5158737    |
+| policy_loss        | -0.010387925 |
+| serial_timesteps   | 14336        |
+| time-step          | 16348        |
+| time_elapsed       | 34.7         |
+| total_timesteps    | 14336        |
+| value_loss         | 0.15298916   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.49e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.7      |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.31      |
+| input_info/old_value_pred                | -1.47     |
+| loss/approximate_kullback-leibler        | 0.00417   |
+| loss/clip_factor                         | 0.0312    |
+| loss/entropy_loss                        | 2.46      |
+| loss/loss                                | 0.0372    |
+| loss/policy_gradient_loss                | -0.0311   |
+| loss/value_function_loss                 | 0.137     |
+| perf/episode_reward                      | -4.17     |
+| time-step                                | 18398     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0046372553 |
+| clipfrac           | 0.053710938  |
+| explained_variance | 0.454        |
+| fps                | 369          |
+| n_updates          | 8            |
+| policy_entropy     | 2.470303     |
+| policy_loss        | -0.009657826 |
+| serial_timesteps   | 16384        |
+| time-step          | 18398        |
+| time_elapsed       | 40.2         |
+| total_timesteps    | 16384        |
+| value_loss         | 0.12364121   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 2.98e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.75    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.63     |
+| input_info/old_value_pred                | -1.62    |
+| loss/approximate_kullback-leibler        | 0.0111   |
+| loss/clip_factor                         | 0.203    |
+| loss/entropy_loss                        | 2.41     |
+| loss/loss                                | 0.0338   |
+| loss/policy_gradient_loss                | -0.0378  |
+| loss/value_function_loss                 | 0.143    |
+| perf/episode_reward                      | -4.12    |
+| time-step                                | 20448    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0065229572 |
+| clipfrac           | 0.07875977   |
+| explained_variance | 0.494        |
+| fps                | 359          |
+| n_updates          | 9            |
+| policy_entropy     | 2.432529     |
+| policy_loss        | -0.009377116 |
+| serial_timesteps   | 18432        |
+| time-step          | 20448        |
+| time_elapsed       | 45.8         |
+| total_timesteps    | 18432        |
+| value_loss         | 0.13285215   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.86e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.99     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.52      |
+| input_info/old_value_pred                | -1.81     |
+| loss/approximate_kullback-leibler        | 0.00927   |
+| loss/clip_factor                         | 0.0781    |
+| loss/entropy_loss                        | 2.34      |
+| loss/loss                                | 0.0341    |
+| loss/policy_gradient_loss                | -0.0221   |
+| loss/value_function_loss                 | 0.112     |
+| perf/episode_reward                      | -4.65     |
+| time-step                                | 22498     |
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------
+| approxkl           | 0.005583125   |
+| clipfrac           | 0.055664062   |
+| explained_variance | 0.519         |
+| fps                | 364           |
+| n_updates          | 10            |
+| policy_entropy     | 2.3734915     |
+| policy_loss        | -0.0102547165 |
+| serial_timesteps   | 20480         |
+| time-step          | 22498         |
+| time_elapsed       | 51.5          |
+| total_timesteps    | 20480         |
+| value_loss         | 0.13422519    |
+-----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 2.98e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.89    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.43     |
+| input_info/old_value_pred                | -1.8     |
+| loss/approximate_kullback-leibler        | 0.0112   |
+| loss/clip_factor                         | 0.172    |
+| loss/entropy_loss                        | 2.3      |
+| loss/loss                                | 0.0332   |
+| loss/policy_gradient_loss                | -0.00552 |
+| loss/value_function_loss                 | 0.0775   |
+| perf/episode_reward                      | -4.08    |
+| time-step                                | 24548    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0069347406 |
+| clipfrac           | 0.08505859   |
+| explained_variance | 0.624        |
+| fps                | 357          |
+| n_updates          | 11           |
+| policy_entropy     | 2.3168979    |
+| policy_loss        | -0.011026508 |
+| serial_timesteps   | 22528        |
+| time-step          | 24548        |
+| time_elapsed       | 57.1         |
+| total_timesteps    | 22528        |
+| value_loss         | 0.09803647   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.49e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.98     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.3       |
+| input_info/old_value_pred                | -1.92     |
+| loss/approximate_kullback-leibler        | 0.0131    |
+| loss/clip_factor                         | 0.109     |
+| loss/entropy_loss                        | 2.24      |
+| loss/loss                                | 0.0358    |
+| loss/policy_gradient_loss                | -0.00352  |
+| loss/value_function_loss                 | 0.0787    |
+| perf/episode_reward                      | -3.62     |
+| time-step                                | 26598     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0064800987 |
+| clipfrac           | 0.07080078   |
+| explained_variance | 0.659        |
+| fps                | 357          |
+| n_updates          | 12           |
+| policy_entropy     | 2.264633     |
+| policy_loss        | -0.010023223 |
+| serial_timesteps   | 24576        |
+| time-step          | 26598        |
+| time_elapsed       | 62.9         |
+| total_timesteps    | 24576        |
+| value_loss         | 0.10389179   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -3.73e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.73     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.08      |
+| input_info/old_value_pred                | -1.71     |
+| loss/approximate_kullback-leibler        | 0.00491   |
+| loss/clip_factor                         | 0.0625    |
+| loss/entropy_loss                        | 2.18      |
+| loss/loss                                | 0.0557    |
+| loss/policy_gradient_loss                | 0.00359   |
+| loss/value_function_loss                 | 0.104     |
+| perf/episode_reward                      | -3.84     |
+| time-step                                | 28648     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.00609634   |
+| clipfrac           | 0.07075195   |
+| explained_variance | 0.684        |
+| fps                | 360          |
+| n_updates          | 13           |
+| policy_entropy     | 2.2062924    |
+| policy_loss        | -0.009719332 |
+| serial_timesteps   | 26624        |
+| time-step          | 28648        |
+| time_elapsed       | 68.6         |
+| total_timesteps    | 26624        |
+| value_loss         | 0.09781502   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -7.45e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.69     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.11      |
+| input_info/old_value_pred                | -1.7      |
+| loss/approximate_kullback-leibler        | 0.00955   |
+| loss/clip_factor                         | 0.188     |
+| loss/entropy_loss                        | 2.14      |
+| loss/loss                                | 0.0422    |
+| loss/policy_gradient_loss                | -0.00213  |
+| loss/value_function_loss                 | 0.0886    |
+| perf/episode_reward                      | -4.36     |
+| time-step                                | 30698     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0053118714 |
+| clipfrac           | 0.05859375   |
+| explained_variance | 0.729        |
+| fps                | 360          |
+| n_updates          | 14           |
+| policy_entropy     | 2.157093     |
+| policy_loss        | -0.009248294 |
+| serial_timesteps   | 28672        |
+| time-step          | 30698        |
+| time_elapsed       | 74.3         |
+| total_timesteps    | 28672        |
+| value_loss         | 0.09148059   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -7.45e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.85     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.05      |
+| input_info/old_value_pred                | -1.81     |
+| loss/approximate_kullback-leibler        | 0.0102    |
+| loss/clip_factor                         | 0.125     |
+| loss/entropy_loss                        | 2.1       |
+| loss/loss                                | 0.0281    |
+| loss/policy_gradient_loss                | -0.0255   |
+| loss/value_function_loss                 | 0.107     |
+| perf/episode_reward                      | -4.17     |
+| time-step                                | 32748     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0055176215 |
+| clipfrac           | 0.06196289   |
+| explained_variance | 0.657        |
+| fps                | 361          |
+| n_updates          | 15           |
+| policy_entropy     | 2.1188316    |
+| policy_loss        | -0.009307016 |
+| serial_timesteps   | 30720        |
+| time-step          | 32748        |
+| time_elapsed       | 80           |
+| total_timesteps    | 30720        |
+| value_loss         | 0.10220281   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 1.86e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.99    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.03     |
+| input_info/old_value_pred                | -1.94    |
+| loss/approximate_kullback-leibler        | 0.00842  |
+| loss/clip_factor                         | 0.172    |
+| loss/entropy_loss                        | 2.04     |
+| loss/loss                                | 0.00356  |
+| loss/policy_gradient_loss                | -0.0293  |
+| loss/value_function_loss                 | 0.0657   |
+| perf/episode_reward                      | -3.06    |
+| time-step                                | 34798    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.006506375  |
+| clipfrac           | 0.07553711   |
+| explained_variance | 0.661        |
+| fps                | 364          |
+| n_updates          | 16           |
+| policy_entropy     | 2.0683072    |
+| policy_loss        | -0.012744071 |
+| serial_timesteps   | 32768        |
+| time-step          | 34798        |
+| time_elapsed       | 85.7         |
+| total_timesteps    | 32768        |
+| value_loss         | 0.1023535    |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.49e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.74     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 2.23      |
+| input_info/old_value_pred                | -1.76     |
+| loss/approximate_kullback-leibler        | 0.00982   |
+| loss/clip_factor                         | 0.109     |
+| loss/entropy_loss                        | 1.99      |
+| loss/loss                                | 0.034     |
+| loss/policy_gradient_loss                | -0.0129   |
+| loss/value_function_loss                 | 0.0939    |
+| perf/episode_reward                      | -3.23     |
+| time-step                                | 36848     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0052462895 |
+| clipfrac           | 0.055859376  |
+| explained_variance | 0.743        |
+| fps                | 369          |
+| n_updates          | 17           |
+| policy_entropy     | 2.008853     |
+| policy_loss        | -0.008508058 |
+| serial_timesteps   | 34816        |
+| time-step          | 36848        |
+| time_elapsed       | 91.3         |
+| total_timesteps    | 34816        |
+| value_loss         | 0.07987062   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 7.45e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.8     |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.82     |
+| input_info/old_value_pred                | -1.89    |
+| loss/approximate_kullback-leibler        | 0.00733  |
+| loss/clip_factor                         | 0.0625   |
+| loss/entropy_loss                        | 1.94     |
+| loss/loss                                | 0.0133   |
+| loss/policy_gradient_loss                | -0.0391  |
+| loss/value_function_loss                 | 0.105    |
+| perf/episode_reward                      | -4.14    |
+| time-step                                | 38898    |
+----------------------------------------------------------------------------------------
+---------------------------------------------------------------------
+| approxkl           | 0.004292242 |
+| clipfrac           | 0.042578124 |
+| explained_variance | 0.716       |
+| fps                | 363         |
+| n_updates          | 18          |
+| policy_entropy     | 1.9593608   |
+| policy_loss        | -0.00978888 |
+| serial_timesteps   | 36864       |
+| time-step          | 38898       |
+| time_elapsed       | 96.8        |
+| total_timesteps    | 36864       |
+| value_loss         | 0.08398728  |
+---------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 1.49e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.81    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.16     |
+| input_info/old_value_pred                | -1.92    |
+| loss/approximate_kullback-leibler        | 0.00396  |
+| loss/clip_factor                         | 0.0469   |
+| loss/entropy_loss                        | 1.92     |
+| loss/loss                                | 0.0357   |
+| loss/policy_gradient_loss                | -0.00264 |
+| loss/value_function_loss                 | 0.0767   |
+| perf/episode_reward                      | -3.51    |
+| time-step                                | 40948    |
+----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------
+| approxkl           | 0.004344602   |
+| clipfrac           | 0.04863281    |
+| explained_variance | 0.761         |
+| fps                | 373           |
+| n_updates          | 19            |
+| policy_entropy     | 1.9272697     |
+| policy_loss        | -0.0070756995 |
+| serial_timesteps   | 38912         |
+| time-step          | 40948         |
+| time_elapsed       | 102           |
+| total_timesteps    | 38912         |
+| value_loss         | 0.074883915   |
+-----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 7.45e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.89    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.95     |
+| input_info/old_value_pred                | -1.96    |
+| loss/approximate_kullback-leibler        | 0.0133   |
+| loss/clip_factor                         | 0.156    |
+| loss/entropy_loss                        | 1.87     |
+| loss/loss                                | 0.0241   |
+| loss/policy_gradient_loss                | -0.023   |
+| loss/value_function_loss                 | 0.0942   |
+| perf/episode_reward                      | -4.11    |
+| time-step                                | 42998    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007536405  |
+| clipfrac           | 0.091552734  |
+| explained_variance | 0.767        |
+| fps                | 381          |
+| n_updates          | 20           |
+| policy_entropy     | 1.8924955    |
+| policy_loss        | -0.011574991 |
+| serial_timesteps   | 40960        |
+| time-step          | 42998        |
+| time_elapsed       | 108          |
+| total_timesteps    | 40960        |
+| value_loss         | 0.07065437   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 3.73e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.78    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 2.01     |
+| input_info/old_value_pred                | -1.77    |
+| loss/approximate_kullback-leibler        | 0.0122   |
+| loss/clip_factor                         | 0.156    |
+| loss/entropy_loss                        | 1.8      |
+| loss/loss                                | 0.0164   |
+| loss/policy_gradient_loss                | -0.0098  |
+| loss/value_function_loss                 | 0.0525   |
+| perf/episode_reward                      | -2.92    |
+| time-step                                | 45048    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.006927685  |
+| clipfrac           | 0.08383789   |
+| explained_variance | 0.774        |
+| fps                | 375          |
+| n_updates          | 21           |
+| policy_entropy     | 1.8343017    |
+| policy_loss        | -0.010340329 |
+| serial_timesteps   | 43008        |
+| time-step          | 45048        |
+| time_elapsed       | 113          |
+| total_timesteps    | 43008        |
+| value_loss         | 0.06454225   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 1.86e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.72    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.8      |
+| input_info/old_value_pred                | -1.7     |
+| loss/approximate_kullback-leibler        | 0.00496  |
+| loss/clip_factor                         | 0.0469   |
+| loss/entropy_loss                        | 1.74     |
+| loss/loss                                | 0.0204   |
+| loss/policy_gradient_loss                | -0.00473 |
+| loss/value_function_loss                 | 0.0503   |
+| perf/episode_reward                      | -2.88    |
+| time-step                                | 47098    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.005919262  |
+| clipfrac           | 0.0668457    |
+| explained_variance | 0.739        |
+| fps                | 370          |
+| n_updates          | 22           |
+| policy_entropy     | 1.771636     |
+| policy_loss        | -0.008869727 |
+| serial_timesteps   | 45056        |
+| time-step          | 47098        |
+| time_elapsed       | 119          |
+| total_timesteps    | 45056        |
+| value_loss         | 0.06927811   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -7.45e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.77     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.8       |
+| input_info/old_value_pred                | -1.76     |
+| loss/approximate_kullback-leibler        | 0.0101    |
+| loss/clip_factor                         | 0.109     |
+| loss/entropy_loss                        | 1.68      |
+| loss/loss                                | 0.0194    |
+| loss/policy_gradient_loss                | -0.0096   |
+| loss/value_function_loss                 | 0.0579    |
+| perf/episode_reward                      | -3.39     |
+| time-step                                | 49148     |
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------
+| approxkl           | 0.0063518966  |
+| clipfrac           | 0.07338867    |
+| explained_variance | 0.847         |
+| fps                | 368           |
+| n_updates          | 23            |
+| policy_entropy     | 1.7113708     |
+| policy_loss        | -0.0109186275 |
+| serial_timesteps   | 47104         |
+| time-step          | 49148         |
+| time_elapsed       | 124           |
+| total_timesteps    | 47104         |
+| value_loss         | 0.046813376   |
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -9.31e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.47     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.47      |
+| input_info/old_value_pred                | -1.58     |
+| loss/approximate_kullback-leibler        | 0.0109    |
+| loss/clip_factor                         | 0.156     |
+| loss/entropy_loss                        | 1.62      |
+| loss/loss                                | 0.0113    |
+| loss/policy_gradient_loss                | -0.0251   |
+| loss/value_function_loss                 | 0.0727    |
+| perf/episode_reward                      | -3.76     |
+| time-step                                | 51198     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0067799576 |
+| clipfrac           | 0.080761716  |
+| explained_variance | 0.806        |
+| fps                | 374          |
+| n_updates          | 24           |
+| policy_entropy     | 1.6480598    |
+| policy_loss        | -0.011213035 |
+| serial_timesteps   | 49152        |
+| time-step          | 51198        |
+| time_elapsed       | 130          |
+| total_timesteps    | 49152        |
+| value_loss         | 0.05390337   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -2.98e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.59     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.3       |
+| input_info/old_value_pred                | -1.71     |
+| loss/approximate_kullback-leibler        | 0.00561   |
+| loss/clip_factor                         | 0.109     |
+| loss/entropy_loss                        | 1.58      |
+| loss/loss                                | -0.00618  |
+| loss/policy_gradient_loss                | -0.0291   |
+| loss/value_function_loss                 | 0.0458    |
+| perf/episode_reward                      | -2.92     |
+| time-step                                | 53198     |
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------
+| approxkl           | 0.00605079    |
+| clipfrac           | 0.07128906    |
+| explained_variance | 0.83          |
+| fps                | 373           |
+| n_updates          | 25            |
+| policy_entropy     | 1.5968143     |
+| policy_loss        | -0.0116076935 |
+| serial_timesteps   | 51200         |
+| time-step          | 53198         |
+| time_elapsed       | 135           |
+| total_timesteps    | 51200         |
+| value_loss         | 0.047449056   |
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -2.24e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.48     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.78      |
+| input_info/old_value_pred                | -1.52     |
+| loss/approximate_kullback-leibler        | 0.0124    |
+| loss/clip_factor                         | 0.172     |
+| loss/entropy_loss                        | 1.52      |
+| loss/loss                                | 0.0113    |
+| loss/policy_gradient_loss                | -0.0126   |
+| loss/value_function_loss                 | 0.0478    |
+| perf/episode_reward                      | -3.21     |
+| time-step                                | 55248     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007296904  |
+| clipfrac           | 0.09213867   |
+| explained_variance | 0.819        |
+| fps                | 370          |
+| n_updates          | 26           |
+| policy_entropy     | 1.5466154    |
+| policy_loss        | -0.010881179 |
+| serial_timesteps   | 53248        |
+| time-step          | 55248        |
+| time_elapsed       | 141          |
+| total_timesteps    | 53248        |
+| value_loss         | 0.044020705  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 3.73e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.48    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.52     |
+| input_info/old_value_pred                | -1.6     |
+| loss/approximate_kullback-leibler        | 0.00916  |
+| loss/clip_factor                         | 0.0938   |
+| loss/entropy_loss                        | 1.46     |
+| loss/loss                                | 0.0207   |
+| loss/policy_gradient_loss                | -0.0131  |
+| loss/value_function_loss                 | 0.0676   |
+| perf/episode_reward                      | -4.14    |
+| time-step                                | 57298    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007372815  |
+| clipfrac           | 0.08735351   |
+| explained_variance | 0.856        |
+| fps                | 363          |
+| n_updates          | 27           |
+| policy_entropy     | 1.4896715    |
+| policy_loss        | -0.012304807 |
+| serial_timesteps   | 55296        |
+| time-step          | 57298        |
+| time_elapsed       | 146          |
+| total_timesteps    | 55296        |
+| value_loss         | 0.038891543  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -2.24e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.49     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.66      |
+| input_info/old_value_pred                | -1.53     |
+| loss/approximate_kullback-leibler        | 0.0123    |
+| loss/clip_factor                         | 0.188     |
+| loss/entropy_loss                        | 1.42      |
+| loss/loss                                | 0.00994   |
+| loss/policy_gradient_loss                | -0.00861  |
+| loss/value_function_loss                 | 0.0371    |
+| perf/episode_reward                      | -3.63     |
+| time-step                                | 59348     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0076760193 |
+| clipfrac           | 0.10131836   |
+| explained_variance | 0.864        |
+| fps                | 362          |
+| n_updates          | 28           |
+| policy_entropy     | 1.4371703    |
+| policy_loss        | -0.011181025 |
+| serial_timesteps   | 57344        |
+| time-step          | 59348        |
+| time_elapsed       | 152          |
+| total_timesteps    | 57344        |
+| value_loss         | 0.037829913  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.49e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.33     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.45      |
+| input_info/old_value_pred                | -1.36     |
+| loss/approximate_kullback-leibler        | 0.012     |
+| loss/clip_factor                         | 0.141     |
+| loss/entropy_loss                        | 1.37      |
+| loss/loss                                | -0.0109   |
+| loss/policy_gradient_loss                | -0.0268   |
+| loss/value_function_loss                 | 0.0319    |
+| perf/episode_reward                      | -3.8      |
+| time-step                                | 61398     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.009450781  |
+| clipfrac           | 0.12797852   |
+| explained_variance | 0.866        |
+| fps                | 368          |
+| n_updates          | 29           |
+| policy_entropy     | 1.3905189    |
+| policy_loss        | -0.015534866 |
+| serial_timesteps   | 59392        |
+| time-step          | 61398        |
+| time_elapsed       | 158          |
+| total_timesteps    | 59392        |
+| value_loss         | 0.032453053  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.86e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.57     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.34      |
+| input_info/old_value_pred                | -1.57     |
+| loss/approximate_kullback-leibler        | 0.00852   |
+| loss/clip_factor                         | 0.109     |
+| loss/entropy_loss                        | 1.31      |
+| loss/loss                                | -0.00764  |
+| loss/policy_gradient_loss                | -0.02     |
+| loss/value_function_loss                 | 0.0248    |
+| perf/episode_reward                      | -3.6      |
+| time-step                                | 63448     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.00884595   |
+| clipfrac           | 0.1065918    |
+| explained_variance | 0.857        |
+| fps                | 358          |
+| n_updates          | 30           |
+| policy_entropy     | 1.3344975    |
+| policy_loss        | -0.012586072 |
+| serial_timesteps   | 61440        |
+| time-step          | 63448        |
+| time_elapsed       | 163          |
+| total_timesteps    | 61440        |
+| value_loss         | 0.033890896  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 0        |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.43    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.47     |
+| input_info/old_value_pred                | -1.48    |
+| loss/approximate_kullback-leibler        | 0.00812  |
+| loss/clip_factor                         | 0.125    |
+| loss/entropy_loss                        | 1.25     |
+| loss/loss                                | -0.0131  |
+| loss/policy_gradient_loss                | -0.0311  |
+| loss/value_function_loss                 | 0.0361   |
+| perf/episode_reward                      | -3.14    |
+| time-step                                | 65498    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007568089  |
+| clipfrac           | 0.086279295  |
+| explained_variance | 0.861        |
+| fps                | 350          |
+| n_updates          | 31           |
+| policy_entropy     | 1.2736962    |
+| policy_loss        | -0.011445734 |
+| serial_timesteps   | 63488        |
+| time-step          | 65498        |
+| time_elapsed       | 169          |
+| total_timesteps    | 63488        |
+| value_loss         | 0.035146497  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -3.73e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.61     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.33      |
+| input_info/old_value_pred                | -1.6      |
+| loss/approximate_kullback-leibler        | 0.0146    |
+| loss/clip_factor                         | 0.203     |
+| loss/entropy_loss                        | 1.18      |
+| loss/loss                                | 0.00629   |
+| loss/policy_gradient_loss                | -0.00588  |
+| loss/value_function_loss                 | 0.0243    |
+| perf/episode_reward                      | -3.91     |
+| time-step                                | 67548     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007321297  |
+| clipfrac           | 0.0796875    |
+| explained_variance | 0.88         |
+| fps                | 362          |
+| n_updates          | 32           |
+| policy_entropy     | 1.2108523    |
+| policy_loss        | -0.010551374 |
+| serial_timesteps   | 65536        |
+| time-step          | 67548        |
+| time_elapsed       | 175          |
+| total_timesteps    | 65536        |
+| value_loss         | 0.03308683   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 2.98e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.28    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.14     |
+| input_info/old_value_pred                | -1.31    |
+| loss/approximate_kullback-leibler        | 0.0104   |
+| loss/clip_factor                         | 0.172    |
+| loss/entropy_loss                        | 1.12     |
+| loss/loss                                | 0.0197   |
+| loss/policy_gradient_loss                | 0.00847  |
+| loss/value_function_loss                 | 0.0225   |
+| perf/episode_reward                      | -3.66    |
+| time-step                                | 69598    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0064179376 |
+| clipfrac           | 0.074316405  |
+| explained_variance | 0.875        |
+| fps                | 356          |
+| n_updates          | 33           |
+| policy_entropy     | 1.1491276    |
+| policy_loss        | -0.010191157 |
+| serial_timesteps   | 67584        |
+| time-step          | 69598        |
+| time_elapsed       | 181          |
+| total_timesteps    | 67584        |
+| value_loss         | 0.030520493  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.49e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.4      |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 1.16      |
+| input_info/old_value_pred                | -1.44     |
+| loss/approximate_kullback-leibler        | 0.00855   |
+| loss/clip_factor                         | 0.0938    |
+| loss/entropy_loss                        | 1.09      |
+| loss/loss                                | 0.00818   |
+| loss/policy_gradient_loss                | -0.00729  |
+| loss/value_function_loss                 | 0.0309    |
+| perf/episode_reward                      | -3.14     |
+| time-step                                | 71648     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007615416  |
+| clipfrac           | 0.09482422   |
+| explained_variance | 0.886        |
+| fps                | 360          |
+| n_updates          | 34           |
+| policy_entropy     | 1.104366     |
+| policy_loss        | -0.009832835 |
+| serial_timesteps   | 69632        |
+| time-step          | 71648        |
+| time_elapsed       | 186          |
+| total_timesteps    | 69632        |
+| value_loss         | 0.026068434  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 7.45e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.53    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.801    |
+| input_info/old_value_pred                | -1.56    |
+| loss/approximate_kullback-leibler        | 0.00444  |
+| loss/clip_factor                         | 0.0156   |
+| loss/entropy_loss                        | 1.03     |
+| loss/loss                                | 0.00365  |
+| loss/policy_gradient_loss                | -0.0132  |
+| loss/value_function_loss                 | 0.0338   |
+| perf/episode_reward                      | -3.46    |
+| time-step                                | 73698    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0063757324 |
+| clipfrac           | 0.07470703   |
+| explained_variance | 0.887        |
+| fps                | 359          |
+| n_updates          | 35           |
+| policy_entropy     | 1.0565895    |
+| policy_loss        | -0.009260004 |
+| serial_timesteps   | 71680        |
+| time-step          | 73698        |
+| time_elapsed       | 192          |
+| total_timesteps    | 71680        |
+| value_loss         | 0.025456022  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 7.45e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.37    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.926    |
+| input_info/old_value_pred                | -1.42    |
+| loss/approximate_kullback-leibler        | 0.00827  |
+| loss/clip_factor                         | 0.109    |
+| loss/entropy_loss                        | 0.972    |
+| loss/loss                                | -0.00186 |
+| loss/policy_gradient_loss                | -0.0234  |
+| loss/value_function_loss                 | 0.043    |
+| perf/episode_reward                      | -3.03    |
+| time-step                                | 75748    |
+----------------------------------------------------------------------------------------
+---------------------------------------------------------------------
+| approxkl           | 0.007976884 |
+| clipfrac           | 0.10102539  |
+| explained_variance | 0.862       |
+| fps                | 358         |
+| n_updates          | 36          |
+| policy_entropy     | 0.99978864  |
+| policy_loss        | -0.01330507 |
+| serial_timesteps   | 73728       |
+| time-step          | 75748       |
+| time_elapsed       | 198         |
+| total_timesteps    | 73728       |
+| value_loss         | 0.029692773 |
+---------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -3.73e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.31     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 0.784     |
+| input_info/old_value_pred                | -1.29     |
+| loss/approximate_kullback-leibler        | 0.0103    |
+| loss/clip_factor                         | 0.109     |
+| loss/entropy_loss                        | 0.894     |
+| loss/loss                                | -0.0259   |
+| loss/policy_gradient_loss                | -0.0352   |
+| loss/value_function_loss                 | 0.0186    |
+| perf/episode_reward                      | -3.05     |
+| time-step                                | 77798     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.011645357  |
+| clipfrac           | 0.14013672   |
+| explained_variance | 0.891        |
+| fps                | 359          |
+| n_updates          | 37           |
+| policy_entropy     | 0.92908317   |
+| policy_loss        | -0.015584344 |
+| serial_timesteps   | 75776        |
+| time-step          | 77798        |
+| time_elapsed       | 203          |
+| total_timesteps    | 75776        |
+| value_loss         | 0.02216979   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 1.49e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.22    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.894    |
+| input_info/old_value_pred                | -1.28    |
+| loss/approximate_kullback-leibler        | 0.0277   |
+| loss/clip_factor                         | 0.0938   |
+| loss/entropy_loss                        | 0.852    |
+| loss/loss                                | 0.00358  |
+| loss/policy_gradient_loss                | -0.0177  |
+| loss/value_function_loss                 | 0.0425   |
+| perf/episode_reward                      | -2.32    |
+| time-step                                | 79848    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.008570218  |
+| clipfrac           | 0.10449219   |
+| explained_variance | 0.852        |
+| fps                | 365          |
+| n_updates          | 38           |
+| policy_entropy     | 0.8679565    |
+| policy_loss        | -0.011082841 |
+| serial_timesteps   | 77824        |
+| time-step          | 79848        |
+| time_elapsed       | 209          |
+| total_timesteps    | 77824        |
+| value_loss         | 0.02891028   |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 7.45e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.3     |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 1.01     |
+| input_info/old_value_pred                | -1.39    |
+| loss/approximate_kullback-leibler        | 0.00896  |
+| loss/clip_factor                         | 0.141    |
+| loss/entropy_loss                        | 0.789    |
+| loss/loss                                | -0.00983 |
+| loss/policy_gradient_loss                | -0.0197  |
+| loss/value_function_loss                 | 0.0197   |
+| perf/episode_reward                      | -2.94    |
+| time-step                                | 81898    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.008552249  |
+| clipfrac           | 0.103710935  |
+| explained_variance | 0.865        |
+| fps                | 369          |
+| n_updates          | 39           |
+| policy_entropy     | 0.817153     |
+| policy_loss        | -0.011843545 |
+| serial_timesteps   | 79872        |
+| time-step          | 81898        |
+| time_elapsed       | 215          |
+| total_timesteps    | 79872        |
+| value_loss         | 0.025106236  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -7.45e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.25     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 0.557     |
+| input_info/old_value_pred                | -1.39     |
+| loss/approximate_kullback-leibler        | 0.00838   |
+| loss/clip_factor                         | 0.0781    |
+| loss/entropy_loss                        | 0.741     |
+| loss/loss                                | -0.00288  |
+| loss/policy_gradient_loss                | -0.0299   |
+| loss/value_function_loss                 | 0.054     |
+| perf/episode_reward                      | -2.19     |
+| time-step                                | 83948     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.006552315  |
+| clipfrac           | 0.07583008   |
+| explained_variance | 0.872        |
+| fps                | 366          |
+| n_updates          | 40           |
+| policy_entropy     | 0.7628231    |
+| policy_loss        | -0.009434352 |
+| serial_timesteps   | 81920        |
+| time-step          | 83948        |
+| time_elapsed       | 220          |
+| total_timesteps    | 81920        |
+| value_loss         | 0.026992863  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 2.98e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.24    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.524    |
+| input_info/old_value_pred                | -1.29    |
+| loss/approximate_kullback-leibler        | 0.00957  |
+| loss/clip_factor                         | 0.156    |
+| loss/entropy_loss                        | 0.659    |
+| loss/loss                                | -0.00937 |
+| loss/policy_gradient_loss                | -0.0154  |
+| loss/value_function_loss                 | 0.0121   |
+| perf/episode_reward                      | -3.07    |
+| time-step                                | 85998    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.010099188  |
+| clipfrac           | 0.12749024   |
+| explained_variance | 0.915        |
+| fps                | 361          |
+| n_updates          | 41           |
+| policy_entropy     | 0.6961496    |
+| policy_loss        | -0.016421802 |
+| serial_timesteps   | 83968        |
+| time-step          | 85998        |
+| time_elapsed       | 226          |
+| total_timesteps    | 83968        |
+| value_loss         | 0.018176582  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 2.98e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.15    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.469    |
+| input_info/old_value_pred                | -1.2     |
+| loss/approximate_kullback-leibler        | 0.0242   |
+| loss/clip_factor                         | 0.141    |
+| loss/entropy_loss                        | 0.61     |
+| loss/loss                                | -0.0168  |
+| loss/policy_gradient_loss                | -0.0228  |
+| loss/value_function_loss                 | 0.0119   |
+| perf/episode_reward                      | -2.41    |
+| time-step                                | 88048    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.010260234  |
+| clipfrac           | 0.12641601   |
+| explained_variance | 0.923        |
+| fps                | 351          |
+| n_updates          | 42           |
+| policy_entropy     | 0.6321104    |
+| policy_loss        | -0.013011754 |
+| serial_timesteps   | 86016        |
+| time-step          | 88048        |
+| time_elapsed       | 231          |
+| total_timesteps    | 86016        |
+| value_loss         | 0.01657012   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -3.73e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.07     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 0.619     |
+| input_info/old_value_pred                | -1.14     |
+| loss/approximate_kullback-leibler        | 0.0113    |
+| loss/clip_factor                         | 0.141     |
+| loss/entropy_loss                        | 0.566     |
+| loss/loss                                | -0.0273   |
+| loss/policy_gradient_loss                | -0.0354   |
+| loss/value_function_loss                 | 0.0162    |
+| perf/episode_reward                      | -2.67     |
+| time-step                                | 90098     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.007860526  |
+| clipfrac           | 0.0959961    |
+| explained_variance | 0.907        |
+| fps                | 360          |
+| n_updates          | 43           |
+| policy_entropy     | 0.5858786    |
+| policy_loss        | -0.009636275 |
+| serial_timesteps   | 88064        |
+| time-step          | 90098        |
+| time_elapsed       | 237          |
+| total_timesteps    | 88064        |
+| value_loss         | 0.015713945  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -3.73e-09 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.18     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 0.645     |
+| input_info/old_value_pred                | -1.18     |
+| loss/approximate_kullback-leibler        | 0.0191    |
+| loss/clip_factor                         | 0.219     |
+| loss/entropy_loss                        | 0.491     |
+| loss/loss                                | -0.00582  |
+| loss/policy_gradient_loss                | -0.0109   |
+| loss/value_function_loss                 | 0.0101    |
+| perf/episode_reward                      | -2.35     |
+| time-step                                | 92148     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.008475936  |
+| clipfrac           | 0.09311523   |
+| explained_variance | 0.937        |
+| fps                | 369          |
+| n_updates          | 44           |
+| policy_entropy     | 0.5256481    |
+| policy_loss        | -0.011302957 |
+| serial_timesteps   | 90112        |
+| time-step          | 92148        |
+| time_elapsed       | 243          |
+| total_timesteps    | 90112        |
+| value_loss         | 0.010517091  |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | 9.31e-09  |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.08     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 0.294     |
+| input_info/old_value_pred                | -1.1      |
+| loss/approximate_kullback-leibler        | 0.00634   |
+| loss/clip_factor                         | 0.0781    |
+| loss/entropy_loss                        | 0.431     |
+| loss/loss                                | 0.00208   |
+| loss/policy_gradient_loss                | -0.000941 |
+| loss/value_function_loss                 | 0.00605   |
+| perf/episode_reward                      | -2.4      |
+| time-step                                | 94198     |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.008607156  |
+| clipfrac           | 0.09169922   |
+| explained_variance | 0.928        |
+| fps                | 360          |
+| n_updates          | 45           |
+| policy_entropy     | 0.45739952   |
+| policy_loss        | -0.010608878 |
+| serial_timesteps   | 92160        |
+| time-step          | 94198        |
+| time_elapsed       | 249          |
+| total_timesteps    | 92160        |
+| value_loss         | 0.010216704  |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 2.24e-08 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.09    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.298    |
+| input_info/old_value_pred                | -1.1     |
+| loss/approximate_kullback-leibler        | 0.00787  |
+| loss/clip_factor                         | 0.172    |
+| loss/entropy_loss                        | 0.385    |
+| loss/loss                                | -0.00818 |
+| loss/policy_gradient_loss                | -0.0141  |
+| loss/value_function_loss                 | 0.0118   |
+| perf/episode_reward                      | -2.28    |
+| time-step                                | 96248    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0084247915 |
+| clipfrac           | 0.110888675  |
+| explained_variance | 0.92         |
+| fps                | 362          |
+| n_updates          | 46           |
+| policy_entropy     | 0.4044234    |
+| policy_loss        | -0.010891777 |
+| serial_timesteps   | 94208        |
+| time-step          | 96248        |
+| time_elapsed       | 254          |
+| total_timesteps    | 94208        |
+| value_loss         | 0.0121314265 |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 5.59e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.08    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.305    |
+| input_info/old_value_pred                | -1.1     |
+| loss/approximate_kullback-leibler        | 0.00946  |
+| loss/clip_factor                         | 0.109    |
+| loss/entropy_loss                        | 0.342    |
+| loss/loss                                | 0.00183  |
+| loss/policy_gradient_loss                | -0.00428 |
+| loss/value_function_loss                 | 0.0122   |
+| perf/episode_reward                      | -2.45    |
+| time-step                                | 98298    |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.008398407  |
+| clipfrac           | 0.10620117   |
+| explained_variance | 0.916        |
+| fps                | 368          |
+| n_updates          | 47           |
+| policy_entropy     | 0.36143464   |
+| policy_loss        | -0.010189461 |
+| serial_timesteps   | 96256        |
+| time-step          | 98298        |
+| time_elapsed       | 260          |
+| total_timesteps    | 96256        |
+| value_loss         | 0.0109873405 |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 0        |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.02    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.0974   |
+| input_info/old_value_pred                | -1.03    |
+| loss/approximate_kullback-leibler        | 0.00501  |
+| loss/clip_factor                         | 0.0469   |
+| loss/entropy_loss                        | 0.289    |
+| loss/loss                                | -0.0354  |
+| loss/policy_gradient_loss                | -0.04    |
+| loss/value_function_loss                 | 0.00923  |
+| perf/episode_reward                      | -2.15    |
+| time-step                                | 100348   |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.009361224  |
+| clipfrac           | 0.11826172   |
+| explained_variance | 0.92         |
+| fps                | 380          |
+| n_updates          | 48           |
+| policy_entropy     | 0.31339654   |
+| policy_loss        | -0.014363838 |
+| serial_timesteps   | 98304        |
+| time-step          | 100348       |
+| time_elapsed       | 265          |
+| total_timesteps    | 98304        |
+| value_loss         | 0.01075919   |
+----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+| input_info/advantage                     | -1.49e-08 |
+| input_info/clip_range                    | 0.2       |
+| input_info/clip_range_vf                 | 0.2       |
+| input_info/discounted_rewards            | -1.02     |
+| input_info/learning_rate                 | 0.0003    |
+| input_info/old_neglog_action_probability | 0.309     |
+| input_info/old_value_pred                | -1.06     |
+| loss/approximate_kullback-leibler        | 0.0082    |
+| loss/clip_factor                         | 0.0625    |
+| loss/entropy_loss                        | 0.22      |
+| loss/loss                                | -0.0152   |
+| loss/policy_gradient_loss                | -0.0176   |
+| loss/value_function_loss                 | 0.00473   |
+| perf/episode_reward                      | -1.96     |
+| time-step                                | 102398    |
+-----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.0085808085 |
+| clipfrac           | 0.104199216  |
+| explained_variance | 0.933        |
+| fps                | 365          |
+| n_updates          | 49           |
+| policy_entropy     | 0.25112304   |
+| policy_loss        | -0.012081781 |
+| serial_timesteps   | 100352       |
+| time-step          | 102398       |
+| time_elapsed       | 271          |
+| total_timesteps    | 100352       |
+| value_loss         | 0.0078101223 |
+----------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+| input_info/advantage                     | 7.45e-09 |
+| input_info/clip_range                    | 0.2      |
+| input_info/clip_range_vf                 | 0.2      |
+| input_info/discounted_rewards            | -1.02    |
+| input_info/learning_rate                 | 0.0003   |
+| input_info/old_neglog_action_probability | 0.246    |
+| input_info/old_value_pred                | -1.03    |
+| loss/approximate_kullback-leibler        | 0.0109   |
+| loss/clip_factor                         | 0.156    |
+| loss/entropy_loss                        | 0.156    |
+| loss/loss                                | 0.0108   |
+| loss/policy_gradient_loss                | 0.0074   |
+| loss/value_function_loss                 | 0.00683  |
+| perf/episode_reward                      | -1.71    |
+| time-step                                | 104398   |
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------
+| approxkl           | 0.009856927  |
+| clipfrac           | 0.124853514  |
+| explained_variance | 0.916        |
+| fps                | 367          |
+| n_updates          | 50           |
+| policy_entropy     | 0.1848269    |
+| policy_loss        | -0.012796176 |
+| serial_timesteps   | 102400       |
+| time-step          | 104398       |
+| time_elapsed       | 276          |
+| total_timesteps    | 102400       |
+| value_loss         | 0.010892857  |
+----------------------------------------------------------------------

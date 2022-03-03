@@ -1,0 +1,7 @@
+[BACKUP] 0 : key: env, value: Reacher-v2
+[BACKUP] 0 : key: info, value: default exp info
+[BACKUP] 0 : key: loaded_date, value: True
+[BACKUP] 0 : key: loaded_task_name, value: 
+[BACKUP] 0 : key: num_timesteps, value: 1000000
+[BACKUP] 0 : key: play, value: False
+[BACKUP] 0 : key: seed, value: 0
