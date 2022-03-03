@@ -67,8 +67,8 @@ Querying:
 ### Other principles
 
 The second design principle is easy for integration. It still has a long way to go to achieve it. We give several example projects integrating with RLA in the directory example. 
-1. PPO with RL based on the stable_baselines framework: example/sb_ppo_example
-2. [TODO] torch example.
+1. PPO with RLA based on the stable_baselines (tensorflow): example/sb_ppo_example
+2. PPO with RL based on the stable_baselines3 (pytorch): example/sb3_ppo_example
 
 We also list the RL projects using RLA as follows:
 1. https://github.com/xionghuichen/MAPLE

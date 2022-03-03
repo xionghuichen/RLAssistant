@@ -9,7 +9,7 @@ PROJECT_TYPE:
 # When the following path is set to relative path, the current working directory is the path which rla_config.yaml in.
 BACKUP_CONFIG:
   backup_code_dir:
-    - 'ppo2'
+    - 'ppo'
   lib_dir: './build/lib/'
 
 LOG_USED:
@@ -19,12 +19,12 @@ LOG_USED:
   - 'csv'
 
 # select a DL framework: tensorflow or pytorch.
-DL_FRAMEWORK: 'tensorflow'
+DL_FRAMEWORK: 'pytorch'
 
 SEND_LOG_FILE: False
 REMOTE_SETTING:
   ftp_server: ''
   username: ''
   password: ''
-  remote_log_root: ''
+  remote_data_root: ''
 

@@ -11,6 +11,7 @@ import numpy as np
 from collections import defaultdict, deque
 
 
+from typing import Any, Dict, List, Optional, Sequence, TextIO, Tuple, Union
 from contextlib import contextmanager
 from RLA.const import DEFAULT_X_NAME, FRAMEWORK
 
@@ -23,6 +24,8 @@ BACKUP = 60
 DISABLED = 50
 
 class KVWriter(object):
+    def __init__(self):
+        self.format_name = None
     """
     Key Value writer
     """
@@ -60,6 +63,7 @@ class HumanOutputFormat(KVWriter, SeqWriter):
             assert hasattr(filename_or_file, 'write'), 'Expected file or str, got {}'.format(filename_or_file)
             self.file = filename_or_file
             self.own_file = False
+        super(HumanOutputFormat).__init__()
 
     def writekvs(self, kvs):
         # Create strings for printing
@@ -123,6 +127,7 @@ class JSONOutputFormat(KVWriter):
         :param filename: (str) the file to write the log to
         """
         self.file = open(filename, 'at')
+        super(JSONOutputFormat).__init__()
 
     def writekvs(self, kvs):
         for key, value in sorted(kvs.items()):
@@ -161,6 +166,7 @@ class CSVOutputFormat(KVWriter):
             self.keys = []
         self.file = open(filename, 'a+t')
         self.sep = ','
+        super(CSVOutputFormat).__init__()
 
     def writekvs(self, kvs):
         # Add our current row to the history
@@ -260,6 +266,8 @@ class TensorBoardOutputFormat(KVWriter):
             self.tbx_writer = SummaryWriter(path)
         else:
             raise NotImplementedError
+
+        super(TensorBoardOutputFormat).__init__()
         # try:
         #     # self.writer = tf.summary.FileWriter(path) # pywrap_tensorflow.EventsWriter(compat.as_bytes(path))
         # except Exception:
@@ -342,21 +350,23 @@ def make_output_format(format, ev_dir, log_suffix='', framework='tensorflow'):
     """
     os.makedirs(ev_dir, exist_ok=True)
     if format == 'stdout':
-        return HumanOutputFormat(sys.stdout)
+        parsed_format =  HumanOutputFormat(sys.stdout)
     elif format == 'log':
-        return HumanOutputFormat(osp.join(ev_dir, 'log%s.txt' % log_suffix))
+        parsed_format = HumanOutputFormat(osp.join(ev_dir, 'log%s.txt' % log_suffix))
     elif format == 'warn':
-        return HumanOutputFormat(osp.join(ev_dir, 'warn%s.txt' % log_suffix))
+        parsed_format = HumanOutputFormat(osp.join(ev_dir, 'warn%s.txt' % log_suffix))
     elif format == 'backup':
-        return HumanOutputFormat(osp.join(ev_dir, 'backup%s.txt' % log_suffix))
+        parsed_format = HumanOutputFormat(osp.join(ev_dir, 'backup%s.txt' % log_suffix))
     elif format == 'json':
-        return JSONOutputFormat(osp.join(ev_dir, 'progress%s.json' % log_suffix))
+        parsed_format = JSONOutputFormat(osp.join(ev_dir, 'progress%s.json' % log_suffix))
     elif format == 'csv':
-        return CSVOutputFormat(osp.join(ev_dir, 'progress%s.csv' % log_suffix))
+        parsed_format = CSVOutputFormat(osp.join(ev_dir, 'progress%s.csv' % log_suffix))
     elif format == 'tensorboard':
-        return TensorBoardOutputFormat(osp.join(ev_dir, 'tb%s' % log_suffix), framework)
+        parsed_format = TensorBoardOutputFormat(osp.join(ev_dir, 'tb%s' % log_suffix), framework)
     else:
         raise ValueError('Unknown format specified: %s' % (format,))
+    parsed_format.format_name = format
+    return parsed_format
 
 # ================================================================
 # API
@@ -374,7 +384,7 @@ def timestep():
 ma_dict = {}
 
 
-def ma_record_tabular(key, val, record_len, ignore_nan=False):
+def ma_record_tabular(key, val, record_len, ignore_nan=False, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
     if key not in ma_dict:
         ma_dict[key] = deque(maxlen=record_len)
     if ignore_nan:
@@ -383,9 +393,9 @@ def ma_record_tabular(key, val, record_len, ignore_nan=False):
     else:
         ma_dict[key].append(val)
     if len(ma_dict[key]) == record_len:
-        record_tabular(key, np.mean(ma_dict[key]))
+        record_tabular(key, np.mean(ma_dict[key]), exclude)
 
-def logkv(key, val):
+def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
     """
     Log a value of some diagnostic
     Call this once for each diagnostic quantity, each iteration
@@ -394,7 +404,7 @@ def logkv(key, val):
     :param key: (Any) save to log this key
     :param val: (Any) save to log this value
     """
-    get_current().logkv(key, val)
+    get_current().logkv(key, val, exclude)
 
 
 def log_from_tf_summary(summary):
@@ -430,12 +440,12 @@ def logkv_mean(key, val):
     """
     get_current().logkv_mean(key, val)
 
-def logkvs(d):
+def logkvs(d, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
     """
     Log a dictionary of key-value pairs
     """
     for (k, v) in d.items():
-        logkv(k, v)
+        logkv(k, v, exclude)
 
 
 def log_key_value(keys, values, prefix_name=''):
@@ -571,6 +581,7 @@ class Logger(object):
 
     def __init__(self, dir, output_formats, warn_output_formats, backup_output_formats, comm=None):
         self.name2val = defaultdict(float)  # values this iteration
+        self.exclude_name = defaultdict(str)  # values this iteration
         self.name2cnt = defaultdict(int)
         self.level = INFO
         self.dir = dir
@@ -581,7 +592,7 @@ class Logger(object):
 
     # Logging API, forwarded
     # ----------------------------------------
-    def logkv(self, key, val):
+    def logkv(self, key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
         """
         Log a value of some diagnostic
         Call this once for each diagnostic quantity, each iteration
@@ -591,8 +602,9 @@ class Logger(object):
         :param val: (Any) save to log this value
         """
         self.name2val[key] = val
+        self.exclude_name[key] = exclude
 
-    def logkv_mean(self, key, val):
+    def logkv_mean(self, key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
         """
         The same as logkv(), but if called many times, values averaged.
 
@@ -601,19 +613,26 @@ class Logger(object):
         """
         if val is None:
             self.name2val[key] = None
+            self.exclude_name[key] = None
             return
         oldval, cnt = self.name2val[key], self.name2cnt[key]
         self.name2val[key] = oldval*cnt/(cnt+1) + val/(cnt+1)
         self.name2cnt[key] = cnt + 1
+        self.exclude_name[key] = exclude
 
     def dumpkvs(self):
         d = self.name2val
         out = d.copy() # Return the dict for unit testing purposes
         for fmt in self.output_formats:
             if isinstance(fmt, KVWriter):
-                fmt.writekvs(d)
+                d2 = d.copy()
+                for k, v in d.items():
+                    if self.exclude_name[k] is not None and fmt.format_name in self.exclude_name[k]:
+                        del d2[k]
+                fmt.writekvs(d2)
         self.name2val.clear()
         self.name2cnt.clear()
+        self.exclude_name.clear()
         return out
 
     def log(self, *args, level=INFO):

@@ -119,7 +119,8 @@ class Tester(object):
         self.task_name = task_name
         if log_root is not None:
             self.data_root = log_root
-        self.data_root = data_root
+        else:
+            self.data_root = data_root
         logger.info("private_config: ")
         self.dl_framework = self.private_config["DL_FRAMEWORK"]
         self.project_root = "/".join(private_config_path.split("/")[:-1])
@@ -317,7 +318,13 @@ class Tester(object):
                 for root, dirs, files in os.walk(self.log_dir):
                     suffix = root.split("/{}/".format(LOG))
                     assert len(suffix) == 2, "root should only have one pattern \"/log/\""
-                    remote_root = osp.join(self.private_config["REMOTE_SETTING"]["remote_data_root"], LOG, suffix[1])
+                    remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_data_root")
+                    if remote_data_root is None:
+                        remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_log_root")
+                        logger.warn("the parameter remote_log_root will be renamed to remote_data_root in future versions.")
+                    else:
+                        raise RuntimeError("miss remote_log_root in rla_config")
+                    remote_root = osp.join(remote_data_root, LOG, suffix[1])
                     local_root = root
                     logger.warn("sync {} <- {}".format(remote_root, local_root))
                     for file in files:
