@@ -161,7 +161,7 @@ class DeleteLogTool(BasicLogTool):
     def delete_small_timestep_log(self):
         self._find_small_timestep_log()
         print("complete searching.")
-        s = input("show files to be deletes? (y/n)")
+        s = input("show files to be deleted? (y/n)")
         if s == 'y':
             for reg in self.small_timestep_regs:
                 print("[delete small-timestep log] reg: ", reg)
