@@ -7,6 +7,8 @@ RLA has decoupled to the training code and only some additional configuration ar
 
 The project is still in developing. Welcome to join us. :)
 
+We also maintain RLA in https://github.com/polixir/RLAssistant.  Polixir/RLAssistant will consider extra requirements needed in the team cooperation scenario.
+
 
 
 ## Design Principles of RLA
