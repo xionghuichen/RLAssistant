@@ -14,7 +14,6 @@ from config import *
 def argsparser():
     parser = argparse.ArgumentParser("Archive Log")
     # reduce setting
-    parser.add_argument('--sub_proj', type=str)
     parser.add_argument('--task', type=str)
     parser.add_argument('--archive_name_as_task', type=str, default='archived')
     parser.add_argument('--regex', type=str)

@@ -9,7 +9,6 @@ from config import *
 def argsparser():
     parser = argparse.ArgumentParser("Delete Log")
     # reduce setting
-    parser.add_argument('--sub_proj', type=str, default="")
     parser.add_argument('--task', type=str, default="")
     parser.add_argument('--regex', type=str)
     parser.add_argument('--timestep_bound', type=int, default=100)
