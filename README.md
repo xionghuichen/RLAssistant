@@ -205,7 +205,7 @@ Usually, it is unnecessary to change the content of experiment logs. In our prac
 3. resume an experiment with other settings.
 
 
-**Bath Management**
+**Batch Management**
 
 We manage the items in the database via toolkits in rla_scripts. Currently, the rla_scripts includes
 1. Archive: archive some important results into another table.
