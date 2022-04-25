@@ -9,3 +9,5 @@ RLA.egg-info**
 **/results/**
 **/log/**
 **/.ipynb_checkpoints/*
+**/.DS_Store
+test/target_data_root/*
