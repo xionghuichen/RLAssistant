@@ -28,41 +28,13 @@ class BasicLogTool(object):
         if optional_log_type is not None:
             self.log_types.extend(optional_log_type)
 
-class DownloadLogTool(BasicLogTool):
-    def __init__(self, rla_config_path, proj_root, task, regex, *args, **kwargs):
-        fs = open(rla_config_path, encoding="UTF-8")
-        self.private_config = yaml.load(fs)
-        self.proj_root = proj_root
-        self.task = task
-        self.regex = regex
-
-    def _download_log(self, show=False):
-        from RLA.auto_ftp import FTPHandler
-
-        for log_type in self.log_types:
-            root_dir_regex = osp.join(self.proj_root, log_type, self.task, self.regex)
-            empty = True
-            for root_dir in glob.glob(root_dir_regex):
-
-                pass
-
-class DeleteLogTool(BasicLogTool):
-    def __init__(self, proj_root, task, regex, filter, *args, **kwargs):
-        self.proj_root = proj_root
-        self.task = task
-        self.regex = regex
-        assert isinstance(filter, Filter)
-        self.filter = filter
-        self.small_timestep_regs = []
-        super(DeleteLogTool, self).__init__(*args, **kwargs)
-
-    def _find_small_timestep_log(self):
-        root_dir_regex = osp.join(self.proj_root, LOG, self.task, self.regex)
+    def _find_small_timestep_log(self, proj_root, task_table_name, regex, timstep_upper_bound=np.inf, timestep_lower_bound=0):
+        small_timestep_regs = []
+        root_dir_regex = osp.join(proj_root, LOG, task_table_name, regex)
         for root_dir in glob.glob(root_dir_regex):
             print("searching dirs", root_dir)
             if os.path.exists(root_dir):
                 for file_list in os.walk(root_dir):
-
                     if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
                         target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
                     else:
@@ -79,7 +51,8 @@ class DeleteLogTool(BasicLogTool):
                             if file_list[1] == ['tb'] or os.path.exists(progress_csv_file): # in root of logdir
                                 if not os.path.exists(progress_csv_file) or os.path.getsize(progress_csv_file) == 0:
                                     print("[delete] find an experiment without progress.csv.", file_list[0])
-                                    self.small_timestep_regs.append(target_reg)
+                                    if timestep_lower_bound <= 0:
+                                        small_timestep_regs.append([target_reg, file_list[0]])
                                 else:
                                     try:
                                         reader = pd.read_csv(progress_csv_file, chunksize=100000, quoting=csv.QUOTE_NONE,
@@ -90,9 +63,9 @@ class DeleteLogTool(BasicLogTool):
                                             raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
                                         last_timestep = raw_df[DEFAULT_X_NAME].max()
                                         print("[found a log] time_step ", last_timestep, target_reg)
-                                        if last_timestep < self.filter.timstep_bound:
-                                            self.small_timestep_regs.append(target_reg)
-                                            print("[delete] find an experiment with too small number of logs. ", file_list[0])
+                                        if timestep_lower_bound <= last_timestep <= timstep_upper_bound:
+                                            small_timestep_regs.append([target_reg, file_list[0]])
+                                            print("[delete] find an experiment satisfied timestep range. ", file_list[0])
                                         else:
                                             print("[valid]")
                                     except Exception as e:
@@ -103,18 +76,47 @@ class DeleteLogTool(BasicLogTool):
                             elif 'events' in file_list[0]: # in event dir
                                 pass
                             else: # empty dir
-                                self.small_timestep_regs.append(target_reg)
+                                if timestep_lower_bound <= 0:
+                                    small_timestep_regs.append([target_reg, file_list[0]])
                                 print("[delete] find an experiment without any files. ", file_list[0])
+        return small_timestep_regs
+
+class DownloadLogTool(BasicLogTool):
+    def __init__(self, rla_config_path, proj_root, task, regex, *args, **kwargs):
+        fs = open(rla_config_path, encoding="UTF-8")
+        self.private_config = yaml.load(fs)
+        self.proj_root = proj_root
+        self.task_table_name = task
+        self.regex = regex
+
+    def _download_log(self, show=False):
+        for log_type in self.log_types:
+            root_dir_regex = osp.join(self.proj_root, log_type, self.task_table_name, self.regex)
+            empty = True
+            for root_dir in glob.glob(root_dir_regex):
+                pass
+
+class DeleteLogTool(BasicLogTool):
+    def __init__(self, proj_root, task_table_name, regex, filter, *args, **kwargs):
+        self.proj_root = proj_root
+        self.task_table_name = task_table_name
+        self.regex = regex
+        assert isinstance(filter, Filter)
+        self.filter = filter
+        self.small_timestep_regs = []
+        super(DeleteLogTool, self).__init__(*args, **kwargs)
 
     def _delete_related_log(self, regex, show=False):
+        log_found = 0
         for log_type in self.log_types:
             print(f"--- search {log_type} ---")
-            root_dir_regex = osp.join(self.proj_root, log_type, self.task, regex)
+            root_dir_regex = osp.join(self.proj_root, log_type, self.task_table_name, regex)
             empty = True
             for root_dir in glob.glob(root_dir_regex):
                 empty = False
                 if os.path.exists(root_dir):
                     print("find a matched experiment", root_dir)
+                    log_found += 1
                     for file_list in os.walk(root_dir):
                         # walk into the leave of the file-tree.
                         for name in file_list[2]:
@@ -126,16 +128,6 @@ class DeleteLogTool(BasicLogTool):
                                     print("skip the permission error file")
                         if not show:
                             print("delete sub-dir {}".format(file_list[0]))
-                        # if not show:
-                        #     if len(os.listdir(file_list[0])) == 0:
-                        #         cur_dir = file_list[0]
-                        #         while True:
-                        #             shutil.rmtree(cur_dir, ignore_errors=True)
-                        #             print(" -- delete the empty dir", cur_dir, "---")
-                        #             cur_dir = os.path.abspath(os.path.join(cur_dir, ".."))
-                        #             if len(os.listdir(cur_dir)) != 0:
-                        #                 break
-                            # print("delete file {}".format(name))
                     if os.path.isdir(root_dir):
                         if not show:
                             try:
@@ -150,43 +142,57 @@ class DeleteLogTool(BasicLogTool):
                 else:
                     print("not dir {}".format(root_dir))
             if empty: print("empty regex {}".format(root_dir_regex))
+        return log_found
 
-    def delete_related_log(self):
+    def delete_related_log(self, skip_ask=False):
         self._delete_related_log(show=True, regex=self.regex)
-        s = input("delete these files? (y/n)")
+        if skip_ask:
+            s = 'y'
+        else:
+            s = input("delete these files? (y/n)")
         if s == 'y':
             print("do delete ...")
-            self._delete_related_log(show=False, regex=self.regex)
+            return self._delete_related_log(show=False, regex=self.regex)
+        else:
+            return 0
 
-    def delete_small_timestep_log(self):
-        self._find_small_timestep_log()
+    def delete_small_timestep_log(self, skip_ask=False):
+        self.small_timestep_regs = self._find_small_timestep_log(self.proj_root, self.task_table_name, self.regex, timstep_upper_bound=self.filter.timstep_bound)
         print("complete searching.")
-        s = input("show files to be deleted? (y/n)")
-        if s == 'y':
-            for reg in self.small_timestep_regs:
-                print("[delete small-timestep log] reg: ", reg)
-                self._delete_related_log(show=True, regex=reg + '*')
-            s = input("delete these files? (y/n)")
-            if s == 'y':
-                for reg in self.small_timestep_regs:
-                    print("do delete: ", reg)
-                    self._delete_related_log(show=False, regex=reg + '*')
+        if skip_ask:
+            s = 'y'
+        else:
+            s = input("show files to be deleted? (y/n)")
+        log_found = 0
 
+        if s == 'y' or skip_ask:
+            for res in self.small_timestep_regs:
+                print("[delete small-timestep log] reg: ", res[1])
+                self._delete_related_log(show=True, regex=res[0] + '*')
+            if skip_ask:
+                s = 'y'
+            else:
+                s = input("delete these files? (y/n)")
+            if s == 'y' or skip_ask:
+                for res in self.small_timestep_regs:
+                    print("do delete: ", res[1])
+                    log_found += self._delete_related_log(show=False, regex=res[0] + '*')
+        return log_found
 
 class ArchiveLogTool(BasicLogTool):
-    def __init__(self, proj_root, task, regex, archive_name_as_task, remove, *args, **kwargs):
+    def __init__(self, proj_root, task_table_name, regex, archive_table_name, remove, *args, **kwargs):
         self.proj_root = proj_root
-        self.task = task
+        self.task_table_name = task_table_name
         self.regex = regex
         self.remove = remove
-        self.archive_name_as_task = archive_name_as_task
+        self.archive_table_name = archive_table_name
         super(ArchiveLogTool, self).__init__(*args, **kwargs)
 
     def _archive_log(self, show=False):
         for log_type in self.log_types:
-            root_dir_regex = osp.join(self.proj_root, log_type, self.task, self.regex)
-            archive_root_dir = osp.join(self.proj_root, log_type, self.archive_name_as_task)
-            prefix_dir = osp.join(self.proj_root, log_type, self.task)
+            root_dir_regex = osp.join(self.proj_root, log_type, self.task_table_name, self.regex)
+            archive_root_dir = osp.join(self.proj_root, log_type, self.archive_table_name)
+            prefix_dir = osp.join(self.proj_root, log_type, self.task_table_name)
             prefix_len = len(prefix_dir)
             empty = True
             # os.system("chmod +x -R \"{}\"".format(prefix_dir))
@@ -217,15 +223,53 @@ class ArchiveLogTool(BasicLogTool):
             if empty: print("empty regex {}".format(root_dir_regex))
         pass
 
-    def archive_log(self):
+    def archive_log(self, skip_ask=False):
         self._archive_log(show=True)
-        warn = ''
-        if self.remove:
-            warn = '[WARN] You are in the \'\'remove\'\' setting, the original log files will be removed!!'
-        s = input("archive these files? (y/n) \n " + warn)
+        if skip_ask:
+            s = 'y'
+        else:
+            s = input("archive these files? (y/n) \n ")
         if s == 'y':
             print("do archive ...")
             self._archive_log(show=False)
+
+class ViewLogTool(BasicLogTool):
+    def __init__(self, proj_root, task_table_name, regex, *args, **kwargs):
+        self.proj_root = proj_root
+        self.task_table_name = task_table_name
+        self.regex = regex
+        super(ViewLogTool, self).__init__(*args, **kwargs)
+
+    def _view_log(self, regex):
+        root_dir_regex = osp.join(self.proj_root, LOG, self.task_table_name, regex)
+        for root_dir in glob.glob(root_dir_regex):
+            if os.path.exists(root_dir):
+                for file_list in os.walk(root_dir):
+                    if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
+                        target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
+                    else:
+                        target_reg = None
+                    if target_reg is not None:
+                        backup_file = file_list[0] + '/backup.txt'
+                        if file_list[1] == ['tb'] or os.path.exists(backup_file):  # in root of logdir
+                            with open(backup_file) as f:
+                                print(f.read())
+
+    def view_log(self, skip_ask=False):
+        found_regs = self._find_small_timestep_log(self.proj_root, self.task_table_name, self.regex, timestep_lower_bound=1)
+        for res in found_regs:
+            print("view experiments:", res[1])
+            if skip_ask:
+                s = 'y'
+            else:
+                s = input("press y to view \n ")
+            if s == 'y':
+                self._view_log(regex=res[0] + '*')
+
+
+
+
+
 
 # if __name__ == '__main__':
 #     dlt = DeleteLogTool("../", "var_seq_imitation", "self-transfer", "2019/11/29/01-11*")
