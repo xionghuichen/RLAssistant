@@ -1,6 +1,7 @@
 from test._base import BaseTest
 from RLA.easy_log.log_tools import DeleteLogTool, Filter
-from RLA.easy_log.log_tools import ArchiveLogTool
+from RLA.easy_log.log_tools import ArchiveLogTool, ViewLogTool
+
 
 class ScriptTest(BaseTest):
 
@@ -51,4 +52,8 @@ class ScriptTest(BaseTest):
         dlt = DeleteLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name='archived', regex='2022/03/01/21-13*', filter=filter)
         log_found = dlt.delete_related_log(skip_ask=True)
         assert log_found == 10
-    
+
+    def test_view(self):
+        self.remove_and_copy_data()
+        dlt = ViewLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name=self.TASK_NAME, regex='2022/03/01/21-13*')
+        dlt.view_log(skip_ask=True)
