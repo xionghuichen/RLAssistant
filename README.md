@@ -7,6 +7,8 @@ RLA has decoupled to the training code and only some additional configuration ar
 
 The project is still in developing. Welcome to join us. :)
 
+We maintain an RLA in https://github.com/polixir/RLAssistant in the future which will consider extra requirements needed in the team cooperation scenario.
+
 
 
 ## Design Principles of RLA
@@ -203,7 +205,7 @@ Usually, it is unnecessary to change the content of experiment logs. In our prac
 3. resume an experiment with other settings.
 
 
-**Bath Management**
+**Batch Management**
 
 We manage the items in the database via toolkits in rla_scripts. Currently, the rla_scripts includes
 1. Archive: archive important experiments into an archived database, which will be saved in DATA_ROOT/arc.
