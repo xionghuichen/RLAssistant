@@ -206,7 +206,7 @@ Usually, it is unnecessary to change the content of experiment logs. In our prac
 **Bath Management**
 
 We manage the items in the database via toolkits in rla_scripts. Currently, the rla_scripts includes
-1. Archive: archive some important results into another table.
+1. Archive: archive important experiments into an archived database, which will be saved in DATA_ROOT/arc.
 2. Delete: delete all useless experiments at once.
 3. Send to remote [TODO]
 4. Download from remote [TODO]
@@ -239,7 +239,8 @@ PS:
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
 # TODO
+- [ ] video visualization.
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
-- [ ] download / upload experiment logs through timestamp;
+- [ ] download / upload experiment logs through timestamp.
 

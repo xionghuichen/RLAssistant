@@ -140,7 +140,7 @@ class DeleteLogTool(BasicLogTool):
                             os.remove(root_dir)
                             print("--- delete root file {} ---".format(root_dir))
                 else:
-                    print("not dir {}".format(root_dir))
+                    print("no dir {}".format(root_dir))
             if empty: print("empty regex {}".format(root_dir_regex))
         return log_found
 
@@ -180,19 +180,18 @@ class DeleteLogTool(BasicLogTool):
         return log_found
 
 class ArchiveLogTool(BasicLogTool):
-    def __init__(self, proj_root, task_table_name, regex, archive_table_name, remove, *args, **kwargs):
+    def __init__(self, proj_root, task_table_name, regex, archive_table_name=ARCHIVED_TABLE, *args, **kwargs):
         self.proj_root = proj_root
         self.task_table_name = task_table_name
         self.regex = regex
-        self.remove = remove
         self.archive_table_name = archive_table_name
         super(ArchiveLogTool, self).__init__(*args, **kwargs)
 
     def _archive_log(self, show=False):
         for log_type in self.log_types:
             root_dir_regex = osp.join(self.proj_root, log_type, self.task_table_name, self.regex)
-            archive_root_dir = osp.join(self.proj_root, log_type, self.archive_table_name)
-            prefix_dir = osp.join(self.proj_root, log_type, self.task_table_name)
+            archive_root_dir = osp.join(self.proj_root, self.archive_table_name, log_type)
+            prefix_dir = osp.join(self.proj_root, log_type)
             prefix_len = len(prefix_dir)
             empty = True
             # os.system("chmod +x -R \"{}\"".format(prefix_dir))
@@ -206,20 +205,13 @@ class ArchiveLogTool(BasicLogTool):
                         if not show:
                             # os.makedirs(archiving_target, exist_ok=True)
                             shutil.copytree(root_dir, archiving_target)
-                            if self.remove:
-                                try:
-                                    shutil.rmtree(root_dir)
-                                except PermissionError as e:
-                                    print("skip the permission error file")
-                        print("move dir {}, to {}".format(root_dir, archiving_target))
+                        print("copy dir {}, to {}".format(root_dir, archiving_target))
                     else:
                         if not show:
                             shutil.copy(root_dir, archiving_target)
-                            if self.remove:
-                                os.remove(root_dir)
-                        print("move file {}, to {}".format(root_dir, archiving_target))
+                        print("copy file {}, to {}".format(root_dir, archiving_target))
                 else:
-                    print("not dir {}".format(root_dir))
+                    print("no dir {}".format(root_dir))
             if empty: print("empty regex {}".format(root_dir_regex))
         pass
 
@@ -265,12 +257,3 @@ class ViewLogTool(BasicLogTool):
                 s = input("press y to view \n ")
             if s == 'y':
                 self._view_log(regex=res[0] + '*')
-
-
-
-
-
-
-# if __name__ == '__main__':
-#     dlt = DeleteLogTool("../", "var_seq_imitation", "self-transfer", "2019/11/29/01-11*")
-#     dlt.delete_related_log()

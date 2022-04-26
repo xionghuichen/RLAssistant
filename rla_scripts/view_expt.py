@@ -7,7 +7,7 @@ import argparse
 from config import *
 
 def argsparser():
-    parser = argparse.ArgumentParser("Archive Log")
+    parser = argparse.ArgumentParser("View Log")
     parser.add_argument('--task_table_name', type=str)
     parser.add_argument('--regex', type=str)
     args = parser.parse_args()
