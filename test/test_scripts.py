@@ -43,13 +43,12 @@ class ScriptTest(BaseTest):
     def test_archive(self):
         self.remove_and_copy_data()
         # archive experiments.
-        dlt = ArchiveLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name=self.TASK_NAME, regex='2022/03/01/21-13*',
-                             archive_table_name='archived', remove=False)
+        dlt = ArchiveLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name=self.TASK_NAME, regex='2022/03/01/21-13*')
         dlt.archive_log(skip_ask=True)
         # remove the archived experiments.
         filter = Filter()
         filter.config(type=Filter.ALL, timstep_bound=1)
-        dlt = DeleteLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name='archived', regex='2022/03/01/21-13*', filter=filter)
+        dlt = DeleteLogTool(proj_root=self.TARGET_DATA_ROOT + '/arc', regex='2022/03/01/21-13*', filter=filter, task_table_name=self.TASK_NAME)
         log_found = dlt.delete_related_log(skip_ask=True)
         assert log_found == 10
 

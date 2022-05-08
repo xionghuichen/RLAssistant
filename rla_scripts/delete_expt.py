@@ -12,6 +12,9 @@ def argsparser():
     parser.add_argument('--task_table_name', type=str, default="")
     parser.add_argument('--regex', type=str)
     parser.add_argument('--timestep_bound', type=int, default=100)
+    # Filter.ALL: delete all experiments satisfied regex
+    # Filter.SMALL_TIMESTEP: delete all experiments that the names satisfy regex
+    # and the recorded timesteps are less than args.timestep_bound.
     parser.add_argument('--delete_type', type=str, default=Filter.ALL)
 
     args = parser.parse_args()
