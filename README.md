@@ -116,6 +116,7 @@ We build an example project for integrating RLA, which can be seen in ./example/
    **/code/**
    **/results/**
    **/log/**
+   **/arc/**
    ```
 ### Step2: record intermediate variables/checkpoints/other types of data.
 

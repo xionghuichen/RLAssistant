@@ -198,6 +198,7 @@ class ArchiveLogTool(BasicLogTool):
             for root_dir in glob.glob(root_dir_regex):
                 empty = False
                 if os.path.exists(root_dir):
+                    # remove the overlapped path.
                     archiving_target = osp.join(archive_root_dir, root_dir[prefix_len+1:])
                     archiving_target_dir = '/'.join(archiving_target.split('/')[:-1])
                     os.makedirs(archiving_target_dir, exist_ok=True)

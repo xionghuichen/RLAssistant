@@ -8,7 +8,7 @@ RLA.egg-info**
 **/code/**
 **/results/**
 **/log/**
+**/arc/**
 **/.ipynb_checkpoints/*
 **/.DS_Store
 test/target_data_root/*
-**/arc/**
