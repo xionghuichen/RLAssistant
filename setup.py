@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='RLA',
-        version="0.5.2",
+        version="0.5.3",
         description=(
             'RL assistant'
         ),
@@ -20,6 +20,7 @@ setup(
             "argparse",
             "dill",
             "seaborn",
-            "pathspec"
+            "pathspec",
+            'tensorboardX'
         ]
     )

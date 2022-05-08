@@ -7,6 +7,8 @@ RLA has decoupled to the training code and only some additional configuration ar
 
 The project is still in developing. Welcome to join us. :)
 
+We maintain an RLA in https://github.com/polixir/RLAssistant in the future which will consider extra requirements needed in the team cooperation scenario.
+
 
 
 ## Design Principles of RLA
@@ -114,6 +116,7 @@ We build an example project for integrating RLA, which can be seen in ./example/
    **/code/**
    **/results/**
    **/log/**
+   **/arc/**
    ```
 ### Step2: record intermediate variables/checkpoints/other types of data.
 
@@ -206,7 +209,7 @@ Usually, it is unnecessary to change the content of experiment logs. In our prac
 **Batch Management**
 
 We manage the items in the database via toolkits in rla_scripts. Currently, the rla_scripts includes
-1. Archive: archive some important results into another table.
+1. Archive: archive important experiments into an archived database, which will be saved in DATA_ROOT/arc.
 2. Delete: delete all useless experiments at once.
 3. Send to remote [TODO]
 4. Download from remote [TODO]
@@ -239,7 +242,8 @@ PS:
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
 # TODO
+- [ ] video visualization.
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
-- [ ] download / upload experiment logs through timestamp;
+- [ ] download / upload experiment logs through timestamp.
 
