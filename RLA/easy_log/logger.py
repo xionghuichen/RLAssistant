@@ -688,7 +688,7 @@ def configure(dir=None, format_strs=None, comm=None, framework='tensorflow'):
     if format_strs is None:
         format_strs = os.getenv('OPENAI_LOG_FORMAT', 'stdout,log,csv').split(',')
     format_strs = filter(None, format_strs)
-    output_formats = [make_output_format(f, dir, log_suffix) for f in format_strs]
+    output_formats = [make_output_format(f, dir, log_suffix, framework) for f in format_strs]
     warn_output_formats = make_output_format('warn', dir, log_suffix, framework)
     backup_output_formats = make_output_format('backup', dir, log_suffix, framework)
 
