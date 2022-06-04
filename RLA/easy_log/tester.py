@@ -187,7 +187,7 @@ class Tester(object):
         self.writer = None
         # logger configure
         logger.info("store file %s" % self.pkl_file)
-        logger.configure(self.log_dir, self.private_config["LOG_USED"])
+        logger.configure(self.log_dir, self.private_config["LOG_USED"], framework=self.private_config["DL_FRAMEWORK"])
         for fmt in logger.Logger.CURRENT.output_formats:
             if isinstance(fmt, logger.TensorBoardOutputFormat):
                 self.writer = fmt.writer
