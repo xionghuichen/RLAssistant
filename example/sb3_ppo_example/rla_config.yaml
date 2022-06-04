@@ -18,8 +18,8 @@ LOG_USED:
   - 'tensorboard'
   - 'csv'
 
-# select a DL framework: tensorflow or pytorch.
-DL_FRAMEWORK: 'pytorch'
+# select a DL framework: tensorflow or torch.
+DL_FRAMEWORK: 'torch'
 
 SEND_LOG_FILE: False
 REMOTE_SETTING:
