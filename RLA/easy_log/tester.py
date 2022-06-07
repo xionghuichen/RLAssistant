@@ -25,7 +25,7 @@ import yaml
 import shutil
 import argparse
 from typing import Optional, Union, Dict, Any
-from RLA.const import DEFAULT_X_NAME
+from RLA.const import DEFAULT_X_NAME, FRAMEWORK
 import pathspec
 
 def import_hyper_parameters(task_name, record_date):
@@ -473,7 +473,7 @@ class Tester(object):
         :param max_to_keep:
         :return:
         """
-        if self.dl_framework == 'tensorflow':
+        if self.dl_framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
             if var_prefix is None:
                 var_prefix = ''
@@ -482,20 +482,20 @@ class Tester(object):
             for v in var_list:
                 logger.info(v)
             self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
-        elif self.dl_framework == 'pytorch':
+        elif self.dl_framework == FRAMEWORK.torch:
             self.max_to_keep = max_to_keep
             self.checkpoint_keep_list = []
         else:
             raise NotImplementedError
 
     def save_checkpoint(self, model_dict: Optional[dict]=None, related_variable: Optional[dict]=None):
-        if self.dl_framework == 'tensorflow':
+        if self.dl_framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
             iter = self.time_step_holder.get_time()
             cpt_name = osp.join(self.checkpoint_dir, 'checkpoint')
             logger.info("save checkpoint to ", cpt_name, iter)
             self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
-        elif self.dl_framework == 'pytorch':
+        elif self.dl_framework == FRAMEWORK.torch:
             import torch
             iter = self.time_step_holder.get_time()
             torch.save(model_dict, f=tester.checkpoint_dir + "checkpoint-{}.pt".format(iter))
@@ -514,7 +514,7 @@ class Tester(object):
         self.add_custom_data(DEFAULT_X_NAME, time_step_holder.get_time(), int, mode='replace')
 
     def load_checkpoint(self):
-        if self.dl_framework == 'tensorflow':
+        if self.dl_framework == FRAMEWORK.tensorflow:
             # TODO: load with variable scope.
             import tensorflow as tf
             cpt_name = osp.join(self.checkpoint_dir)
@@ -524,7 +524,7 @@ class Tester(object):
             max_iter = ckpt_path.split('-')[-1]
             self.time_step_holder.set_time(max_iter)
             return int(max_iter), None
-        elif self.dl_framework == 'pytorch':
+        elif self.dl_framework == FRAMEWORK.torch:
             import torch
             return self.checkpoint_keep_list[-1], torch.load(tester.checkpoint_dir + "checkpoint-{}.pt".format(self.checkpoint_keep_list[-1]))
 
