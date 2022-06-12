@@ -311,10 +311,18 @@ class Tester(object):
         # ignore_files = self.private_config["IGNORE_RULE"]
         if self.private_config["SEND_LOG_FILE"]:
             from RLA.auto_ftp import FTPHandler
+            from RLA.auto_ftp import SFTPHandler
             try:
-                ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
-                                 username=self.private_config["REMOTE_SETTING"]["username"],
-                                 password=self.private_config["REMOTE_SETTING"]["password"])
+                try:
+                    ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
+                                    username=self.private_config["REMOTE_SETTING"]["username"],
+                                    password=self.private_config["REMOTE_SETTING"]["password"])
+                except Exception as e:
+                    logger.warn("sending log file failed. {}".format(e))
+                    logger.warn("try to send log file through sftp")
+                    ftp = SFTPHandler(sftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
+                                            username=self.private_config["REMOTE_SETTING"]["username"],
+                                            password=self.private_config["REMOTE_SETTING"]["password"])
                 for root, dirs, files in os.walk(self.log_dir):
                     suffix = root.split("/{}/".format(LOG))
                     assert len(suffix) == 2, "root should only have one pattern \"/log/\""
