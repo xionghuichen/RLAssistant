@@ -125,15 +125,18 @@ We build an example project for integrating RLA, which can be seen in ./example/
 We record scalars by `RLA.easy_log.logger`: 
 ```python
 from RLA.easy_log import logger
-
-# scalar variable
-value = 1
-logger.record_tabular("k", value)
-
-# tensorflow summary
 import tensorflow as tf
-summary = tf.Summary()
-logger.log_from_tf_summary(summary)
+from RLA.easy_log.time_step import time_step_holder
+
+for i in range(1000):
+    # time-steps (iterations)
+    time_step_holder.set_time(i)
+    # scalar variable
+    value = 1
+    logger.record_tabular("k", value)
+    # tensorflow summary
+    summary = tf.Summary()
+    logger.log_from_tf_summary(summary)
 
 ```
 **Record checkpoints**
@@ -242,8 +245,9 @@ PS:
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
 # TODO
-- [ ] video visualization.
+- [ ] support sftp-based sync.
+- [ ] support custom data structure saving and loading.
+- [ ] support video visualization.
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp.
-
