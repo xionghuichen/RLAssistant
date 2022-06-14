@@ -313,16 +313,17 @@ class Tester(object):
             from RLA.auto_ftp import FTPHandler
             from RLA.auto_ftp import SFTPHandler
             try:
-                try:
-                    ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
-                                    username=self.private_config["REMOTE_SETTING"]["username"],
-                                    password=self.private_config["REMOTE_SETTING"]["password"])
-                except Exception as e:
-                    logger.warn("sending log file failed. {}".format(e))
-                    logger.warn("try to send log file through sftp")
+                if 'file_transfer_protocol' not in self.private_config["REMOTE_SETTING"].keys() or self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] is 'sftp':
                     ftp = SFTPHandler(sftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
                                             username=self.private_config["REMOTE_SETTING"]["username"],
                                             password=self.private_config["REMOTE_SETTING"]["password"])
+                elif self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] is 'ftp':
+                    ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
+                                    username=self.private_config["REMOTE_SETTING"]["username"],
+                                    password=self.private_config["REMOTE_SETTING"]["password"])
+                else:
+                    raise ValueError("designated file_transfer_protocol {} is not supported".format(self.private_config["REMOTE_SETTING"]['file_transfer_protocol']))
+                    
                 for root, dirs, files in os.walk(self.log_dir):
                     suffix = root.split("/{}/".format(LOG))
                     assert len(suffix) == 2, "root should only have one pattern \"/log/\""
