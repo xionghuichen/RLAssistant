@@ -21,6 +21,7 @@ setup(
             "dill",
             "seaborn",
             "pathspec",
-            'tensorboardX'
+            'tensorboardX', 
+            'pysftp'
         ]
     )
