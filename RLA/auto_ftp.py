@@ -197,13 +197,14 @@ class SFTPHandler(FTPHandler):
         self.close()
 
     def download_file(self, remote_file, local_file):
+        self.sftp = self.sftpconnect()
         logger.info("try download {}".format(local_file))
         if not os.path.isfile(local_file):
             logger.info("new file {}".format(local_file))
-            self.sftp.get(remote_file)
+            self.sftp.get(remote_file, local_file)
         elif self.sftp.stat(remote_file).st_size != os.path.getsize(local_file):
             logger.info("update file {}".format(local_file))
-            self.sftp.get(remote_file)
+            self.sftp.get(remote_file, local_file)
         else:
             logger.info("skip download file {}".format(remote_file))
 
