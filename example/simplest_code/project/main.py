@@ -57,7 +57,7 @@ for _ in range(3):
     l = tf.nn.tanh(tf.layers.dense(l, 64, kernel_initializer=tf.keras.initializers.glorot_normal))
 
 out = tf.layers.dense(l, 1, kernel_initializer=tf.keras.initializers.glorot_normal)
-loss = tf.reduce_mean(np.square(out - y_ph))
+loss = tf.reduce_mean(tf.square(out - y_ph))
 opt = tf.train.AdamOptimizer(learning_rate=kwargs["learning_rate"]).minimize(loss)
 
 sess = tf.Session().__enter__()

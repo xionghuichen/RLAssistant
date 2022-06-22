@@ -90,7 +90,7 @@ class ManagerTest(BaseTest):
         yaml = self._load_rla_config()
         yaml['DL_FRAMEWORK'] = 'torch'
         self._init_proj(yaml)
-        from torch_net import MLP, to_tensor
+        from test.test_proj.proj.torch_net import MLP, to_tensor
         from torch import nn
         from torch.nn import functional as F
         import torch as th
@@ -106,7 +106,7 @@ class ManagerTest(BaseTest):
             optimizer.zero_grad()
             mse_loss.backward()
             optimizer.step()
-            logger.ma_record_tabular("perf/mse", np.mean(mse_loss.detach().numpy()), 10)
+            logger.ma_record_tabular("perf/mse", np.mean(mse_loss.detach().cpu().numpy()), 10)
             logger.record_tabular("y_out", np.mean(y))
             if i % 10 == 0:
                 def plot_func():
@@ -114,7 +114,7 @@ class ManagerTest(BaseTest):
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)
                     testX = testX.astype(np.float32)
                     testY = target_func(testX)
-                    predY = mlp(to_tensor(testX)).detach()
+                    predY = mlp(to_tensor(testX)).detach().cpu().numpy()
                     plt.plot(testX.mean(axis=-1), predY.mean(axis=-1), label='pred')
                     plt.plot(testX.mean(axis=-1), testY.mean(axis=-1), label='real')
                 mpr.pretty_plot_wrapper('react_func', plot_func, xlabel='x', ylabel='y', title='react test')
@@ -134,14 +134,14 @@ class ManagerTest(BaseTest):
         exp_manager.set_hyper_param(**kwargs)
         exp_manager.add_record_param(['input_size'])
         yaml = self._load_rla_config()
-        import private_config
+        from test.test_proj.proj import private_config
         yaml['DL_FRAMEWORK'] = 'torch'
         yaml['SEND_LOG_FILE'] = True
         yaml['REMOTE_SETTING']['ftp_server'] = '127.0.0.1'
-        yaml['REMOTE_SETTING']['file_transfer_protocol'] = 'ftp'
+        yaml['REMOTE_SETTING']['file_transfer_protocol'] = 'sftp'
         yaml['REMOTE_SETTING']['username'] = private_config.username
-        yaml['REMOTE_SETTING']['password'] = private_config.passward
-        yaml['REMOTE_SETTING']['remote_data_root'] = private_config.remote_root
+        yaml['REMOTE_SETTING']['password'] = private_config.password
+        yaml['REMOTE_SETTING']['remote_log_root'] = private_config.remote_root
 
         self._init_proj(yaml, is_master_node=False)
         for i in range(0, 100):
