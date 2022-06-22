@@ -265,7 +265,6 @@ class Tester(object,):
         load_tester.update_log_files_location(root=log_root)
         return load_tester
 
-
     def add_record_param(self, keys):
         for k in keys:
             if '.' in k:
@@ -336,7 +335,8 @@ class Tester(object,):
         password: password of target server
         remote_porject_dir: log root of target server, e.g., "/Project/SRG/SRG/var_gan_imitation/"
 
-        :return:
+        :param skip_error: if skip_error==True, we will skip the error of sync.
+        :type skip_error: bool
         """
 
         logger.warn("sync: start")
@@ -371,13 +371,6 @@ class Tester(object,):
                     alternative_protocol = 'sftp'
                 else:
                     alternative_protocol = 'ftp'
-                # elif self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] is 'ftp':
-                #     ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
-                #                     username=self.private_config["REMOTE_SETTING"]["username"],
-                #                     password=self.private_config["REMOTE_SETTING"]["password"])
-                #     alternative_protocol = 'sftp'
-                # else:
-                #     raise ValueError("designated file_transfer_protocol {} is not supported".format(self.private_config["REMOTE_SETTING"]['file_transfer_protocol']))
                 send_data(ftp_obj=ftp)
                 logger.warn("sync: send success!")
             except Exception as e:
@@ -391,7 +384,7 @@ class Tester(object,):
                     send_data(ftp_obj=ftp)
                     logger.warn("sync: send success!")
                 except Exception as e:
-                    logger.warn("failed to send log files through {}: {} ".format(alternative_protocol, e))
+                    logger.warn("fail to send log files through {}: {} ".format(alternative_protocol, e))
 
                     logger.warn("server info ftp_server {}, username {}, password {}, remote_data_root {}".format(
                         self.private_config["REMOTE_SETTING"]["ftp_server"],

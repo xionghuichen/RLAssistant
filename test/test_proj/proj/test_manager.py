@@ -4,8 +4,8 @@ from RLA.easy_log import logger
 from RLA.easy_log.complex_data_recorder import MatplotlibRecorder as mpr
 import numpy as np
 from RLA.utils.utils import load_yaml
-import os
-import yaml
+
+
 def target_func(x):
     return np.tanh(np.mean(x, axis=-1, keepdims=True))
 
