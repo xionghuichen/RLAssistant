@@ -24,38 +24,39 @@ from RLA.easy_log.const import *
 import yaml
 import shutil
 import argparse
-from typing import Optional, Union, Dict, Any
+from typing import Dict, List, Tuple, Type, Union, Optional
+from RLA.utils.utils import deprecated_alias, load_yaml
 from RLA.const import DEFAULT_X_NAME, FRAMEWORK
 import pathspec
 
-def import_hyper_parameters(task_name, record_date):
+def import_hyper_parameters(task_table_name, record_date):
     """
-    return the hyper parameters of the experiment in task_name/record_date, which is stored in Tester.
+    return the hyper parameters of the experiment in task_table_name/record_date, which is stored in Tester.
 
-    :param task_name:
+    :param task_table_name:
     :param record_date:
     :return:
     """
     logger.warn("the function is deprecated. please check the ExperimentLoader as the new implementation")
     global tester
     assert isinstance(tester, Tester)
-    load_tester = tester.load_tester(record_date, task_name, tester.root)
+    load_tester = tester.load_tester(record_date, task_table_name, tester.data_root)
 
     args = argparse.Namespace(**load_tester.hyper_param)
     return args
 
 
-def load_from_record_date(task_name, record_date):
+def load_from_record_date(task_table_name, record_date):
     """
-    load the checkpoint of the experiment in task_name/record_date.
-    :param task_name:
+    load the checkpoint of the experiment in task_table_name/record_date.
+    :param task_table_name:
     :param record_date:
     :return:
     """
     logger.warn("the function is deprecated. please check the ExperimentLoader as the new implementation")
     global tester
     assert isinstance(tester, Tester)
-    load_tester = tester.load_tester(record_date, task_name, tester.root)
+    load_tester = tester.load_tester(record_date, task_table_name, tester.data_root)
     # load checkpoint
     load_tester.new_saver(var_prefix='', max_to_keep=1)
     load_iter, load_res = load_tester.load_checkpoint()
@@ -64,17 +65,17 @@ def load_from_record_date(task_name, record_date):
     return load_iter, load_res
 
 
-def fork_tester_log_files(task_name, record_date):
+def fork_tester_log_files(task_table_name, record_date):
     """
-    copy the log files in task_name/record_date to the new experiment.
-    :param task_name:
+    copy the log files in task_table_name/record_date to the new experiment.
+    :param task_table_name:
     :param record_date:
     :return:
     """
     logger.warn("the function is deprecated. please check the ExperimentLoader as the new implementation")
     global tester
     assert isinstance(tester, Tester)
-    load_tester = tester.load_tester(record_date, task_name, tester.root)
+    load_tester = tester.load_tester(record_date, task_table_name, tester.data_root)
     # copy log file
     tester.log_file_copy(load_tester)
     # copy attribute
@@ -83,7 +84,7 @@ def fork_tester_log_files(task_name, record_date):
     tester.private_config = load_tester.private_config
 
 
-class Tester(object):
+class Tester(object,):
 
     def __init__(self):
         self.__custom_recorder = {}
@@ -107,32 +108,64 @@ class Tester(object):
         self.saver = None
         self.dl_framework = None
 
-    def configure(self, task_name, private_config_path, log_root=None, data_root=None, ignore_file_path=None, run_file=None):
-        fs = open(private_config_path, encoding="UTF-8")
-        try:
-            self.private_config = yaml.load(fs)
-        except TypeError:
-            self.private_config = yaml.safe_load(fs)
-
+    @deprecated_alias(task_name='task_table_name', private_config_path='rla_config', log_root='data_root')
+    def configure(self, task_table_name: str, rla_config: Union[str, dict], data_root: str,
+                  ignore_file_path: Optional[str] = None, run_file: Optional[str] = None,
+                  is_master_node: bool = False, code_root: Optional[str] = None):
+        """
+        The function to configure your exp_manager, which should be run before your experiments.
+        :param task_table_name: define a ``table'' to store a collection of experiment data item.
+        :type task_table_name: str
+        :param rla_config: Pass the location of rla_config.yaml. It defines all of the running strategies of RLA.
+        Ref to RLAssistant/example/rla_config.yaml
+        :type rla_config: str
+        :param data_root: define the location of the RLA database.
+        :type data_root: str
+        :param ignore_file_path: RLA will backup the codebase of each experiment (defined in rla_config.yaml).
+         If there are some files unnecessary to backup,
+         you can customize the pattern of files to ignore with the same rules of gitignore (https://git-scm.com/docs/gitignore).
+         We recommend you to pass the location of .gitignore directly to ignore_file_path.
+        :type ignore_file_path: str
+        :param run_file: If you have extra files out of your codebase (e.g., some scripts to run the code), you can pass it to the run_file.
+        Then we will backup the run_file too.
+        :type run_file: str
+        :param is_master_node: In "distributed training & centralized logs" mode (By set SEND_LOG_FILE in rla_config.yaml to True),
+        you should mark the master node (is_master_node=True) to collect logs of the slave nodes (is_master_node=False).
+        :type is_master_node: bool
+        : param code_root:  Define the root of your codebase (for backup) explicitly. It will be in the same location as rla_config.yaml by default.
+        """
+        if isinstance(rla_config, str):
+            self.private_config = load_yaml(rla_config)
+        elif isinstance(rla_config, dict):
+            self.private_config = rla_config
+        else:
+            raise NotImplementedError
         self.run_file = run_file
         self.ignore_file_path = ignore_file_path
-        self.task_name = task_name
-        if log_root is not None:
-            self.data_root = log_root
-        else:
-            self.data_root = data_root
+        self.task_table_name = task_table_name
+        self.data_root = data_root
         logger.info("private_config: ")
         self.dl_framework = self.private_config["DL_FRAMEWORK"]
-        self.project_root = "/".join(private_config_path.split("/")[:-1])
+        self.is_master_node = is_master_node
+
+        if code_root is None:
+            if isinstance(rla_config, str):
+                self.project_root = "/".join(rla_config.split("/")[:-1])
+            else:
+                raise NotImplementedError("If you pass the rla_config dict directly, "
+                                          "you should define the root of your codebase (for backup) explicitly by pass the code_root.")
+        else:
+            self.project_root = code_root
         for k, v in self.private_config.items():
             logger.info("k: {}, v: {}".format(k, v))
+
 
     def set_hyper_param(self, **argkw):
         """
         This method is to record all of hyper parameters to test object.
 
         Place pass your parameters as follow format:
-            self.set_hyper_param(param_a=a,param_b=b)
+            self.set_hyper_param(param_a=a,param_b=b) or a dict self.set_hyper_param(**{'param_a'=a,'param_b'=b})
 
         Note: It is invalid to pass a local object to this function.
 
@@ -158,11 +191,11 @@ class Tester(object):
             info = self.auto_parse_info()
             info = '&' + info
         self.info = info
-        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_name), is_file=False)
+        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_table_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_table_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_table_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_table_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_table_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
 
@@ -174,11 +207,11 @@ class Tester(object):
 
     def update_log_files_location(self, root):
         self.data_root = root
-        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_name), is_file=False)
+        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_table_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_table_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_table_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_table_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_table_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
         self.print_log_dir()
@@ -220,9 +253,9 @@ class Tester(object):
         logger.info("results_dir: {}".format(self.results_dir))
 
     @classmethod
-    def load_tester(cls, record_date, task_name, log_root):
+    def load_tester(cls, record_date, task_table_name, log_root):
         logger.info("load tester")
-        res_dir, res_file = cls.log_file_finder(record_date, task_name=task_name,
+        res_dir, res_file = cls.log_file_finder(record_date, task_table_name=task_table_name,
                                                 file_root=osp.join(log_root, ARCHIVE_TESTER),
                                                 log_type='files')
         import dill
@@ -231,7 +264,6 @@ class Tester(object):
         logger.info("update log files' root")
         load_tester.update_log_files_location(root=log_root)
         return load_tester
-
 
     def add_record_param(self, keys):
         for k in keys:
@@ -291,8 +323,7 @@ class Tester(object):
             if isinstance(fmt, logger.TensorBoardOutputFormat):
                 fmt.add_hyper_params_to_tb(self.hyper_param, metric_dict)
 
-
-    def sync_log_file(self):
+    def sync_log_file(self, skip_error=False):
         """
         syn_log_file is an automatic synchronization function.
         It will send all log files (e.g., code/**, checkpoint/**, log/**, etc.) to your target server via the FTP protocol.
@@ -304,53 +335,72 @@ class Tester(object):
         password: password of target server
         remote_porject_dir: log root of target server, e.g., "/Project/SRG/SRG/var_gan_imitation/"
 
-        :return:
+        :param skip_error: if skip_error==True, we will skip the error of sync.
+        :type skip_error: bool
         """
 
         logger.warn("sync: start")
-        # ignore_files = self.private_config["IGNORE_RULE"]
-        if self.private_config["SEND_LOG_FILE"]:
-            from RLA.auto_ftp import FTPHandler
-            from RLA.auto_ftp import SFTPHandler
-            try:
-                if 'file_transfer_protocol' not in self.private_config["REMOTE_SETTING"].keys() or self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] is 'sftp':
-                    ftp = SFTPHandler(sftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
-                                            username=self.private_config["REMOTE_SETTING"]["username"],
-                                            password=self.private_config["REMOTE_SETTING"]["password"])
-                elif self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] is 'ftp':
-                    ftp = FTPHandler(ftp_server=self.private_config["REMOTE_SETTING"]["ftp_server"],
-                                    username=self.private_config["REMOTE_SETTING"]["username"],
-                                    password=self.private_config["REMOTE_SETTING"]["password"])
-                else:
-                    raise ValueError("designated file_transfer_protocol {} is not supported".format(self.private_config["REMOTE_SETTING"]['file_transfer_protocol']))
-                    
-                for root, dirs, files in os.walk(self.log_dir):
-                    suffix = root.split("/{}/".format(LOG))
-                    assert len(suffix) == 2, "root should only have one pattern \"/log/\""
-                    remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_data_root")
-                    if remote_data_root is None:
-                        remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_log_root")
-                        logger.warn("the parameter remote_log_root will be renamed to remote_data_root in future versions.")
-                    else:
-                        raise RuntimeError("miss remote_log_root in rla_config")
-                    remote_root = osp.join(remote_data_root, LOG, suffix[1])
-                    local_root = root
-                    logger.warn("sync {} <- {}".format(remote_root, local_root))
-                    for file in files:
-                        ftp.upload_file(remote_root, local_root, file)
+        remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_data_root")
+        if remote_data_root is None:
+            remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_log_root")
+            logger.warn("the parameter remote_log_root will be renamed to remote_data_root in future versions.")
+        else:
+            raise RuntimeError("miss remote_log_root in rla_config")
 
+        def send_data(ftp_obj):
+            for root, dirs, files in os.walk(self.log_dir):
+                suffix = root.split("/{}/".format(LOG))
+                assert len(suffix) == 2, "root should only have one pattern \"/log/\""
+                remote_root = osp.join(remote_data_root, LOG, suffix[1])
+                local_root = root
+                logger.warn("sync {} <- {}".format(remote_root, local_root))
+                for file in files:
+                    ftp_obj.upload_file(remote_root, local_root, file)
+
+        if self.private_config["SEND_LOG_FILE"] and not self.is_master_node:
+            from RLA.auto_ftp import ftp_factory
+            alternative_protocol = 'ftp'
+            try:
+                if 'file_transfer_protocol' not in self.private_config["REMOTE_SETTING"].keys():
+                    self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] = 'ftp'
+                ftp = ftp_factory(name=self.private_config["REMOTE_SETTING"]['file_transfer_protocol'],
+                                  server=self.private_config["REMOTE_SETTING"]["ftp_server"],
+                                  username=self.private_config["REMOTE_SETTING"]["username"],
+                                   password=self.private_config["REMOTE_SETTING"]["password"])
+                if self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] == 'ftp':
+                    alternative_protocol = 'sftp'
+                else:
+                    alternative_protocol = 'ftp'
+                send_data(ftp_obj=ftp)
                 logger.warn("sync: send success!")
             except Exception as e:
-                logger.warn("sending log file failed. {}".format(e))
-                import traceback
-                logger.warn(traceback.format_exc())
+                try:
+                    logger.warn("failed to send log files through {}: {} ".format(self.private_config["REMOTE_SETTING"]['file_transfer_protocol'], e))
+                    logger.warn("try another protocol:", alternative_protocol)
+                    ftp = ftp_factory(name=alternative_protocol,
+                                      server=self.private_config["REMOTE_SETTING"]["ftp_server"],
+                                      username=self.private_config["REMOTE_SETTING"]["username"],
+                                      password=self.private_config["REMOTE_SETTING"]["password"])
+                    send_data(ftp_obj=ftp)
+                    logger.warn("sync: send success!")
+                except Exception as e:
+                    logger.warn("fail to send log files through {}: {} ".format(alternative_protocol, e))
+
+                    logger.warn("server info ftp_server {}, username {}, password {}, remote_data_root {}".format(
+                        self.private_config["REMOTE_SETTING"]["ftp_server"],
+                        self.private_config["REMOTE_SETTING"]["username"],
+                        self.private_config["REMOTE_SETTING"]["password"], remote_data_root))
+                    import traceback
+                    logger.warn(traceback.format_exc())
+                    if not skip_error:
+                        raise RuntimeError("fail to sync")
         else:
-            logger.warn("SEND_LOG_FILE in rla_config.yaml is set to False. skip the sync process.")
+            logger.warn("skip the sync process.")
 
     @classmethod
-    def log_file_finder(cls, record_date, task_name='train', file_root='../checkpoint/', log_type='dir'):
+    def log_file_finder(cls, record_date, task_table_name='train', file_root='../checkpoint/', log_type='dir'):
         record_date = datetime.datetime.strptime(record_date, '%Y/%m/%d/%H-%M-%S-%f')
-        prefix = osp.join(file_root, task_name)
+        prefix = osp.join(file_root, task_table_name)
         directory = str(record_date.strftime("%Y/%m/%d"))
         directory = osp.join(prefix, directory)
         file_found = ''
@@ -424,6 +474,8 @@ class Tester(object):
             for dir_name in self.private_config["BACKUP_CONFIG"]["backup_code_dir"]:
                 shutil.copytree(osp.join(self.project_root, dir_name), osp.join(code_dir, dir_name),
                                 ignore=self.get_ignore_files)
+            if run_file is not None:
+                shutil.copy(run_file, code_dir)
         else:
             raise NotImplementedError
 
@@ -437,13 +489,13 @@ class Tester(object):
         directory = osp.join(prefix, directory)
         if is_file:
             os.makedirs(directory, exist_ok=True)
-            file_name = '{dir}/{timestep} {ip} {info}{ext}'.format(dir=directory,
+            file_name = '{dir}/{timestep}_{ip}_{info}{ext}'.format(dir=directory,
                                                                  timestep=self.record_date_to_str(record_date),
                                                                  ip=str(self.ipaddr),
                                                                  info=self.info,
                                                                  ext=ext)
         else:
-            directory = '{dir}/{timestep} {ip} {info}{ext}/'.format(dir=directory,
+            directory = '{dir}/{timestep}_{ip}_{info}{ext}/'.format(dir=directory,
                                                                  timestep=self.record_date_to_str(record_date),
                                                                  ip=str(self.ipaddr),
                                                                  info=self.info,
@@ -627,6 +679,7 @@ class Tester(object):
         if large_mermory_dict != {}:
             summary = self.dict_to_table_text_summary(large_mermory_dict, 'large_memory')
             self.add_summary_to_logger(summary, 'large_memory')
+
 
     def dict_to_table_text_summary(self, input_dict, name):
         import tensorflow as tf

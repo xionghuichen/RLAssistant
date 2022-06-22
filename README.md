@@ -46,7 +46,7 @@ Currently, we store the data items in standard file systems and manage the relat
 - The directory "code" is a backup of code for experiment reproducibility.
 - The directory "checkpoint" save weights of neural networks.
 - We have a table named "demo_task", which is the root directory of log/archive_tester/checkpoint/code/results. 
-- The "index" of experiments in named in the formulation of `${%Y}/${%m}/${%d}/${%H-%M-%S-%f} ${ip address} ${tracked hyper-parameters}`.
+- The "index" of experiments in named in the formulation of `${%Y}/${%m}/${%d}/${%H-%M-%S-%f}_${ip address}_${tracked hyper-parameters}`.
 
 
 ### Tools to Manage the Database
@@ -226,21 +226,24 @@ In practice, we might conduct our experiments in multiple physical machines for 
 ```
 SEND_LOG_FILE: True
 REMOTE_SETTING:
-  ftp_server: ''
-  username: ''
-  password: ''
-  remote_data_root: ''
+  ftp_server: '114.114.114.114'
+  username: 'agent'
+  password: '123'
+  remote_data_root: 'remote_project/data_root/'
+  file_transfer_protocol: 'sftp'
 ```
-where we set `SEND_LOG_FILE` to True and `ftp_server`, `username` and `password` are the ip address, username and passward of the master node.  `remote_data_root` define the data_root of the database in the main node. For the main node, just keep `SEND_LOG_FILE` to False. In our experiment code, we should call the function `RLA.easy_log.tester.exp_manager.sync_log_file` periodically, then the data items we be sent to the `remote_data_root`  of the main node. For example, 
+where `SEND_LOG_FILE` is set to True,  `ftp_server`, `username` and `password` are the ip address, username and passward of the master node respectively, and `file_transfer_protocol` is the protocol to send data.  `remote_data_root` defines the data_root of the database in the main node. 
+For the main node, configure the exp_manger by `exp_manager.configure(..., is_master_node=True)`. 
+In our experiment code, we should call the function `RLA.easy_log.tester.exp_manager.sync_log_file` periodically, for example, 
 ```
 for i in range(1000):
     # your trianing code.
     exp_manager.sync_log_file()
 ```
-Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
+then the data items we be sent to the `remote_data_root`  of the main node. Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
 
 PS: 
-1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/questions/16428401/unable-to-use-ip-address-with-ftplib-python).
+1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/a/70784201/6055868).
 
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
@@ -251,3 +254,4 @@ PS:
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp.
+- [ ] add a document to the plot function.

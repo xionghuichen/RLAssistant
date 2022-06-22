@@ -7,6 +7,7 @@ sns.set_style('darkgrid', {'legend.frameon': True})
 import matplotlib.pyplot as plt
 from RLA.easy_log.tester import exp_manager
 from RLA.easy_log.time_step import time_step_holder
+from typing import Callable
 # video recorder
 
 
@@ -27,8 +28,35 @@ class MatplotlibRecorder:
                 plt.savefig(save_path, **kwargs)
 
     @classmethod
-    def pretty_plot_wrapper(cls, name, plot_func, cover=False, legend_outside=False, xlabel='', ylabel='', title='',
+    def pretty_plot_wrapper(cls, name:str, plot_func:Callable,
+                            cover=False, legend_outside=False, xlabel='', ylabel='', title='',
                             add_timestamp=True, *args, **kwargs):
+        """
+        Save the customized plot figure to the RLA database.
+
+        :param name:  file name to save.
+        :type name: str
+        :param plot_func: the function to plot figures
+        :type plot_func: function
+        :param cover: if you would like to cover the original figure with the same name, you can set cover to True
+        :type cover: bool
+        :param legend_outside: let legend be outside of the figure.
+        :type legend_outside: bool
+        :param xlabel: name of xlabel
+        :type xlabel: str
+        :param ylabel: name of xlabel
+        :type ylabel: str
+        :param title: title of the plotted figure
+        :type title: str
+        :param add_timestamp: add the timestamp (recorded by the timestep holder) to the name.
+        :type add_timestamp:  str
+        :param args: other parameters to plt.savefig
+        :type args:
+        :param kwargs:  other parameters to plt.savefig
+        :type kwargs:
+        :return:
+        :rtype:
+        """
         plt.cla()
         plot_func()
         lgd = plt.legend(prop={'size': 15}, loc=2 if legend_outside else None,
