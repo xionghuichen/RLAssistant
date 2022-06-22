@@ -4,22 +4,28 @@ from RLA.easy_log import logger
 from RLA.easy_log.complex_data_recorder import MatplotlibRecorder as mpr
 import numpy as np
 from RLA.utils.utils import load_yaml
+import os
 
 
 def target_func(x):
     return np.tanh(np.mean(x, axis=-1, keepdims=True))
 
+
+RLA_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+DATABASE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 class ManagerTest(BaseTest):
 
     def _load_rla_config(self):
-        return load_yaml(f'../../../example/rla_config.yaml')
+        return load_yaml(os.path.join(RLA_REPO_ROOT, 'example/rla_config.yaml'))
 
     def _init_proj(self, config_yaml, **kwargs):
         task_name = 'test_manger_demo_task'
-        rla_data_root = '../../test_data_root'
+        rla_data_root = os.path.join(DATABASE_ROOT, 'test_data_root')
         config_yaml['BACKUP_CONFIG']['backup_code_dir'] = ['proj']
         exp_manager.configure(task_name, private_config_path=config_yaml, data_root=rla_data_root,
-                              code_root='../', **kwargs)
+                              code_root=CODE_ROOT, **kwargs)
         exp_manager.log_files_gen()
         exp_manager.print_args()
 
