@@ -108,19 +108,15 @@ def word_replace_back(strings):
     return eval(strings.replace('--', '/').replace("||", "\'"))
 
 
-def plot_res_func(prefix_dir, regs, param_keys,
-                  value_keys,
-                  scale_dict=None,
-                  # misc_scale=None, misc_scale_index=None,
+def plot_res_func(prefix_dir:str, regs, param_keys,
+                  value_keys, scale_dict=None,
                   replace_legend_keys=None,
-                  legend_rescale=None,
                   save_name=None,
                   resample=int(1e3), smooth_step=1.0,
                   ylabel=None, x_bound=None, y_bound=None, x_start=None, use_buf=False,
                   remove_outlier=False, xlabel=None,
                   key_to_legend_fn=None,
-                  verbose=True,
-                  *args, **kwargs):
+                  verbose=True, *args, **kwargs):
     dirs = []
     if key_to_legend_fn is None:
         key_to_legend_fn = default_key_to_legend
@@ -129,6 +125,8 @@ def plot_res_func(prefix_dir, regs, param_keys,
     reg_group = {}
 
     for regex_str in regs:
+        if regex_str[0] == '/':
+            regex_str = regex_str[1:]
         if verbose:
             print("check regs {}. log found: ".format(osp.join(prefix_dir, regex_str)))
 

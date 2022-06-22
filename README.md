@@ -226,18 +226,21 @@ In practice, we might conduct our experiments in multiple physical machines for 
 ```
 SEND_LOG_FILE: True
 REMOTE_SETTING:
-  ftp_server: ''
-  username: ''
-  password: ''
-  remote_data_root: ''
+  ftp_server: '114.114.114.114'
+  username: 'agent'
+  password: '123'
+  remote_data_root: 'remote_project/data_root/'
+  file_transfer_protocol: 'sftp'
 ```
-where we set `SEND_LOG_FILE` to True and `ftp_server`, `username` and `password` are the ip address, username and passward of the master node.  `remote_data_root` define the data_root of the database in the main node. For the main node, just keep `SEND_LOG_FILE` to False. In our experiment code, we should call the function `RLA.easy_log.tester.exp_manager.sync_log_file` periodically, then the data items we be sent to the `remote_data_root`  of the main node. For example, 
+where `SEND_LOG_FILE` is set to True,  `ftp_server`, `username` and `password` are the ip address, username and passward of the master node respectively, and `file_transfer_protocol` is the protocol to send data.  `remote_data_root` defines the data_root of the database in the main node. 
+For the main node, configure the exp_manger by `exp_manager.configure(..., is_master_node=True)`. 
+In our experiment code, we should call the function `RLA.easy_log.tester.exp_manager.sync_log_file` periodically, for example, 
 ```
 for i in range(1000):
     # your trianing code.
     exp_manager.sync_log_file()
 ```
-Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
+then the data items we be sent to the `remote_data_root`  of the main node. Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
 
 PS: 
 1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/questions/16428401/unable-to-use-ip-address-with-ftplib-python).
@@ -251,3 +254,4 @@ PS:
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp.
+- [ ] add a document to the plot function.

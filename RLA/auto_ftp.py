@@ -3,9 +3,19 @@ import fnmatch
 import shutil
 import os
 import traceback
+from RLA.const import *
 from RLA.easy_log import logger
 
 import pysftp
+
+
+def ftp_factory(name, server, username, password, ignore=None):
+    if name == FTP_PROTOCOL_NAME.FTP:
+        return FTPHandler(ftp_server=server, username=username,password=password, ignore=ignore)
+    elif name == FTP_PROTOCOL_NAME.SFTP:
+        return SFTPHandler(sftp_server=server, username=username, password=password, ignore=ignore)
+    else:
+        raise NotImplementedError
 
 class FTPHandler(object):
 
