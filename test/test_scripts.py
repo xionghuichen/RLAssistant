@@ -1,13 +1,15 @@
 from test._base import BaseTest
 from RLA.easy_log.log_tools import DeleteLogTool, Filter
 from RLA.easy_log.log_tools import ArchiveLogTool, ViewLogTool
+from RLA.easy_log.tester import exp_manager
 
+import os
 
 class ScriptTest(BaseTest):
 
     def test_delete_reg(self) -> None:
         """
-        test delete log filtered by regex.
+        test delete log filtered by regex. See rla_scripts/delete_expt.py
         """
         self.remove_and_copy_data()
         filter = Filter()
@@ -18,9 +20,9 @@ class ScriptTest(BaseTest):
         log_found = dlt.delete_related_log(skip_ask=True)
         assert log_found == 0
 
-    def test_delete_reg_small_ts(self):
+    def test_delete_reg_small_ts(self) -> None:
         """
-        test delete log filtered by regex and threshold of time-step.
+        test delete log filtered by regex and threshold of time-step.  See rla_scripts/delete_expt.py
         """
         self.remove_and_copy_data()
         filter = Filter()
@@ -40,7 +42,10 @@ class ScriptTest(BaseTest):
         log_found = dlt.delete_small_timestep_log(skip_ask=True)
         assert log_found == 0
 
-    def test_archive(self):
+    def test_archive(self) -> None:
+        """
+        archive experiment log. See rla_scripts/archive_expt.py
+        """
         self.remove_and_copy_data()
         # archive experiments.
         dlt = ArchiveLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name=self.TASK_NAME, regex='2022/03/01/21-13*')
@@ -52,7 +57,11 @@ class ScriptTest(BaseTest):
         log_found = dlt.delete_related_log(skip_ask=True)
         assert log_found == 10
 
-    def test_view(self):
+    def test_view(self) -> None:
+        """
+        view experiment log.See rla_scripts/view_expt.py
+
+        """
         self.remove_and_copy_data()
         dlt = ViewLogTool(proj_root=self.TARGET_DATA_ROOT, task_table_name=self.TASK_NAME, regex='2022/03/01/21-13*')
         dlt.view_log(skip_ask=True)

@@ -27,4 +27,5 @@ REMOTE_SETTING:
   username: ''
   password: ''
   remote_data_root: ''
-
+  # option: ftp or sftp
+  file_transfer_protocol: 'sftp'
