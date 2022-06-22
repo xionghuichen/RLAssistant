@@ -39,7 +39,6 @@ class ManagerTest(BaseTest):
         yaml = self._load_rla_config()
         self._init_proj(yaml)
         import tensorflow as tf
-        import numpy as np
         X_ph = tf.placeholder(dtype=tf.float32, shape=[None, kwargs["input_size"]], name='x')
         y_ph = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='x')
         l = X_ph
@@ -48,7 +47,7 @@ class ManagerTest(BaseTest):
             l = tf.nn.tanh(tf.layers.dense(l, 64, kernel_initializer=tf.keras.initializers.glorot_normal))
 
         out = tf.layers.dense(l, 1, kernel_initializer=tf.keras.initializers.glorot_normal)
-        loss = tf.reduce_mean(np.square(out - y_ph))
+        loss = tf.reduce_mean(tf.square(out - y_ph))
         opt = tf.train.AdamOptimizer(learning_rate=kwargs["learning_rate"]).minimize(loss)
         sess = tf.Session().__enter__()
         sess.run(tf.variables_initializer(tf.global_variables()))
