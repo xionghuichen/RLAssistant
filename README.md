@@ -46,7 +46,7 @@ Currently, we store the data items in standard file systems and manage the relat
 - The directory "code" is a backup of code for experiment reproducibility.
 - The directory "checkpoint" save weights of neural networks.
 - We have a table named "demo_task", which is the root directory of log/archive_tester/checkpoint/code/results. 
-- The "index" of experiments in named in the formulation of `${%Y}/${%m}/${%d}/${%H-%M-%S-%f} ${ip address} ${tracked hyper-parameters}`.
+- The "index" of experiments in named in the formulation of `${%Y}/${%m}/${%d}/${%H-%M-%S-%f}_${ip address}_${tracked hyper-parameters}`.
 
 
 ### Tools to Manage the Database
