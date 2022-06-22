@@ -240,7 +240,7 @@ for i in range(1000):
     # your trianing code.
     exp_manager.sync_log_file()
 ```
-then the data items we be sent to the `remote_data_root`  of the main node. Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
+then the data items we be sent to the `remote_data_root`  of the main node. Since `is_master_node` is set to True in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
 
 PS: 
 1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/a/70784201/6055868).
