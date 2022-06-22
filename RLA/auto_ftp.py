@@ -203,7 +203,7 @@ class SFTPHandler(FTPHandler):
                 raise expection
             logger.warn('create dir succeed {}'.format(remote_dir))
             self.sftp.cwd(remote_dir)
-        self.sftp.put(local_dir + local_file)
+        self.sftp.put(os.path.join(local_dir, local_file))
         self.close()
 
     def download_file(self, remote_file, local_file):
