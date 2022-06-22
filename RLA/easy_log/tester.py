@@ -340,17 +340,17 @@ class Tester(object,):
         """
 
         logger.warn("sync: start")
-        # ignore_files = self.private_config["IGNORE_RULE"]
+        remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_data_root")
+        if remote_data_root is None:
+            remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_log_root")
+            logger.warn("the parameter remote_log_root will be renamed to remote_data_root in future versions.")
+        else:
+            raise RuntimeError("miss remote_log_root in rla_config")
+
         def send_data(ftp_obj):
             for root, dirs, files in os.walk(self.log_dir):
                 suffix = root.split("/{}/".format(LOG))
                 assert len(suffix) == 2, "root should only have one pattern \"/log/\""
-                remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_data_root")
-                if remote_data_root is None:
-                    remote_data_root = self.private_config["REMOTE_SETTING"].get("remote_log_root")
-                    logger.warn("the parameter remote_log_root will be renamed to remote_data_root in future versions.")
-                else:
-                    raise RuntimeError("miss remote_log_root in rla_config")
                 remote_root = osp.join(remote_data_root, LOG, suffix[1])
                 local_root = root
                 logger.warn("sync {} <- {}".format(remote_root, local_root))
@@ -389,8 +389,7 @@ class Tester(object,):
                     logger.warn("server info ftp_server {}, username {}, password {}, remote_data_root {}".format(
                         self.private_config["REMOTE_SETTING"]["ftp_server"],
                         self.private_config["REMOTE_SETTING"]["username"],
-                        self.private_config["REMOTE_SETTING"]["password"],
-                        self.private_config["REMOTE_SETTING"]["remote_data_root"]))
+                        self.private_config["REMOTE_SETTING"]["password"], remote_data_root))
                     import traceback
                     logger.warn(traceback.format_exc())
                     if not skip_error:

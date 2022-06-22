@@ -243,7 +243,7 @@ for i in range(1000):
 then the data items we be sent to the `remote_data_root`  of the main node. Since `SEND_LOG_FILE` is set to False in the main node, the `exp_manager.sync_log_file()` will be skipped in the main node.
 
 PS: 
-1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/questions/16428401/unable-to-use-ip-address-with-ftplib-python).
+1. You might meet "socket.error: [Errno 111] Connection refused" problem in this process. The solution can be found [here](https://stackoverflow.com/a/70784201/6055868).
 
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
