@@ -17,10 +17,10 @@ import pprint
 
 import tensorboardX
 
-from RLA.easy_log.const import *
 from RLA.easy_log.time_step import time_step_holder
 from RLA.easy_log import logger
 from RLA.easy_log.const import *
+from RLA.const import *
 import yaml
 import shutil
 import argparse
@@ -107,6 +107,8 @@ class Tester(object,):
         self.code_dir = None
         self.saver = None
         self.dl_framework = None
+        self.checkpoint_keep_list = None
+        self.log_name_format_version = LOG_NAME_FORMAT_VERSION.V1
 
     @deprecated_alias(task_name='task_table_name', private_config_path='rla_config', log_root='data_root')
     def configure(self, task_table_name: str, rla_config: Union[str, dict], data_root: str,
@@ -205,13 +207,28 @@ class Tester(object,):
         self._feed_hyper_params_to_tb()
         self.print_log_dir()
 
-    def update_log_files_location(self, root):
+    def update_log_files_location(self, root:str):
+        """
+        This function is designed for the requirement of using copied/moved experiment logs to other databases for downstream task.
+        The location of the experiment logs might have changed compared with their original location.
+        The function automatically update the attributes related to the data_root to the current location.
+        :param root: current data_root
+        :type root: str
+        """
         self.data_root = root
-        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, self.task_table_name), '', is_file=False)
-        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, self.task_table_name), '', is_file=False)
-        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, self.task_table_name), '.pkl')
-        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, self.task_table_name), is_file=False)
-        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, self.task_table_name), is_file=False)
+
+        task_table_name = getattr(self, 'task_table_name', None)
+        if task_table_name is None:
+            task_table_name = getattr(self, 'task_name', None)
+            print("[WARN] you are using an old-version RLA. "
+                  "Some attributes' name have been changed (task_name->task_table_name).")
+        else:
+            raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+        code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, task_table_name), '', is_file=False)
+        log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, task_table_name), '', is_file=False)
+        self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, task_table_name), '.pkl')
+        self.checkpoint_dir, _ = self.__create_file_directory(osp.join(self.data_root, CHECKPOINT, task_table_name), is_file=False)
+        self.results_dir, _ = self.__create_file_directory(osp.join(self.data_root, OTHER_RESULTS, task_table_name), is_file=False)
         self.log_dir = log_dir
         self.code_dir = code_dir
         self.print_log_dir()
@@ -487,15 +504,23 @@ class Tester(object,):
             record_date = self.record_date
         directory = str(record_date.strftime("%Y/%m/%d"))
         directory = osp.join(prefix, directory)
+        version_num = getattr(self, 'log_name_format_version', None)
+
+        if version_num is None:
+            name_format = '{dir}/{timestep} {ip} {info}{ext}'
+        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
+            name_format = '{dir}/{timestep}_{ip}_{info}{ext}'
+        else:
+            raise RuntimeError("unknown version name", version_num)
+
         if is_file:
             os.makedirs(directory, exist_ok=True)
-            file_name = '{dir}/{timestep}_{ip}_{info}{ext}'.format(dir=directory,
-                                                                 timestep=self.record_date_to_str(record_date),
+            file_name = name_format.format(dir=directory, timestep=self.record_date_to_str(record_date),
                                                                  ip=str(self.ipaddr),
                                                                  info=self.info,
                                                                  ext=ext)
         else:
-            directory = '{dir}/{timestep}_{ip}_{info}{ext}/'.format(dir=directory,
+            directory = (name_format + '/').format(dir=directory,
                                                                  timestep=self.record_date_to_str(record_date),
                                                                  ip=str(self.ipaddr),
                                                                  info=self.info,
@@ -545,7 +570,6 @@ class Tester(object,):
             self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
         elif self.dl_framework == FRAMEWORK.torch:
             self.max_to_keep = max_to_keep
-            self.checkpoint_keep_list = []
         else:
             raise NotImplementedError
 
@@ -558,6 +582,8 @@ class Tester(object,):
             self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
+            if self.checkpoint_keep_list is None:
+                self.checkpoint_keep_list = []
             iter = self.time_step_holder.get_time()
             torch.save(model_dict, f=tester.checkpoint_dir + "checkpoint-{}.pt".format(iter))
             self.checkpoint_keep_list.append(iter)
@@ -574,20 +600,27 @@ class Tester(object,):
                 self.add_custom_data(k, v, type(v), mode='replace')
         self.add_custom_data(DEFAULT_X_NAME, time_step_holder.get_time(), int, mode='replace')
 
-    def load_checkpoint(self):
+    def load_checkpoint(self, ckp_index=None):
         if self.dl_framework == FRAMEWORK.tensorflow:
             # TODO: load with variable scope.
             import tensorflow as tf
             cpt_name = osp.join(self.checkpoint_dir)
             logger.info("load checkpoint {}".format(cpt_name))
-            ckpt_path = tf.train.latest_checkpoint(cpt_name)
+            if ckp_index is None:
+                ckpt_path = tf.train.latest_checkpoint(cpt_name)
+            else:
+                ckpt_path = tf.train.latest_checkpoint(cpt_name, ckp_index)
             self.saver.restore(tf.get_default_session(), ckpt_path)
             max_iter = ckpt_path.split('-')[-1]
-            self.time_step_holder.set_time(max_iter)
             return int(max_iter), None
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
-            return self.checkpoint_keep_list[-1], torch.load(tester.checkpoint_dir + "checkpoint-{}.pt".format(self.checkpoint_keep_list[-1]))
+            all_ckps = sorted(os.listdir(self.checkpoint_dir))
+            print("all checkpoints:")
+            pprint.pprint(all_ckps)
+            if ckp_index is None:
+                ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
+            return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):
         return '&'.join(self.hyper_param_record)
@@ -648,7 +681,7 @@ class Tester(object,):
         saver = self.saver
         self.saver = None
         with open(self.pkl_file, 'wb') as f:
-            dill.dump(self, f)
+            dill.dump(self, f, recurse=True)
         self.writer = writer
         self.saver = saver
 

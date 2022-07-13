@@ -248,10 +248,11 @@ PS:
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
 # TODO
-- [ ] support sftp-based sync.
 - [ ] support custom data structure saving and loading.
 - [ ] support video visualization.
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp.
 - [ ] add a document to the plot function.
+- [ ] allow sync LOG only or ALL TYPE LOGS. 
+- [ ] support aim and smarter logger.

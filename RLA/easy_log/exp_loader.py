@@ -4,6 +4,7 @@ import copy
 import argparse
 from typing import Optional, OrderedDict, Union, Dict, Any
 from RLA.const import DEFAULT_X_NAME
+from pprint import pprint
 
 class ExperimentLoader(object):
     """
@@ -32,7 +33,9 @@ class ExperimentLoader(object):
     def __init__(self):
         self.task_name = exp_manager.hyper_param.get('loaded_task_name', None)
         self.load_date = exp_manager.hyper_param.get('loaded_date', None)
-        self.data_root = getattr(exp_manager, 'root', None)
+        self.data_root = getattr(exp_manager, 'data_root', None)
+        if self.data_root is None:
+            self.data_root = getattr(exp_manager, 'root', None)
         pass
 
     def config(self, task_name, record_date, root):
@@ -53,15 +56,17 @@ class ExperimentLoader(object):
 
     def import_hyper_parameters(self, hp_to_overwrite: Optional[list] = None):
         if self.is_valid_config:
-            load_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
+            loaded_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
             target_hp = copy.deepcopy(exp_manager.hyper_param)
-            target_hp.update(load_tester.hyper_param)
+            target_hp.update(loaded_tester.hyper_param)
             if hp_to_overwrite is not None:
                 for v in hp_to_overwrite:
                     target_hp[v] = exp_manager.hyper_param[v]
             args = argparse.Namespace(**target_hp)
             args.load_date = self.load_date
             args.load_task_name = self.task_name
+            load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
+            exp_manager.time_step_holder.set_time(load_iter)
             return args
         else:
             return argparse.Namespace(**exp_manager.hyper_param)
@@ -75,18 +80,21 @@ class ExperimentLoader(object):
         """
         if self.is_valid_config:
             loaded_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
+            print("attrs of the loaded tester")
+            pprint(loaded_tester.__dict__)
             # load checkpoint
             load_res = {}
             if var_prefix is not None:
                 loaded_tester.new_saver(var_prefix=var_prefix, max_to_keep=1)
                 _, load_res = loaded_tester.load_checkpoint()
-                exp_manager.print_log_dir()
+            else:
+                loaded_tester.new_saver(max_to_keep=1)
+                _, load_res = loaded_tester.load_checkpoint()
             hist_variables = {}
             if variable_list is not None:
                 for v in variable_list:
                     hist_variables[v] = loaded_tester.get_custom_data(v)
             load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
-            exp_manager.time_step_holder.set_time(load_iter)
             return load_iter, load_res, hist_variables
         else:
             return 0, {}, {}

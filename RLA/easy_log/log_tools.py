@@ -169,6 +169,10 @@ class DeleteLogTool(BasicLogTool):
             for res in self.small_timestep_regs:
                 print("[delete small-timestep log] reg: ", res[1])
                 self._delete_related_log(show=True, regex=res[0] + '*')
+            print("summarize:")
+            for count, res in enumerate(self.small_timestep_regs):
+                print(f"[delete small-timestep log] {count} reg: {res[1]}")
+
             if skip_ask:
                 s = 'y'
             else:
