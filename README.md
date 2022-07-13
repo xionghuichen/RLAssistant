@@ -277,6 +277,5 @@ PS:
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp.
 - [ ] add a document to the plot function.
-- [ ] allow sync LOG only or ALL TYPE LOGS. 
-- [x] support aim and smarter logger.
+- [ ] allow sync LOG only or ALL TYPE LOGS.
 - [ ] add unit_test to ckp loader.
