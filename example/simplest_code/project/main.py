@@ -15,6 +15,7 @@ def get_param():
     parser.add_argument('--env_id', help='environment ID', default='Test-v1')
     parser.add_argument('--learning_rate', help='a hyperparameter', default=1e-3, type=float)
     parser.add_argument('--input_size', help='a hyperparameter', default=16, type=int)
+    # NOTE: add some recommended hyper-parameters for RLA.
     parser = arg_parser_postprocess(parser)
     args = parser.parse_args()
     kwargs = vars(args)

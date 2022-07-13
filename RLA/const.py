@@ -7,3 +7,6 @@ class FRAMEWORK:
 class FTP_PROTOCOL_NAME:
     FTP = 'ftp'
     SFTP = 'sftp'
+
+class LOG_NAME_FORMAT_VERSION:
+    V1 = 'v1'
