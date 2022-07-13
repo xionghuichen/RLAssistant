@@ -54,7 +54,7 @@ class ExperimentLoader(object):
             logger.warn("root", self.data_root)
             return False
 
-    def import_hyper_parameters(self, hp_to_overwrite: Optional[list] = None):
+    def import_hyper_parameters(self, hp_to_overwrite: Optional[list] = None, sync_timestep=False):
         if self.is_valid_config:
             loaded_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
             target_hp = copy.deepcopy(exp_manager.hyper_param)
@@ -65,8 +65,9 @@ class ExperimentLoader(object):
             args = argparse.Namespace(**target_hp)
             args.load_date = self.load_date
             args.load_task_name = self.task_name
-            load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
-            exp_manager.time_step_holder.set_time(load_iter)
+            if sync_timestep:
+                load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
+                exp_manager.time_step_holder.set_time(load_iter)
             return args
         else:
             return argparse.Namespace(**exp_manager.hyper_param)
