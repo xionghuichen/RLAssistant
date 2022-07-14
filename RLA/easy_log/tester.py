@@ -695,6 +695,7 @@ class Tester(object,):
             pprint.pprint(all_ckps)
             if ckp_index is None:
                 ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
+            print("loaded checkpoints:", "checkpoint-{}.pt".format(ckp_index))
             return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):
