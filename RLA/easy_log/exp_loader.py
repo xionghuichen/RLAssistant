@@ -82,8 +82,9 @@ class ExperimentLoader(object):
         """
         if self.is_valid_config:
             loaded_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
-            print("attrs of the loaded tester")
-            pprint(loaded_tester.__dict__)
+            if verbose:
+                print("attrs of the loaded tester")
+                pprint(loaded_tester.__dict__)
             # load checkpoint
             load_res = {}
             if var_prefix is not None:
