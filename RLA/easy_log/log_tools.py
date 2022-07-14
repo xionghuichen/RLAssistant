@@ -106,10 +106,12 @@ class DeleteLogTool(BasicLogTool):
         self.small_timestep_regs = []
         super(DeleteLogTool, self).__init__(*args, **kwargs)
 
-    def _delete_related_log(self, regex, show=False):
+    def _delete_related_log(self, regex, show=False, delete_log_types=None):
         log_found = 0
         for log_type in self.log_types:
             print(f"--- search {log_type} ---")
+            if delete_log_types is not None and log_type not in delete_log_types:
+                continue
             root_dir_regex = osp.join(self.proj_root, log_type, self.task_table_name, regex)
             empty = True
             for root_dir in glob.glob(root_dir_regex):
@@ -144,15 +146,15 @@ class DeleteLogTool(BasicLogTool):
             if empty: print("empty regex {}".format(root_dir_regex))
         return log_found
 
-    def delete_related_log(self, skip_ask=False):
-        self._delete_related_log(show=True, regex=self.regex)
+    def delete_related_log(self, skip_ask=False, delete_log_types=None):
+        self._delete_related_log(show=True, regex=self.regex, delete_log_types=delete_log_types)
         if skip_ask:
             s = 'y'
         else:
             s = input("delete these files? (y/n)")
         if s == 'y':
             print("do delete ...")
-            return self._delete_related_log(show=False, regex=self.regex)
+            return self._delete_related_log(show=False, regex=self.regex, delete_log_types=delete_log_types)
         else:
             return 0
 

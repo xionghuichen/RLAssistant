@@ -222,8 +222,8 @@ class Tester(object,):
             task_table_name = getattr(self, 'task_name', None)
             print("[WARN] you are using an old-version RLA. "
                   "Some attributes' name have been changed (task_name->task_table_name).")
-        else:
-            raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+            if task_table_name is None:
+                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
         code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, task_table_name), '', is_file=False)
         log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, task_table_name), '', is_file=False)
         self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, task_table_name), '.pkl')
@@ -430,9 +430,15 @@ class Tester(object,):
                 raise NotImplementedError
             for search_item in search_list:
                 if search_item.startswith(str(record_date.strftime("%H-%M-%S-%f"))):
-                    split_dir = search_item.split(' ')
-                    # self.__ipaddr = split_dir[1]
-                    info = " ".join(split_dir[2:])
+                    try:
+                        split_dir = search_item.split('_')
+                        assert len(split_dir) >= 2
+                        info = " ".join(split_dir[2:])
+                    except AssertionError as e:
+                        split_dir = search_item.split(' ')
+                        # self.__ipaddr = split_dir[1]
+                        info = "_".join(split_dir[2:])
+                        print("[WARN] We find an old-version experiment data.")
                     logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
                     file_found = search_item
                     break
