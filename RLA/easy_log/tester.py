@@ -15,6 +15,7 @@ import datetime
 import os.path as osp
 import pprint
 
+import numpy as np
 import tensorboardX
 
 from RLA.easy_log.time_step import time_step_holder
@@ -621,11 +622,17 @@ class Tester(object,):
             return int(max_iter), None
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
-            all_ckps = sorted(os.listdir(self.checkpoint_dir))
+            all_ckps = os.listdir(self.checkpoint_dir)
+            ites = []
+            for ckps in all_ckps:
+                ites.append(int(ckps.split('checkpoint-')[1].split('.pt')[0]))
+            idx = np.argsort(ites)
+            all_ckps = np.array(all_ckps)[idx]
             print("all checkpoints:")
             pprint.pprint(all_ckps)
             if ckp_index is None:
                 ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
+            print("loaded checkpoints:", "checkpoint-{}.pt".format(ckp_index))
             return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):
