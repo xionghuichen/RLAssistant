@@ -625,6 +625,7 @@ class Tester(object,):
             all_ckps = os.listdir(self.checkpoint_dir)
             ites = []
             for ckps in all_ckps:
+                print("ckps", ckps)
                 ites.append(int(ckps.split('checkpoint-')[1].split('.pt')[0]))
             idx = np.argsort(ites)
             all_ckps = np.array(all_ckps)[idx]
