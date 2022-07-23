@@ -170,7 +170,7 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
         group_fn = lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names,
                                            key_to_legend_fn=key_to_legend_fn)
 
-    _, _, lgd, texts, g2lf = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
+    _, _, lgd, texts, g2lf, score_results = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
                                                                                            final_scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
@@ -194,7 +194,7 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
             plt.savefig(file_name, bbox_extra_artists=tuple(texts), bbox_inches='tight')
         print("saved location: {}".format(file_name))
     plt.show()
-    return g2lf
+    return g2lf, score_results
 
 def scale_index_to_dict(measure, scale_index, scale):
     scale_dict = {}

@@ -339,6 +339,7 @@ def plot_results(
                                               See docstrings for decay_steps in symmetric_ema or one_sided_ema functions.
 
     '''
+    score_results = {}
     if vary_len_plot:
         assert resample <= 0, "plot varied length averaged lines only allowed in unresample mode."
     if colors is None:
@@ -508,14 +509,17 @@ def plot_results(
                         res = g2lf[original_legend_keys[index] + '-se']
                         res[0].update(props={"color": colors[index % len(colors)]})
                         print("{}-err : ({:.2f} \pm {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        score_results[legend_keys[index]+'-err'] = [res[1][-1], res[2][-1]]
                     if shaded_std:
                         res = g2lf[original_legend_keys[index] + '-ss']
                         res[0].update(props={"color": colors[index % len(colors)]})
                         print("{}-std :({:.2f} \pm {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        score_results[legend_keys[index]+'-std'] = [res[1][-1], res[2][-1]]
                     if shaded_range:
                         res = g2lf[original_legend_keys[index] + '-sr']
                         res[0].update(props={"color": colors[index % len(colors)]})
                         print("{}-range : ({:.2f}, {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        score_results[legend_keys[index]+'-range'] = [res[1][-1], res[2][-1]]
 
             if bound_line is not None:
                 for bl in bound_line:
@@ -569,7 +573,7 @@ def plot_results(
         plt.title(title, fontsize=18)
     else:
         plt.gcf().subplots_adjust(bottom=0.12, left=0.12)
-    return f, axarr, lgd, texts, g2lf
+    return f, axarr, lgd, texts, g2lf, score_results
 
 def regression_analysis(df):
     xcols = list(df.columns.copy())
