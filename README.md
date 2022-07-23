@@ -255,4 +255,5 @@ PS:
 - [ ] download / upload experiment logs through timestamp.
 - [ ] add a document to the plot function.
 - [ ] allow sync LOG only or ALL TYPE LOGS. 
-- [ ] support aim and smarter logger.
+- [x] support aim and smarter logger.
+- [ ] add unit_test to ckp loader.
