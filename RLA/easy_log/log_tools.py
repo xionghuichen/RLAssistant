@@ -219,7 +219,11 @@ class ArchiveLogTool(BasicLogTool):
                     if os.path.isdir(root_dir):
                         if not show:
                             # os.makedirs(archiving_target, exist_ok=True)
-                            shutil.copytree(root_dir, archiving_target)
+                            try:
+                                shutil.copytree(root_dir, archiving_target)
+                            except FileExistsError as e:
+                                print(e)
+
                         print("copy dir {}, to {}".format(root_dir, archiving_target))
                     else:
                         if not show:

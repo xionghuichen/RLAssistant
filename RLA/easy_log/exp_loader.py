@@ -72,8 +72,12 @@ class ExperimentLoader(object):
         else:
             return argparse.Namespace(**exp_manager.hyper_param)
 
+<<<<<<< HEAD
     def load_from_record_date(self, var_prefix: Optional[str] = None, variable_list: Optional[list]=None, verbose=True,
                               ckp_index: Optional[int]=None):
+=======
+    def load_from_record_date(self, var_prefix: Optional[str] = None, variable_list: Optional[list]=None, verbose=True):
+>>>>>>> 44c2cff78cda88205eb350d592f33d5d8f3715f9
         """
 
         :param var_prefix: the prefix of namescope (for tf) to load. Set to '' to load all of the parameters.

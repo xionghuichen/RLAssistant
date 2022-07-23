@@ -217,24 +217,30 @@ def load_results(root_dir_or_dirs, names, x_bound, enable_progress=True, use_buf
                                 reader = pd.read_csv(progcsv, chunksize=100000,  quoting=csv.QUOTE_NONE,
                                                      encoding='utf-8', index_col=False, comment='#')
                                 raw_df = pd.DataFrame()
+
                                 for chunk in reader:
                                     slim_chunk = chunk
-                                    if set(names).issubset(slim_chunk.columns):
-                                        slim_chunk = slim_chunk[names]
-                                        if x_bound[1] is not None:
-                                            slim_chunk = slim_chunk[slim_chunk[x_bound[0]] < x_bound[1]]
-                                        raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
-                                    else:
-                                        raise RuntimeError
+                                    # if set(names).issubset(slim_chunk.columns):
+                                    existed_names = []
+                                    for name in names:
+                                        if name not in slim_chunk.columns:
+                                            print("[error keys]: {}".format(name))
+                                        else:
+                                            existed_names.append(name)
+                                    if len(existed_names) == 0:
+                                        raise RuntimeError("all value_keys cannot be found.")
+                                    slim_chunk = slim_chunk[existed_names]
+                                    if x_bound[1] is not None:
+                                        slim_chunk = slim_chunk[slim_chunk[x_bound[0]] < x_bound[1]]
+                                    raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
+                                    # else:
+                                    #     raise RuntimeError
                                 import csv
                                 raw_df.to_csv(buf_csv, index=False)
                             result['progress'] = raw_df
                         except pandas.errors.EmptyDataError:
                             print('skipping progress file in ', dirname, 'empty data')
                         except Exception as e:
-                            for name in names:
-                                if name not in slim_chunk.columns:
-                                    print("[error keys]: {}".format(name))
                             print("other read error :", e)
 
                     else:

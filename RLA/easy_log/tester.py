@@ -15,6 +15,7 @@ import datetime
 import os.path as osp
 import pprint
 
+import numpy as np
 import tensorboardX
 
 from RLA.easy_log.time_step import time_step_holder
@@ -231,7 +232,17 @@ class Tester(object,):
         """
         self.data_root = root
 
+<<<<<<< HEAD
         task_table_name = self.get_task_table_name()
+=======
+        task_table_name = getattr(self, 'task_table_name', None)
+        if task_table_name is None:
+            task_table_name = getattr(self, 'task_name', None)
+            print("[WARN] you are using an old-version RLA. "
+                  "Some attributes' name have been changed (task_name->task_table_name).")
+            if task_table_name is None:
+                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+>>>>>>> 44c2cff78cda88205eb350d592f33d5d8f3715f9
         code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, task_table_name), '', is_file=False)
         log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, task_table_name), '', is_file=False)
         self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, task_table_name), '.pkl')
@@ -632,11 +643,18 @@ class Tester(object,):
             return int(max_iter), None
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
-            all_ckps = sorted(os.listdir(self.checkpoint_dir))
+            all_ckps = os.listdir(self.checkpoint_dir)
+            ites = []
+            for ckps in all_ckps:
+                print("ckps", ckps)
+                ites.append(int(ckps.split('checkpoint-')[1].split('.pt')[0]))
+            idx = np.argsort(ites)
+            all_ckps = np.array(all_ckps)[idx]
             print("all checkpoints:")
             pprint.pprint(all_ckps)
             if ckp_index is None:
                 ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
+            print("loaded checkpoints:", "checkpoint-{}.pt".format(ckp_index))
             return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):
