@@ -232,17 +232,7 @@ class Tester(object,):
         """
         self.data_root = root
 
-<<<<<<< HEAD
         task_table_name = self.get_task_table_name()
-=======
-        task_table_name = getattr(self, 'task_table_name', None)
-        if task_table_name is None:
-            task_table_name = getattr(self, 'task_name', None)
-            print("[WARN] you are using an old-version RLA. "
-                  "Some attributes' name have been changed (task_name->task_table_name).")
-            if task_table_name is None:
-                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
->>>>>>> 44c2cff78cda88205eb350d592f33d5d8f3715f9
         code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, task_table_name), '', is_file=False)
         log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, task_table_name), '', is_file=False)
         self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, task_table_name), '.pkl')
