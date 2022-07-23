@@ -110,6 +110,11 @@ class Tester(object,):
         self.checkpoint_keep_list = None
         self.log_name_format_version = LOG_NAME_FORMAT_VERSION.V1
 
+
+    @staticmethod
+    def record_date_to_str(record_date):
+        return str(record_date.strftime("%H-%M-%S-%f"))
+
     @deprecated_alias(task_name='task_table_name', private_config_path='rla_config', log_root='data_root')
     def configure(self, task_table_name: str, rla_config: Union[str, dict], data_root: str,
                   ignore_file_path: Optional[str] = None, run_file: Optional[str] = None,
@@ -161,6 +166,15 @@ class Tester(object,):
         for k, v in self.private_config.items():
             logger.info("k: {}, v: {}".format(k, v))
 
+    def get_task_table_name(self):
+        task_table_name = getattr(self, 'task_table_name', None)
+        if task_table_name is None:
+            task_table_name = getattr(self, 'task_name', None)
+            print("[WARN] you are using an old-version RLA. "
+                  "Some attributes' name have been changed (task_name->task_table_name).")
+            if task_table_name is None:
+                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+        return task_table_name
 
     def set_hyper_param(self, **argkw):
         """
@@ -217,13 +231,7 @@ class Tester(object,):
         """
         self.data_root = root
 
-        task_table_name = getattr(self, 'task_table_name', None)
-        if task_table_name is None:
-            task_table_name = getattr(self, 'task_name', None)
-            print("[WARN] you are using an old-version RLA. "
-                  "Some attributes' name have been changed (task_name->task_table_name).")
-            if task_table_name is None:
-                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+        task_table_name = self.get_task_table_name()
         code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, task_table_name), '', is_file=False)
         log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, task_table_name), '', is_file=False)
         self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, task_table_name), '.pkl')
@@ -502,35 +510,38 @@ class Tester(object,):
         else:
             raise NotImplementedError
 
-    def record_date_to_str(self, record_date):
-        return str(record_date.strftime("%H-%M-%S-%f"))
+
+
+
+    def log_name_formatter(self, prefix, record_date):
+        """
+        return a unified and unique name for the experiment log.
+        :param prefix: prefix location to store the log data.
+        :param record_date: the timestamp of the experiment log.
+        :return: a unify and unique name
+        """
+        version_num = getattr(self, 'log_name_format_version', None)
+        if version_num is None:
+            name_format = '{prefix}/{date}/{timestep} {ip} {info}'
+        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
+            name_format = '{prefix}/{date}/{timestep}_{ip}_{info}'
+        else:
+            raise RuntimeError("unknown version name", version_num)
+        date = record_date.strftime("%Y/%m/%d")
+        return name_format.format(prefix=prefix, date=date, timestep=self.record_date_to_str(record_date),
+                                                             ip=str(self.ipaddr), info=self.info)
 
     def __create_file_directory(self, prefix, ext='', is_file=True, record_date=None):
         if record_date is None:
             record_date = self.record_date
-        directory = str(record_date.strftime("%Y/%m/%d"))
-        directory = osp.join(prefix, directory)
-        version_num = getattr(self, 'log_name_format_version', None)
-
-        if version_num is None:
-            name_format = '{dir}/{timestep} {ip} {info}{ext}'
-        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
-            name_format = '{dir}/{timestep}_{ip}_{info}{ext}'
-        else:
-            raise RuntimeError("unknown version name", version_num)
-
+        name = self.log_name_formatter(prefix, record_date)
         if is_file:
+            directory = str(record_date.strftime("%Y/%m/%d"))
+            directory = osp.join(prefix, directory)
             os.makedirs(directory, exist_ok=True)
-            file_name = name_format.format(dir=directory, timestep=self.record_date_to_str(record_date),
-                                                                 ip=str(self.ipaddr),
-                                                                 info=self.info,
-                                                                 ext=ext)
+            file_name = name + ext
         else:
-            directory = (name_format + '/').format(dir=directory,
-                                                                 timestep=self.record_date_to_str(record_date),
-                                                                 ip=str(self.ipaddr),
-                                                                 info=self.info,
-                                                                 ext=ext)
+            directory = name + '/'
             os.makedirs(directory, exist_ok=True)
             file_name = ''
         return directory, file_name

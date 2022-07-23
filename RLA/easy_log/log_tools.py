@@ -12,6 +12,10 @@ import distutils.dir_util
 import yaml
 import pandas as pd
 import csv
+import dill
+
+import json
+from RLA.easy_log.tester import Tester
 
 class Filter(object):
     ALL = 'all'
@@ -27,7 +31,14 @@ class BasicLogTool(object):
         self.log_types = default_log_types.copy()
         if optional_log_type is not None:
             self.log_types.extend(optional_log_type)
-
+    
+    def is_valid_index(self, regex):
+        if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', regex):
+            target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', regex).group(0)
+        else:
+            target_reg = None
+        return target_reg
+    
     def _find_small_timestep_log(self, proj_root, task_table_name, regex, timstep_upper_bound=np.inf, timestep_lower_bound=0):
         small_timestep_regs = []
         root_dir_regex = osp.join(proj_root, LOG, task_table_name, regex)
@@ -35,10 +46,7 @@ class BasicLogTool(object):
             print("searching dirs", root_dir)
             if os.path.exists(root_dir):
                 for file_list in os.walk(root_dir):
-                    if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
-                        target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
-                    else:
-                        target_reg = None
+                    target_reg = self.is_valid_index(file_list[0])
                     if target_reg is not None:
                         if LOG in root_dir_regex:
                             try:
@@ -232,6 +240,7 @@ class ArchiveLogTool(BasicLogTool):
             print("do archive ...")
             self._archive_log(show=False)
 
+
 class ViewLogTool(BasicLogTool):
     def __init__(self, proj_root, task_table_name, regex, *args, **kwargs):
         self.proj_root = proj_root
@@ -244,10 +253,7 @@ class ViewLogTool(BasicLogTool):
         for root_dir in glob.glob(root_dir_regex):
             if os.path.exists(root_dir):
                 for file_list in os.walk(root_dir):
-                    if re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]):
-                        target_reg = re.search(r'\d{4}/\d{2}/\d{2}/\d{2}-\d{2}-\d{2}-\d{6}', file_list[0]).group(0)
-                    else:
-                        target_reg = None
+                    target_reg = self.is_valid_index(file_list[0])
                     if target_reg is not None:
                         backup_file = file_list[0] + '/backup.txt'
                         if file_list[1] == ['tb'] or os.path.exists(backup_file):  # in root of logdir
@@ -264,3 +270,45 @@ class ViewLogTool(BasicLogTool):
                 s = input("press y to view \n ")
             if s == 'y':
                 self._view_log(regex=res[0] + '*')
+
+
+class PrettyPlotterTool(BasicLogTool):
+    def __init__(self, proj_root, task_table_name, regex, *args, **kwargs):
+        self.proj_root = proj_root
+        self.task_table_name = task_table_name
+        self.regex = regex
+        super(PrettyPlotterTool, self).__init__(*args, **kwargs)
+
+    def json_dump(self, location):
+        target_index = self.is_valid_index(location)
+        if target_index is not None:
+
+            json_location = None
+            try:
+                exp_manager = dill.load(open(location, 'rb'))
+                assert isinstance(exp_manager, Tester)
+                formatted_log_name = exp_manager.log_name_formatter(exp_manager.get_task_table_name(),
+                                                                    exp_manager.record_date)
+                params = exp_manager.hyper_param
+                params['formatted_log_name'] = formatted_log_name
+
+                json_location = exp_manager.log_name_formatter(
+                    osp.join(self.proj_root, LOG, exp_manager.get_task_table_name()), exp_manager.record_date) + '/'
+                json.dump(params, open(osp.join(json_location, 'parameter.json'), 'w'))
+                print("gen:", osp.join(json_location, 'parameter.json'))
+            except FileNotFoundError as e:
+                print("log file cannot found", json_location)
+            except EOFError as e:
+                print("log file broken", json_location)
+
+    def gen_json(self, regex):
+        root_dir_regex = osp.join(self.proj_root, ARCHIVE_TESTER, self.task_table_name, regex)
+        for root_dir in glob.glob(root_dir_regex):
+            if os.path.exists(root_dir):
+                if osp.isdir(root_dir):
+                    for file_list in os.walk(root_dir):
+                        for file in file_list[2]:
+                            location = osp.join(file_list[0], file)
+                            self.json_dump(location)
+                else:
+                    self.json_dump(root_dir)
