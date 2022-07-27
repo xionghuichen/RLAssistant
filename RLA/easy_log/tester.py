@@ -581,23 +581,46 @@ class Tester(object,):
             import tensorflow as tf
             if var_prefix is None:
                 var_prefix = ''
-            var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
-            logger.info("save variable :")
-            for v in var_list:
-                logger.info(v)
-            self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
+            try:
+                var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
+                logger.info("save variable :")
+                for v in var_list:
+                    logger.info(v)
+                self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir,
+                                            save_relative_paths=True)
+
+            except AttributeError as e:
+                self.max_to_keep = max_to_keep
+                # tf.compat.v1.disable_eager_execution()
+                # tf = tf.compat.v1
+                # var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
         elif self.dl_framework == FRAMEWORK.torch:
             self.max_to_keep = max_to_keep
         else:
             raise NotImplementedError
 
-    def save_checkpoint(self, model_dict: Optional[dict]=None, related_variable: Optional[dict]=None):
+    def save_checkpoint(self, model_dict: Optional[dict] = None, related_variable: Optional[dict] = None):
         if self.dl_framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
             iter = self.time_step_holder.get_time()
             cpt_name = osp.join(self.checkpoint_dir, 'checkpoint')
             logger.info("save checkpoint to ", cpt_name, iter)
-            self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+            try:
+                self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+            except AttributeError as e:
+                if model_dict is None:
+                    logger.warn("call save_checkpoints without passing a model_dict")
+                    return
+                if self.checkpoint_keep_list is None:
+                    self.checkpoint_keep_list = []
+                iter = self.time_step_holder.get_time()
+                # tf.compat.v1.disable_eager_execution()
+                # tf = tf.compat.v1
+                # self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+
+                tf.train.Checkpoint(**model_dict).save(tester.checkpoint_dir + "checkpoint-{}".format(iter))
+                self.checkpoint_keep_list.append(iter)
+                self.checkpoint_keep_list = self.checkpoint_keep_list[-1 * self.max_to_keep:]
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
             if self.checkpoint_keep_list is None:

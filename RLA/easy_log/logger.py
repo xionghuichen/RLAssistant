@@ -252,11 +252,21 @@ class TensorBoardOutputFormat(KVWriter):
         path = osp.join(osp.abspath(dir), prefix)
         if self.framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
-            self.tb_writer = tf.summary.FileWriter(path)
+            from tensorflow.python import pywrap_tensorflow
+
             self.tbx_writer = None
             from tensorflow.python import pywrap_tensorflow
             from tensorflow.core.util import event_pb2
             from tensorflow.python.util import compat
+            try:
+                self.tb_writer = tf.summary.FileWriter(path)
+                self.tf = tf
+            except AttributeError as e:
+                # tf.compat.v1.disable_eager_execution()
+                # from tensorflow.python.client import _pywrap_events_writer
+                self.tb_writer = tf.summary.create_file_writer(path) # tf.compat.v1.summary.FileWriter(path)
+                # tf.compat.v1.disable_eager_execution()
+                # tf = tf.compat.v1
             self.tf = tf
             self.event_pb2 = event_pb2
             self.pywrap_tensorflow = pywrap_tensorflow
@@ -284,10 +294,16 @@ class TensorBoardOutputFormat(KVWriter):
     def add_hyper_params_to_tb(self, hyper_param, metric_dict=None):
         if self.framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
-            with tf.Session(graph=tf.Graph()) as sess:
-                hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in hyper_param.items()]
-                summary = sess.run(tf.summary.text('hyperparameters', tf.stack(hyperparameters)))
-                self.tb_writer.add_summary(summary, self.step)
+            try:
+                with tf.Session(graph=tf.Graph()) as sess:
+                    hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in hyper_param.items()]
+                    summary = sess.run(tf.summary.text('hyperparameters', tf.stack(hyperparameters)))
+                    self.tb_writer.add_summary(summary, self.step)
+            except AttributeError as e:
+                tf.compat.v1.enable_eager_execution()
+                with self.tb_writer.as_default():
+                    hyperparameters = [tf.convert_to_tensor([k, str(v)]) for k, v in hyper_param.items()]
+                    tf.summary.text('hyperparameters', tf.stack(hyperparameters), step=self.step)
         elif self.framework == FRAMEWORK.torch:
             import pprint
             if metric_dict is None:
@@ -300,14 +316,20 @@ class TensorBoardOutputFormat(KVWriter):
 
     def writekvs(self, kvs):
         if self.framework == FRAMEWORK.tensorflow:
-            def summary_val(k, v):
-                kwargs = {'tag': k, 'simple_value': float(v)}
-                return self.tf.Summary.Value(**kwargs)
-            summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
-            event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
-            event.step = self.step  # is there any reason why you'd want to specify the step?
-            self.writer.add_event(event)
-            self.writer.flush()
+            try:
+                def summary_val(k, v):
+                    kwargs = {'tag': k, 'simple_value': float(v)}
+                    return self.tf.Summary.Value(**kwargs)
+                summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
+                event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
+                event.step = self.step  # is there any reason why you'd want to specify the step?
+                self.writer.add_event(event)
+                self.writer.flush()
+            except AttributeError as e:
+                self.tf.compat.v1.enable_eager_execution()
+                with self.tb_writer.as_default():
+                    for k, v in kvs.items():
+                        self.tf.summary.scalar(k, v, step=self.step)
         elif self.framework == FRAMEWORK.torch:
             def summary_val(k, v):
                 kwargs = {'tag': k, 'scalar_value': float(v), 'global_step': self.step}
