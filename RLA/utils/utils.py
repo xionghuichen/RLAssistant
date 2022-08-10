@@ -32,3 +32,6 @@ def load_yaml(path):
     except TypeError:
         private_config = yaml.safe_load(fs)
     return private_config
+
+def optional_set(new_val, old_val):
+    return new_val if new_val is not None else old_val

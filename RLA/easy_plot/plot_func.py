@@ -6,6 +6,7 @@ import numpy as np
 from RLA.easy_log import logger
 from RLA.easy_plot import plot_util
 from RLA.const import DEFAULT_X_NAME
+from RLA.easy_log.const import LOG, ARCHIVE_TESTER
 
 
 def default_key_to_legend(parse_list, y_name):
@@ -72,7 +73,7 @@ def picture_split(taskpath, single_name=None, param_keys=None, y_names=None,
 
 def csv_to_xy(r, x_name, y_name, scale_dict, x_bound=None, x_start=None, y_bound=None, remove_outlier=False):
 
-    df = r.progress.copy().reset_index() # ['progress']
+    df = r.progress.copy().reset_index()
     if df is None:
         logger.warn("empty df!")
         return [], []
@@ -117,6 +118,7 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
                   remove_outlier=False, xlabel=None,
                   key_to_legend_fn=None,
                   verbose=True, *args, **kwargs):
+    logger.warn("the function is deprecated. please check the plot_func_v2 as the new implementation")
     dirs = []
     if key_to_legend_fn is None:
         key_to_legend_fn = default_key_to_legend
@@ -132,7 +134,6 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
 
         log_found = glob.glob(osp.join(prefix_dir, regex_str))
         dirs.extend(log_found)
-        # print("regex str :{}. log found".format(regex_str))
         reg_group[regex_str] = []
 
         for log in log_found:
@@ -151,9 +152,6 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
     # if misc_scale_index is None:
     #     misc_scale_index = []
     for i in range(len(value_keys)):
-        # if i in misc_scale_index:
-        #     scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
-        # else:
         final_scale_dict[value_keys[i]] = lambda x: x
     if scale_dict is not None:
         final_scale_dict.update(scale_dict)
@@ -170,7 +168,7 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
         group_fn = lambda r: picture_split(taskpath=r, param_keys=param_keys, y_names=y_names,
                                            key_to_legend_fn=key_to_legend_fn)
 
-    _, _, lgd, texts, g2lf = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
+    _, _, lgd, texts, g2lf, score_results = plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names,
                                                                                            final_scale_dict, x_start=x_start, y_bound=y_bound,
                                                                                            remove_outlier=remove_outlier),
                            # xy_fn=lambda r: ts2xy(r['monitor'], 'info/TimestepsSoFar', 'diff/driver_1_2_std'),
@@ -194,7 +192,8 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
             plt.savefig(file_name, bbox_extra_artists=tuple(texts), bbox_inches='tight')
         print("saved location: {}".format(file_name))
     plt.show()
-    return g2lf
+    return g2lf, score_results
+
 
 def scale_index_to_dict(measure, scale_index, scale):
     scale_dict = {}

@@ -1,0 +1,12 @@
+Logging to /Users/xionghuichen/projects/RLAssistant/test/test_data_root/log/test_manger_demo_task/2022/06/23/00-07-43-969899_192.168.0.192_&input_size=16&input_size=16&input_size=16/
+log dir: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/log/test_manger_demo_task/2022/06/23/00-07-43-969899_192.168.0.192_&input_size=16&input_size=16&input_size=16/
+pkl_file: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/archive_tester/test_manger_demo_task/2022/06/23/00-07-43-969899_192.168.0.192_&input_size=16&input_size=16&input_size=16.pkl
+checkpoint_dir: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/checkpoint/test_manger_demo_task/2022/06/23/00-07-43-969899_192.168.0.192_&input_size=16&input_size=16&input_size=16/
+results_dir: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/results/test_manger_demo_task/2022/06/23/00-07-43-969899_192.168.0.192_&input_size=16&input_size=16&input_size=16/
+[BACKUP] 99 : key: input_size, value: 16
+[BACKUP] 99 : key: learning_rate, value: 0.0001
+--------------------------------------------------
+| i         | 0 |
+| time-step | 0 |
+--------------------------------------------------
+[WARN] 0 : sync: start

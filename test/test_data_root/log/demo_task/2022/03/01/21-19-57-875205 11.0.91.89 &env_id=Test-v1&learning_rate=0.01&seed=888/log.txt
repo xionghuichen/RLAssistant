@@ -1,0 +1,12 @@
+Logging to ../log/demo_task/2022/03/01/21-19-57-875205 11.0.91.89 &env_id=Test-v1&learning_rate=0.01&seed=888/
+log dir: ../log/demo_task/2022/03/01/21-19-57-875205 11.0.91.89 &env_id=Test-v1&learning_rate=0.01&seed=888/
+pkl_file: ../archive_tester/demo_task/2022/03/01/21-19-57-875205 11.0.91.89 &env_id=Test-v1&learning_rate=0.01&seed=888.pkl
+checkpoint_dir: ../checkpoint/demo_task/2022/03/01/21-19-57-875205 11.0.91.89 &env_id=Test-v1&learning_rate=0.01&seed=888/
+results_dir: ../results/demo_task/2022/03/01/21-19-57-875205 11.0.91.89 &env_id=Test-v1&learning_rate=0.01&seed=888/
+[BACKUP] 0 : key: env_id, value: Test-v1
+[BACKUP] 0 : key: info, value: default exp info
+[BACKUP] 0 : key: input_size, value: 16
+[BACKUP] 0 : key: learning_rate, value: 0.01
+[BACKUP] 0 : key: loaded_date, value: True
+[BACKUP] 0 : key: loaded_task_name, value: 
+[BACKUP] 0 : key: seed, value: 888

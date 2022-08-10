@@ -1,0 +1,1 @@
+Logging to /Users/xionghuichen/projects/RLAssistant/test/test_data_root/log/test_manger_demo_task/2022/07/27/14-51-34-399790_172.16.0.33_&input_size=16/

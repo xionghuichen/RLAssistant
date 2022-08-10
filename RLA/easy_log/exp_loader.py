@@ -72,7 +72,8 @@ class ExperimentLoader(object):
         else:
             return argparse.Namespace(**exp_manager.hyper_param)
 
-    def load_from_record_date(self, var_prefix: Optional[str] = None, variable_list: Optional[list]=None, verbose=True):
+    def load_from_record_date(self, var_prefix: Optional[str] = None, variable_list: Optional[list]=None, verbose=True,
+                              ckp_index: Optional[int]=None):
         """
 
         :param var_prefix: the prefix of namescope (for tf) to load. Set to '' to load all of the parameters.
@@ -81,9 +82,8 @@ class ExperimentLoader(object):
         """
         if self.is_valid_config:
             loaded_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
-            if verbose:
-                print("attrs of the loaded tester")
-                pprint(loaded_tester.__dict__)
+            print("attrs of the loaded tester")
+            pprint(loaded_tester.__dict__)
             # load checkpoint
             load_res = {}
             if var_prefix is not None:

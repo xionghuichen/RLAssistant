@@ -1,0 +1,22 @@
+Logging to /Users/xionghuichen/projects/RLAssistant/test/test_data_root/log/test_manger_demo_task/2022/07/27/21-02-23-935694_172.16.0.33_&input_size=16/
+log dir: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/log/test_manger_demo_task/2022/07/27/21-02-23-935694_172.16.0.33_&input_size=16/
+pkl_file: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/archive_tester/test_manger_demo_task/2022/07/27/21-02-23-935694_172.16.0.33_&input_size=16.pkl
+checkpoint_dir: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/checkpoint/test_manger_demo_task/2022/07/27/21-02-23-935694_172.16.0.33_&input_size=16/
+results_dir: /Users/xionghuichen/projects/RLAssistant/test/test_data_root/results/test_manger_demo_task/2022/07/27/21-02-23-935694_172.16.0.33_&input_size=16/
+[BACKUP] 0 : key: input_size, value: 16
+[BACKUP] 0 : key: learning_rate, value: 0.0001
+save checkpoint to  /Users/xionghuichen/projects/RLAssistant/test/test_data_root/checkpoint/test_manger_demo_task/2022/07/27/21-02-23-935694_172.16.0.33_&input_size=16/checkpoint 0
+[WARN] 0 : call save_checkpoints without passing a model_dict
+---------------------------------------------------------
+| time-step | 0        |
+| y_out     | 0.0544   |
+---------------------------------------------------------
+private_config: 
+k: PROJECT_TYPE, v: {'backup_code_by': 'source'}
+k: BACKUP_CONFIG, v: {'backup_code_dir': ['proj'], 'lib_dir': './build/lib/'}
+k: LOG_USED, v: ['stdout', 'log', 'tensorboard', 'csv']
+k: DL_FRAMEWORK, v: torch
+k: SEND_LOG_FILE, v: False
+k: REMOTE_SETTING, v: {'ftp_server': '', 'username': '', 'password': '', 'remote_log_root': '', 'file_transfer_protocol': 'sftp'}
+gen log files for record date : 2022-07-27 21:02:31.719700
+store file /Users/xionghuichen/projects/RLAssistant/test/test_data_root/archive_tester/test_manger_demo_task/2022/07/27/21-02-31-719700_172.16.0.33_&input_size=16&input_size=16.pkl

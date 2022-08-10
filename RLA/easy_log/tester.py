@@ -15,7 +15,6 @@ import datetime
 import os.path as osp
 import pprint
 
-import numpy as np
 import tensorboardX
 
 from RLA.easy_log.time_step import time_step_holder
@@ -162,6 +161,15 @@ class Tester(object,):
         for k, v in self.private_config.items():
             logger.info("k: {}, v: {}".format(k, v))
 
+    def get_task_table_name(self):
+        task_table_name = getattr(self, 'task_table_name', None)
+        if task_table_name is None:
+            task_table_name = getattr(self, 'task_name', None)
+            print("[WARN] you are using an old-version RLA. "
+                  "Some attributes' name have been changed (task_name->task_table_name).")
+            if task_table_name is None:
+                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+        return task_table_name
 
     def set_hyper_param(self, **argkw):
         """
@@ -218,13 +226,7 @@ class Tester(object,):
         """
         self.data_root = root
 
-        task_table_name = getattr(self, 'task_table_name', None)
-        if task_table_name is None:
-            task_table_name = getattr(self, 'task_name', None)
-            print("[WARN] you are using an old-version RLA. "
-                  "Some attributes' name have been changed (task_name->task_table_name).")
-            if task_table_name is None:
-                raise RuntimeError("invalid ExpManager: task_table_name cannot be found", )
+        task_table_name = self.get_task_table_name()
         code_dir, _ = self.__create_file_directory(osp.join(self.data_root, CODE, task_table_name), '', is_file=False)
         log_dir, _ = self.__create_file_directory(osp.join(self.data_root, LOG, task_table_name), '', is_file=False)
         self.pkl_dir, self.pkl_file = self.__create_file_directory(osp.join(self.data_root, ARCHIVE_TESTER, task_table_name), '.pkl')
@@ -431,15 +433,9 @@ class Tester(object,):
                 raise NotImplementedError
             for search_item in search_list:
                 if search_item.startswith(str(record_date.strftime("%H-%M-%S-%f"))):
-                    try:
-                        split_dir = search_item.split('_')
-                        assert len(split_dir) >= 2
-                        info = " ".join(split_dir[2:])
-                    except AssertionError as e:
-                        split_dir = search_item.split(' ')
-                        # self.__ipaddr = split_dir[1]
-                        info = "_".join(split_dir[2:])
-                        print("[WARN] We find an old-version experiment data.")
+                    split_dir = search_item.split(' ')
+                    # self.__ipaddr = split_dir[1]
+                    info = " ".join(split_dir[2:])
                     logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
                     file_found = search_item
                     break
@@ -625,6 +621,7 @@ class Tester(object,):
             all_ckps = os.listdir(self.checkpoint_dir)
             ites = []
             for ckps in all_ckps:
+                print("ckps", ckps)
                 ites.append(int(ckps.split('checkpoint-')[1].split('.pt')[0]))
             idx = np.argsort(ites)
             all_ckps = np.array(all_ckps)[idx]
@@ -632,7 +629,6 @@ class Tester(object,):
             pprint.pprint(all_ckps)
             if ckp_index is None:
                 ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
-            print("loaded checkpoints:", "checkpoint-{}.pt".format(ckp_index))
             return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):

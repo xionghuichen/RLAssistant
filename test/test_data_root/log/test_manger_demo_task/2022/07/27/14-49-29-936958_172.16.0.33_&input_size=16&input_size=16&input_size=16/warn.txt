@@ -1,0 +1,2 @@
+[WARN] 0 : sync: start
+[WARN] 0 : the parameter remote_log_root will be renamed to remote_data_root in future versions.

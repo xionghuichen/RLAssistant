@@ -1,0 +1,2 @@
+[BACKUP] 99 : key: input_size, value: 16
+[BACKUP] 99 : key: learning_rate, value: 0.0001

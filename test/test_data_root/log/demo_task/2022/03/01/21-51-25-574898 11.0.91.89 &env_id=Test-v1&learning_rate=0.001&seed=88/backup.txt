@@ -1,0 +1,7 @@
+[BACKUP] 0 : key: env_id, value: Test-v1
+[BACKUP] 0 : key: info, value: default exp info
+[BACKUP] 0 : key: input_size, value: 16
+[BACKUP] 0 : key: learning_rate, value: 0.001
+[BACKUP] 0 : key: loaded_date, value: True
+[BACKUP] 0 : key: loaded_task_name, value: 
+[BACKUP] 0 : key: seed, value: 88
