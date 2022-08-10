@@ -6,6 +6,7 @@ import numpy as np
 from RLA.easy_log import logger
 from RLA.easy_plot import plot_util
 from RLA.const import DEFAULT_X_NAME
+from RLA.easy_log.const import LOG, ARCHIVE_TESTER
 
 
 def default_key_to_legend(parse_list, y_name):
@@ -72,7 +73,7 @@ def picture_split(taskpath, single_name=None, param_keys=None, y_names=None,
 
 def csv_to_xy(r, x_name, y_name, scale_dict, x_bound=None, x_start=None, y_bound=None, remove_outlier=False):
 
-    df = r.progress.copy().reset_index() # ['progress']
+    df = r.progress.copy().reset_index()
     if df is None:
         logger.warn("empty df!")
         return [], []
@@ -107,11 +108,7 @@ def word_replace(string):
 def word_replace_back(strings):
     return eval(strings.replace('--', '/').replace("||", "\'"))
 
-#
-# def plot_func(data_root:str, task_table_name:str, regs:list, split_keys:list, metrics:list):
-#
-#
-#
+
 def plot_res_func(prefix_dir:str, regs, param_keys,
                   value_keys, scale_dict=None,
                   replace_legend_keys=None,
@@ -121,10 +118,7 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
                   remove_outlier=False, xlabel=None,
                   key_to_legend_fn=None,
                   verbose=True, *args, **kwargs):
-    """
-    """
-
-    # print("the function is deprecated. please check the plot_func as the new implementation")
+    logger.warn("the function is deprecated. please check the plot_func_v2 as the new implementation")
     dirs = []
     if key_to_legend_fn is None:
         key_to_legend_fn = default_key_to_legend
@@ -158,9 +152,6 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
     # if misc_scale_index is None:
     #     misc_scale_index = []
     for i in range(len(value_keys)):
-        # if i in misc_scale_index:
-        #     scale_dict[value_keys[i]] = misc_scale[misc_scale_index.index(i)]
-        # else:
         final_scale_dict[value_keys[i]] = lambda x: x
     if scale_dict is not None:
         final_scale_dict.update(scale_dict)

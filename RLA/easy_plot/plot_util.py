@@ -11,6 +11,7 @@ from RLA.easy_log.logger import read_json, read_csv
 sns.set_style('darkgrid', {'legend.frameon':True})
 
 
+
 def smooth(y, radius, mode='two_sided', valid_only=False):
     '''
     Smooth signal y, where radius is determines the size of the window
@@ -151,8 +152,16 @@ def symmetric_ema(xolds, yolds, low=None, high=None, n=512, decay_steps=1., low_
     ys[count_ys < low_counts_threshold] = np.nan
     return xs, ys, count_ys
 
-Result = namedtuple('Result', 'monitor progress dirname metadata')
-Result.__new__.__defaults__ = (None,) * len(Result._fields)
+# Result = namedtuple('Result', 'monitor progress dirname metadata hyper_param')
+# Result.__new__.__defaults__ = (None,) * len(Result._fields)
+
+class Result:
+    def __init__(self, monitor=None, progress=None, dirname=None, metadata=None, hyper_param=None):
+        self.monitor = monitor
+        self.progress = progress
+        self.dirname = dirname
+        self.metadata = metadata
+        self.hyper_param = hyper_param
 
 def word_replace(string):
     return string.replace('/', '--').replace("\'", "||")
@@ -231,10 +240,12 @@ def load_results(root_dir_or_dirs, names, x_bound, enable_progress=True, use_buf
                                         raise RuntimeError("all value_keys cannot be found.")
                                     slim_chunk = slim_chunk[existed_names]
                                     if x_bound[1] is not None:
-                                        slim_chunk = slim_chunk[slim_chunk[x_bound[0]] < x_bound[1]]
+                                        if isinstance(x_bound[1], tuple):
+                                            slim_chunk = slim_chunk[np.logical_and(slim_chunk[x_bound[0]] < x_bound[1][1],
+                                                                                   slim_chunk[x_bound[0]] > x_bound[1][0])]
+                                        else:
+                                            slim_chunk = slim_chunk[slim_chunk[x_bound[0]] < x_bound[1]]
                                     raw_df = pd.concat([raw_df, slim_chunk], ignore_index=True)
-                                    # else:
-                                    #     raise RuntimeError
                                 import csv
                                 raw_df.to_csv(buf_csv, index=False)
                             result['progress'] = raw_df
@@ -402,10 +413,7 @@ def plot_results(
         idx_row = isplit // ncols
         idx_col = isplit % ncols
         ax = axarr[idx_row][idx_col]
-        # 单张图片可能有多个数据源
         for result in sresults:
-            # 一个数据源目前只能画一条线，我把这里变成多个group应该就可以了
-            # 并且多个实验只要group名字相同，就应该使用相同的group
             result_groups, y_names = group_fn(result)
             for group, y_name in zip(result_groups, y_names):
                 g2c[group] += 1
@@ -427,7 +435,6 @@ def plot_results(
                     if resample:
                         x, y, counts = symmetric_ema(x, y, x[0], x[-1], resample, decay_steps=smooth_step)
                     l, = ax.plot(x, y, color=colors[groups.index(group) % len(colors)])
-                    # l 应该是对应线的结果？
                     g2l[group] = l
 
         if average_group:
