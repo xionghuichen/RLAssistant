@@ -15,7 +15,6 @@ import datetime
 import os.path as osp
 import pprint
 
-import numpy as np
 import tensorboardX
 
 from RLA.easy_log.time_step import time_step_holder
@@ -110,11 +109,6 @@ class Tester(object,):
         self.dl_framework = None
         self.checkpoint_keep_list = None
         self.log_name_format_version = LOG_NAME_FORMAT_VERSION.V1
-
-
-    @staticmethod
-    def record_date_to_str(record_date):
-        return str(record_date.strftime("%H-%M-%S-%f"))
 
     @deprecated_alias(task_name='task_table_name', private_config_path='rla_config', log_root='data_root')
     def configure(self, task_table_name: str, rla_config: Union[str, dict], data_root: str,
@@ -439,15 +433,9 @@ class Tester(object,):
                 raise NotImplementedError
             for search_item in search_list:
                 if search_item.startswith(str(record_date.strftime("%H-%M-%S-%f"))):
-                    try:
-                        split_dir = search_item.split('_')
-                        assert len(split_dir) >= 2
-                        info = " ".join(split_dir[2:])
-                    except AssertionError as e:
-                        split_dir = search_item.split(' ')
-                        # self.__ipaddr = split_dir[1]
-                        info = "_".join(split_dir[2:])
-                        print("[WARN] We find an old-version experiment data.")
+                    split_dir = search_item.split(' ')
+                    # self.__ipaddr = split_dir[1]
+                    info = " ".join(split_dir[2:])
                     logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
                     file_found = search_item
                     break
@@ -511,38 +499,35 @@ class Tester(object,):
         else:
             raise NotImplementedError
 
-
-
-
-    def log_name_formatter(self, prefix, record_date):
-        """
-        return a unified and unique name for the experiment log.
-        :param prefix: prefix location to store the log data.
-        :param record_date: the timestamp of the experiment log.
-        :return: a unify and unique name
-        """
-        version_num = getattr(self, 'log_name_format_version', None)
-        if version_num is None:
-            name_format = '{prefix}/{date}/{timestep} {ip} {info}'
-        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
-            name_format = '{prefix}/{date}/{timestep}_{ip}_{info}'
-        else:
-            raise RuntimeError("unknown version name", version_num)
-        date = record_date.strftime("%Y/%m/%d")
-        return name_format.format(prefix=prefix, date=date, timestep=self.record_date_to_str(record_date),
-                                                             ip=str(self.ipaddr), info=self.info)
+    def record_date_to_str(self, record_date):
+        return str(record_date.strftime("%H-%M-%S-%f"))
 
     def __create_file_directory(self, prefix, ext='', is_file=True, record_date=None):
         if record_date is None:
             record_date = self.record_date
-        name = self.log_name_formatter(prefix, record_date)
-        if is_file:
-            directory = str(record_date.strftime("%Y/%m/%d"))
-            directory = osp.join(prefix, directory)
-            os.makedirs(directory, exist_ok=True)
-            file_name = name + ext
+        directory = str(record_date.strftime("%Y/%m/%d"))
+        directory = osp.join(prefix, directory)
+        version_num = getattr(self, 'log_name_format_version', None)
+
+        if version_num is None:
+            name_format = '{dir}/{timestep} {ip} {info}{ext}'
+        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
+            name_format = '{dir}/{timestep}_{ip}_{info}{ext}'
         else:
-            directory = name + '/'
+            raise RuntimeError("unknown version name", version_num)
+
+        if is_file:
+            os.makedirs(directory, exist_ok=True)
+            file_name = name_format.format(dir=directory, timestep=self.record_date_to_str(record_date),
+                                                                 ip=str(self.ipaddr),
+                                                                 info=self.info,
+                                                                 ext=ext)
+        else:
+            directory = (name_format + '/').format(dir=directory,
+                                                                 timestep=self.record_date_to_str(record_date),
+                                                                 ip=str(self.ipaddr),
+                                                                 info=self.info,
+                                                                 ext=ext)
             os.makedirs(directory, exist_ok=True)
             file_name = ''
         return directory, file_name
@@ -558,31 +543,11 @@ class Tester(object,):
             # self.last_record_fph_time = cur_time
             logger.dump_tabular()
 
-    def time_record(self, name:str):
-        """
-        [deprecated] see RLA.easy_log.time_used_recorder
-        record the consumed time of your code snippet. call this function to start a recorder.
-        "name" is identifier to distinguish different recorder and record different snippets at the same time.
-        call time_record_end to end a recorder.
-        :param name: identifier of your code snippet.
-        :type name: str
-        :return:
-        :rtype:
-        """
+    def time_record(self, name):
         assert name not in self._rc_start_time
         self._rc_start_time[name] = time.time()
 
-    def time_record_end(self, name:str):
-        """
-        [deprecated] see RLA.easy_log.time_used_recorder
-        record the consumed time of your code snippet. call this function to start a recorder.
-        "name" is identifier to distinguish different recorder and record different snippets at the same time.
-        call time_record_end to end a recorder.
-        :param name: identifier of your code snippet.
-        :type name: str
-        :return:
-        :rtype:
-        """
+    def time_record_end(self, name):
         end_time = time.time()
         start_time = self._rc_start_time[name]
         logger.record_tabular("time_used/{}".format(name), end_time - start_time)
@@ -601,46 +566,23 @@ class Tester(object,):
             import tensorflow as tf
             if var_prefix is None:
                 var_prefix = ''
-            try:
-                var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
-                logger.info("save variable :")
-                for v in var_list:
-                    logger.info(v)
-                self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir,
-                                            save_relative_paths=True)
-
-            except AttributeError as e:
-                self.max_to_keep = max_to_keep
-                # tf.compat.v1.disable_eager_execution()
-                # tf = tf.compat.v1
-                # var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
+            var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
+            logger.info("save variable :")
+            for v in var_list:
+                logger.info(v)
+            self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
         elif self.dl_framework == FRAMEWORK.torch:
             self.max_to_keep = max_to_keep
         else:
             raise NotImplementedError
 
-    def save_checkpoint(self, model_dict: Optional[dict] = None, related_variable: Optional[dict] = None):
+    def save_checkpoint(self, model_dict: Optional[dict]=None, related_variable: Optional[dict]=None):
         if self.dl_framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
             iter = self.time_step_holder.get_time()
             cpt_name = osp.join(self.checkpoint_dir, 'checkpoint')
             logger.info("save checkpoint to ", cpt_name, iter)
-            try:
-                self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
-            except AttributeError as e:
-                if model_dict is None:
-                    logger.warn("call save_checkpoints without passing a model_dict")
-                    return
-                if self.checkpoint_keep_list is None:
-                    self.checkpoint_keep_list = []
-                iter = self.time_step_holder.get_time()
-                # tf.compat.v1.disable_eager_execution()
-                # tf = tf.compat.v1
-                # self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
-
-                tf.train.Checkpoint(**model_dict).save(tester.checkpoint_dir + "checkpoint-{}".format(iter))
-                self.checkpoint_keep_list.append(iter)
-                self.checkpoint_keep_list = self.checkpoint_keep_list[-1 * self.max_to_keep:]
+            self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
             if self.checkpoint_keep_list is None:
@@ -660,7 +602,6 @@ class Tester(object,):
             for k, v in related_variable.items():
                 self.add_custom_data(k, v, type(v), mode='replace')
         self.add_custom_data(DEFAULT_X_NAME, time_step_holder.get_time(), int, mode='replace')
-        self.serialize_object_and_save()
 
     def load_checkpoint(self, ckp_index=None):
         if self.dl_framework == FRAMEWORK.tensorflow:
@@ -672,7 +613,6 @@ class Tester(object,):
                 ckpt_path = tf.train.latest_checkpoint(cpt_name)
             else:
                 ckpt_path = tf.train.latest_checkpoint(cpt_name, ckp_index)
-            logger.info("load ckpt_path {}".format(ckpt_path))
             self.saver.restore(tf.get_default_session(), ckpt_path)
             max_iter = ckpt_path.split('-')[-1]
             return int(max_iter), None
@@ -689,7 +629,6 @@ class Tester(object,):
             pprint.pprint(all_ckps)
             if ckp_index is None:
                 ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
-            print("loaded checkpoints:", "checkpoint-{}.pt".format(ckp_index))
             return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):

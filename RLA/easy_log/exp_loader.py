@@ -2,9 +2,8 @@ from RLA.easy_log import logger
 from RLA.easy_log.tester import exp_manager, Tester
 import copy
 import argparse
-from typing import Optional, Union, Dict, Any
+from typing import Optional, OrderedDict, Union, Dict, Any
 from RLA.const import DEFAULT_X_NAME
-from RLA.utils.utils import *
 from pprint import pprint
 
 class ExperimentLoader(object):
@@ -39,10 +38,10 @@ class ExperimentLoader(object):
             self.data_root = getattr(exp_manager, 'root', None)
         pass
 
-    def config(self, task_name=None, record_date=None, root=None):
-        self.task_name = optional_set(task_name, self.task_name)
-        self.load_date = optional_set(record_date, self.load_date)
-        self.data_root = optional_set(root, self.data_root)
+    def config(self, task_name, record_date, root):
+        self.task_name = task_name
+        self.load_date = record_date
+        self.data_root = root
 
     @property
     def is_valid_config(self):
@@ -83,24 +82,21 @@ class ExperimentLoader(object):
         """
         if self.is_valid_config:
             loaded_tester = Tester.load_tester(self.load_date, self.task_name, self.data_root)
-            if verbose:
-                print("attrs of the loaded tester")
-                pprint(loaded_tester.__dict__)
+            print("attrs of the loaded tester")
+            pprint(loaded_tester.__dict__)
             # load checkpoint
             load_res = {}
             if var_prefix is not None:
                 loaded_tester.new_saver(var_prefix=var_prefix, max_to_keep=1)
-                load_iter, load_res = loaded_tester.load_checkpoint(ckp_index)
+                _, load_res = loaded_tester.load_checkpoint()
             else:
                 loaded_tester.new_saver(max_to_keep=1)
-                load_iter, load_res = loaded_tester.load_checkpoint(ckp_index)
+                _, load_res = loaded_tester.load_checkpoint()
             hist_variables = {}
             if variable_list is not None:
                 for v in variable_list:
                     hist_variables[v] = loaded_tester.get_custom_data(v)
-            ts_load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
-            if ts_load_iter is not None:
-                load_iter = ts_load_iter
+            load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
             return load_iter, load_res, hist_variables
         else:
             return 0, {}, {}
