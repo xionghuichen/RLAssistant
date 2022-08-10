@@ -22,6 +22,7 @@ setup(
             "seaborn",
             "pathspec",
             'tensorboardX', 
-            'pysftp'
+            'pysftp',
+            'typing'
         ]
     )

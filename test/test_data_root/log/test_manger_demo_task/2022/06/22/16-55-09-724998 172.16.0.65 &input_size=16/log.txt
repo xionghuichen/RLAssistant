@@ -1,0 +1,7 @@
+Logging to ../../test_data_root/log/test_manger_demo_task/2022/06/22/16-55-09-724998 172.16.0.65 &input_size=16/
+log dir: ../../test_data_root/log/test_manger_demo_task/2022/06/22/16-55-09-724998 172.16.0.65 &input_size=16/
+pkl_file: ../../test_data_root/archive_tester/test_manger_demo_task/2022/06/22/16-55-09-724998 172.16.0.65 &input_size=16.pkl
+checkpoint_dir: ../../test_data_root/checkpoint/test_manger_demo_task/2022/06/22/16-55-09-724998 172.16.0.65 &input_size=16/
+results_dir: ../../test_data_root/results/test_manger_demo_task/2022/06/22/16-55-09-724998 172.16.0.65 &input_size=16/
+[BACKUP] 0 : key: input_size, value: 16
+[BACKUP] 0 : key: learning_rate, value: 0.0001

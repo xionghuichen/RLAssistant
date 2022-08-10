@@ -1,0 +1,10 @@
+Logging to /Users/xionghuichen/projects/RLAssistant/test/test_data_root/log/test_manger_demo_task/2022/07/27/14-31-00-050367_172.16.0.33_&input_size=16/
+private_config: 
+k: PROJECT_TYPE, v: {'backup_code_by': 'source'}
+k: BACKUP_CONFIG, v: {'backup_code_dir': ['proj'], 'lib_dir': './build/lib/'}
+k: LOG_USED, v: ['stdout', 'log', 'tensorboard', 'csv']
+k: DL_FRAMEWORK, v: torch
+k: SEND_LOG_FILE, v: False
+k: REMOTE_SETTING, v: {'ftp_server': '', 'username': '', 'password': '', 'remote_log_root': '', 'file_transfer_protocol': 'sftp'}
+gen log files for record date : 2022-07-27 14:31:04.861007
+store file /Users/xionghuichen/projects/RLAssistant/test/test_data_root/archive_tester/test_manger_demo_task/2022/07/27/14-31-04-861007_172.16.0.33_&input_size=16&input_size=16.pkl

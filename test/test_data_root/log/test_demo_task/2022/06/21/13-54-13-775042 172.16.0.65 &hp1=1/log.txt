@@ -1,0 +1,7 @@
+Logging to ../../test_data_root/log/test_demo_task/2022/06/21/13-54-13-775042 172.16.0.65 &hp1=1/
+log dir: ../../test_data_root/log/test_demo_task/2022/06/21/13-54-13-775042 172.16.0.65 &hp1=1/
+pkl_file: ../../test_data_root/archive_tester/test_demo_task/2022/06/21/13-54-13-775042 172.16.0.65 &hp1=1.pkl
+checkpoint_dir: ../../test_data_root/checkpoint/test_demo_task/2022/06/21/13-54-13-775042 172.16.0.65 &hp1=1/
+results_dir: ../../test_data_root/results/test_demo_task/2022/06/21/13-54-13-775042 172.16.0.65 &hp1=1/
+[BACKUP] 0 : key: hp1, value: 1
+[BACKUP] 0 : key: hp2, value: 2

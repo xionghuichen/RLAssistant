@@ -1,0 +1,39 @@
+Logging to ../../test_data_root/log/test_manger_demo_task/2022/06/21/14-11-06-996700 172.16.0.65 &input_size=2/
+log dir: ../../test_data_root/log/test_manger_demo_task/2022/06/21/14-11-06-996700 172.16.0.65 &input_size=2/
+pkl_file: ../../test_data_root/archive_tester/test_manger_demo_task/2022/06/21/14-11-06-996700 172.16.0.65 &input_size=2.pkl
+checkpoint_dir: ../../test_data_root/checkpoint/test_manger_demo_task/2022/06/21/14-11-06-996700 172.16.0.65 &input_size=2/
+results_dir: ../../test_data_root/results/test_manger_demo_task/2022/06/21/14-11-06-996700 172.16.0.65 &input_size=2/
+[BACKUP] 0 : key: input_size, value: 2
+[BACKUP] 0 : key: learning_rate, value: 0.0001
+save variable :
+<tf.Variable 'dense/kernel:0' shape=(2, 64) dtype=float32_ref>
+<tf.Variable 'dense/bias:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_1/kernel:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'dense_1/bias:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_2/kernel:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'dense_2/bias:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_3/kernel:0' shape=(64, 1) dtype=float32_ref>
+<tf.Variable 'dense_3/bias:0' shape=(1,) dtype=float32_ref>
+<tf.Variable 'beta1_power:0' shape=() dtype=float32_ref>
+<tf.Variable 'beta2_power:0' shape=() dtype=float32_ref>
+<tf.Variable 'dense/kernel/Adam:0' shape=(2, 64) dtype=float32_ref>
+<tf.Variable 'dense/kernel/Adam_1:0' shape=(2, 64) dtype=float32_ref>
+<tf.Variable 'dense/bias/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense/bias/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_1/kernel/Adam:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'dense_1/kernel/Adam_1:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'dense_1/bias/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_1/bias/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_2/kernel/Adam:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'dense_2/kernel/Adam_1:0' shape=(64, 64) dtype=float32_ref>
+<tf.Variable 'dense_2/bias/Adam:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_2/bias/Adam_1:0' shape=(64,) dtype=float32_ref>
+<tf.Variable 'dense_3/kernel/Adam:0' shape=(64, 1) dtype=float32_ref>
+<tf.Variable 'dense_3/kernel/Adam_1:0' shape=(64, 1) dtype=float32_ref>
+<tf.Variable 'dense_3/bias/Adam:0' shape=(1,) dtype=float32_ref>
+<tf.Variable 'dense_3/bias/Adam_1:0' shape=(1,) dtype=float32_ref>
+---------------------------------------------------------
+| time-step | 0        |
+| y_out     | 0.0614   |
+---------------------------------------------------------
+save checkpoint to  ../../test_data_root/checkpoint/test_manger_demo_task/2022/06/21/14-11-06-996700 172.16.0.65 &input_size=2/checkpoint 0
