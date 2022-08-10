@@ -417,7 +417,7 @@ def ma_record_tabular(key, val, record_len, ignore_nan=False, exclude:Optional[U
     if len(ma_dict[key]) == record_len:
         record_tabular(key, np.mean(ma_dict[key]), exclude)
 
-def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
+def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Optional[int]=None):
     """
     Log a value of some diagnostic
     Call this once for each diagnostic quantity, each iteration
@@ -426,7 +426,8 @@ def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
     :param key: (Any) save to log this key
     :param val: (Any) save to log this value
     """
-    get_current().logkv(key, val, exclude)
+    if freq is None or timestep() % freq == 0:
+        get_current().logkv(key, val, exclude)
 
 
 def log_from_tf_summary(summary):

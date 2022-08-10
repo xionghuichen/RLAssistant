@@ -107,7 +107,11 @@ def word_replace(string):
 def word_replace_back(strings):
     return eval(strings.replace('--', '/').replace("||", "\'"))
 
-
+#
+# def plot_func(data_root:str, task_table_name:str, regs:list, split_keys:list, metrics:list):
+#
+#
+#
 def plot_res_func(prefix_dir:str, regs, param_keys,
                   value_keys, scale_dict=None,
                   replace_legend_keys=None,
@@ -117,6 +121,10 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
                   remove_outlier=False, xlabel=None,
                   key_to_legend_fn=None,
                   verbose=True, *args, **kwargs):
+    """
+    """
+
+    # print("the function is deprecated. please check the plot_func as the new implementation")
     dirs = []
     if key_to_legend_fn is None:
         key_to_legend_fn = default_key_to_legend
@@ -132,7 +140,6 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
 
         log_found = glob.glob(osp.join(prefix_dir, regex_str))
         dirs.extend(log_found)
-        # print("regex str :{}. log found".format(regex_str))
         reg_group[regex_str] = []
 
         for log in log_found:
@@ -195,6 +202,7 @@ def plot_res_func(prefix_dir:str, regs, param_keys,
         print("saved location: {}".format(file_name))
     plt.show()
     return g2lf, score_results
+
 
 def scale_index_to_dict(measure, scale_index, scale):
     scale_dict = {}

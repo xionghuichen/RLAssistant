@@ -558,11 +558,31 @@ class Tester(object,):
             # self.last_record_fph_time = cur_time
             logger.dump_tabular()
 
-    def time_record(self, name):
+    def time_record(self, name:str):
+        """
+        [deprecated] see RLA.easy_log.time_used_recorder
+        record the consumed time of your code snippet. call this function to start a recorder.
+        "name" is identifier to distinguish different recorder and record different snippets at the same time.
+        call time_record_end to end a recorder.
+        :param name: identifier of your code snippet.
+        :type name: str
+        :return:
+        :rtype:
+        """
         assert name not in self._rc_start_time
         self._rc_start_time[name] = time.time()
 
-    def time_record_end(self, name):
+    def time_record_end(self, name:str):
+        """
+        [deprecated] see RLA.easy_log.time_used_recorder
+        record the consumed time of your code snippet. call this function to start a recorder.
+        "name" is identifier to distinguish different recorder and record different snippets at the same time.
+        call time_record_end to end a recorder.
+        :param name: identifier of your code snippet.
+        :type name: str
+        :return:
+        :rtype:
+        """
         end_time = time.time()
         start_time = self._rc_start_time[name]
         logger.record_tabular("time_used/{}".format(name), end_time - start_time)
@@ -640,6 +660,7 @@ class Tester(object,):
             for k, v in related_variable.items():
                 self.add_custom_data(k, v, type(v), mode='replace')
         self.add_custom_data(DEFAULT_X_NAME, time_step_holder.get_time(), int, mode='replace')
+        self.serialize_object_and_save()
 
     def load_checkpoint(self, ckp_index=None):
         if self.dl_framework == FRAMEWORK.tensorflow:
@@ -651,6 +672,7 @@ class Tester(object,):
                 ckpt_path = tf.train.latest_checkpoint(cpt_name)
             else:
                 ckpt_path = tf.train.latest_checkpoint(cpt_name, ckp_index)
+            logger.info("load ckpt_path {}".format(ckpt_path))
             self.saver.restore(tf.get_default_session(), ckpt_path)
             max_iter = ckpt_path.split('-')[-1]
             return int(max_iter), None
