@@ -191,7 +191,7 @@ Result visualization:
       For example, lanuch tensorboard by `tensorboard --logdir ./example/simplest_code/log/demo_task/2022/03`. We can see results:
         ![img.png](resource/demo-tb-res.png)
    2. Easy_plot toolkit: The intermediate scalar variables are saved in a CSV file in `${data_root}/log/${task_name}/${index_name}/progress.csv`. 
-      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in example/plot_res.ipynb. 
+      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in https://github.com/xionghuichen/RLAssistant/blob/main/example/plot_res.ipynb and more user cases in https://github.com/xionghuichen/RLAssistant/blob/main/test/test_plot.py
       The result will be something like this:
         ![img.png](resource/demo-easy-to-plot-res.png)
    3. View data in "results" directory directly: other type of data are stored in `${data_root}/results/${task_name}/${index_name}`
@@ -217,7 +217,7 @@ We manage the items in the database via toolkits in rla_scripts. Currently, the 
 3. Send to remote [TODO]
 4. Download from remote [TODO]
 
-We can use the above tools after copying the rla_scripts to our research project and modifying the DATA_ROOT in config.py to locate the root of the RLA database.
+We can use the above tools after copying the rla_scripts to our research project and modifying the DATA_ROOT in config.py to locate the root of the RLA database. We give several user cases in https://github.com/xionghuichen/RLAssistant/blob/main/test/test_scripts.py
 
 
 ## Distributed training & centralized logs
