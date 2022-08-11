@@ -543,11 +543,31 @@ class Tester(object,):
             # self.last_record_fph_time = cur_time
             logger.dump_tabular()
 
-    def time_record(self, name):
+    def time_record(self, name:str):
+        """
+        [deprecated] see RLA.easy_log.time_used_recorder
+        record the consumed time of your code snippet. call this function to start a recorder.
+        "name" is identifier to distinguish different recorder and record different snippets at the same time.
+        call time_record_end to end a recorder.
+        :param name: identifier of your code snippet.
+        :type name: str
+        :return:
+        :rtype:
+        """
         assert name not in self._rc_start_time
         self._rc_start_time[name] = time.time()
 
-    def time_record_end(self, name):
+    def time_record_end(self, name:str):
+        """
+        [deprecated] see RLA.easy_log.time_used_recorder
+        record the consumed time of your code snippet. call this function to start a recorder.
+        "name" is identifier to distinguish different recorder and record different snippets at the same time.
+        call time_record_end to end a recorder.
+        :param name: identifier of your code snippet.
+        :type name: str
+        :return:
+        :rtype:
+        """
         end_time = time.time()
         start_time = self._rc_start_time[name]
         logger.record_tabular("time_used/{}".format(name), end_time - start_time)
@@ -566,23 +586,46 @@ class Tester(object,):
             import tensorflow as tf
             if var_prefix is None:
                 var_prefix = ''
-            var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
-            logger.info("save variable :")
-            for v in var_list:
-                logger.info(v)
-            self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir, save_relative_paths=True)
+            try:
+                var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
+                logger.info("save variable :")
+                for v in var_list:
+                    logger.info(v)
+                self.saver = tf.train.Saver(var_list=var_list, max_to_keep=max_to_keep, filename=self.checkpoint_dir,
+                                            save_relative_paths=True)
+
+            except AttributeError as e:
+                self.max_to_keep = max_to_keep
+                # tf.compat.v1.disable_eager_execution()
+                # tf = tf.compat.v1
+                # var_list = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, var_prefix)
         elif self.dl_framework == FRAMEWORK.torch:
             self.max_to_keep = max_to_keep
         else:
             raise NotImplementedError
 
-    def save_checkpoint(self, model_dict: Optional[dict]=None, related_variable: Optional[dict]=None):
+    def save_checkpoint(self, model_dict: Optional[dict] = None, related_variable: Optional[dict] = None):
         if self.dl_framework == FRAMEWORK.tensorflow:
             import tensorflow as tf
             iter = self.time_step_holder.get_time()
             cpt_name = osp.join(self.checkpoint_dir, 'checkpoint')
             logger.info("save checkpoint to ", cpt_name, iter)
-            self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+            try:
+                self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+            except AttributeError as e:
+                if model_dict is None:
+                    logger.warn("call save_checkpoints without passing a model_dict")
+                    return
+                if self.checkpoint_keep_list is None:
+                    self.checkpoint_keep_list = []
+                iter = self.time_step_holder.get_time()
+                # tf.compat.v1.disable_eager_execution()
+                # tf = tf.compat.v1
+                # self.saver.save(tf.get_default_session(), cpt_name, global_step=iter)
+
+                tf.train.Checkpoint(**model_dict).save(tester.checkpoint_dir + "checkpoint-{}".format(iter))
+                self.checkpoint_keep_list.append(iter)
+                self.checkpoint_keep_list = self.checkpoint_keep_list[-1 * self.max_to_keep:]
         elif self.dl_framework == FRAMEWORK.torch:
             import torch
             if self.checkpoint_keep_list is None:
@@ -602,6 +645,7 @@ class Tester(object,):
             for k, v in related_variable.items():
                 self.add_custom_data(k, v, type(v), mode='replace')
         self.add_custom_data(DEFAULT_X_NAME, time_step_holder.get_time(), int, mode='replace')
+        self.serialize_object_and_save()
 
     def load_checkpoint(self, ckp_index=None):
         if self.dl_framework == FRAMEWORK.tensorflow:
@@ -613,6 +657,7 @@ class Tester(object,):
                 ckpt_path = tf.train.latest_checkpoint(cpt_name)
             else:
                 ckpt_path = tf.train.latest_checkpoint(cpt_name, ckp_index)
+            logger.info("load ckpt_path {}".format(ckpt_path))
             self.saver.restore(tf.get_default_session(), ckpt_path)
             max_iter = ckpt_path.split('-')[-1]
             return int(max_iter), None

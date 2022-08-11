@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from RLA import logger
 from RLA.const import DEFAULT_X_NAME
 from RLA.query_tool import experiment_data_query, extract_valid_index
+
 from RLA.easy_plot import plot_util
 from RLA.easy_log.const import LOG, ARCHIVE_TESTER, OTHER_RESULTS
 
