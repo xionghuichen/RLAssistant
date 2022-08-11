@@ -305,7 +305,7 @@ def plot_results(
     ylabel=None,
     title=None,
     replace_legend_keys=None,
-    replace_legend_sort=None,
+    regs2legends=None,
     pretty=False,
     bound_line=None,
     colors=None,
@@ -505,6 +505,8 @@ def plot_results(
             legend_lines = legend_lines[sorted_index]
             if replace_legend_keys is not None:
                 legend_keys = np.array(replace_legend_keys)
+            if regs2legends is not None:
+                legend_keys = np.array(regs2legends)
                 # if replace_legend_sort is not None:
                 #     sorted_index = replace_legend_sort
                 # else:
