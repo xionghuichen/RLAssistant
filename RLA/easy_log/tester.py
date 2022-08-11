@@ -15,7 +15,6 @@ import datetime
 import os.path as osp
 import pprint
 
-import numpy as np
 import tensorboardX
 
 from RLA.easy_log.time_step import time_step_holder
@@ -110,11 +109,6 @@ class Tester(object,):
         self.dl_framework = None
         self.checkpoint_keep_list = None
         self.log_name_format_version = LOG_NAME_FORMAT_VERSION.V1
-
-
-    @staticmethod
-    def record_date_to_str(record_date):
-        return str(record_date.strftime("%H-%M-%S-%f"))
 
     @deprecated_alias(task_name='task_table_name', private_config_path='rla_config', log_root='data_root')
     def configure(self, task_table_name: str, rla_config: Union[str, dict], data_root: str,
@@ -439,15 +433,9 @@ class Tester(object,):
                 raise NotImplementedError
             for search_item in search_list:
                 if search_item.startswith(str(record_date.strftime("%H-%M-%S-%f"))):
-                    try:
-                        split_dir = search_item.split('_')
-                        assert len(split_dir) >= 2
-                        info = " ".join(split_dir[2:])
-                    except AssertionError as e:
-                        split_dir = search_item.split(' ')
-                        # self.__ipaddr = split_dir[1]
-                        info = "_".join(split_dir[2:])
-                        print("[WARN] We find an old-version experiment data.")
+                    split_dir = search_item.split(' ')
+                    # self.__ipaddr = split_dir[1]
+                    info = " ".join(split_dir[2:])
                     logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
                     file_found = search_item
                     break
@@ -511,38 +499,35 @@ class Tester(object,):
         else:
             raise NotImplementedError
 
-
-
-
-    def log_name_formatter(self, prefix, record_date):
-        """
-        return a unified and unique name for the experiment log.
-        :param prefix: prefix location to store the log data.
-        :param record_date: the timestamp of the experiment log.
-        :return: a unify and unique name
-        """
-        version_num = getattr(self, 'log_name_format_version', None)
-        if version_num is None:
-            name_format = '{prefix}/{date}/{timestep} {ip} {info}'
-        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
-            name_format = '{prefix}/{date}/{timestep}_{ip}_{info}'
-        else:
-            raise RuntimeError("unknown version name", version_num)
-        date = record_date.strftime("%Y/%m/%d")
-        return name_format.format(prefix=prefix, date=date, timestep=self.record_date_to_str(record_date),
-                                                             ip=str(self.ipaddr), info=self.info)
+    def record_date_to_str(self, record_date):
+        return str(record_date.strftime("%H-%M-%S-%f"))
 
     def __create_file_directory(self, prefix, ext='', is_file=True, record_date=None):
         if record_date is None:
             record_date = self.record_date
-        name = self.log_name_formatter(prefix, record_date)
-        if is_file:
-            directory = str(record_date.strftime("%Y/%m/%d"))
-            directory = osp.join(prefix, directory)
-            os.makedirs(directory, exist_ok=True)
-            file_name = name + ext
+        directory = str(record_date.strftime("%Y/%m/%d"))
+        directory = osp.join(prefix, directory)
+        version_num = getattr(self, 'log_name_format_version', None)
+
+        if version_num is None:
+            name_format = '{dir}/{timestep} {ip} {info}{ext}'
+        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
+            name_format = '{dir}/{timestep}_{ip}_{info}{ext}'
         else:
-            directory = name + '/'
+            raise RuntimeError("unknown version name", version_num)
+
+        if is_file:
+            os.makedirs(directory, exist_ok=True)
+            file_name = name_format.format(dir=directory, timestep=self.record_date_to_str(record_date),
+                                                                 ip=str(self.ipaddr),
+                                                                 info=self.info,
+                                                                 ext=ext)
+        else:
+            directory = (name_format + '/').format(dir=directory,
+                                                                 timestep=self.record_date_to_str(record_date),
+                                                                 ip=str(self.ipaddr),
+                                                                 info=self.info,
+                                                                 ext=ext)
             os.makedirs(directory, exist_ok=True)
             file_name = ''
         return directory, file_name
@@ -689,7 +674,6 @@ class Tester(object,):
             pprint.pprint(all_ckps)
             if ckp_index is None:
                 ckp_index = all_ckps[-1].split('checkpoint-')[1].split('.pt')[0]
-            print("loaded checkpoints:", "checkpoint-{}.pt".format(ckp_index))
             return ckp_index, torch.load(self.checkpoint_dir + "checkpoint-{}.pt".format(ckp_index))
 
     def auto_parse_info(self):
