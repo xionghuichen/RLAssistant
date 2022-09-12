@@ -24,7 +24,7 @@ class ManagerTest(BaseTest):
         task_name = 'test_manger_demo_task'
         rla_data_root = os.path.join(DATABASE_ROOT, 'test_data_root')
         config_yaml['BACKUP_CONFIG']['backup_code_dir'] = ['proj']
-        exp_manager.configure(task_name, private_config_path=config_yaml, data_root=rla_data_root,
+        exp_manager.configure(task_name, rla_config=config_yaml, data_root=rla_data_root,
                               code_root=CODE_ROOT, **kwargs)
         exp_manager.log_files_gen()
         exp_manager.print_args()
