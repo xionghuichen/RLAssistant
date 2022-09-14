@@ -66,6 +66,8 @@ class ManagerTest(BaseTest):
             if i % 20 == 0:
                 exp_manager.save_checkpoint()
             if i % 10 == 0:
+                logger.ma_record_tabular("perf/mse-long", np.mean(mse_loss.detach().cpu().numpy()), 10, freq=25)
+                logger.record_tabular("y_out-long", np.mean(y), freq=25)
                 def plot_func():
                     import matplotlib.pyplot as plt
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)
@@ -109,6 +111,8 @@ class ManagerTest(BaseTest):
             logger.ma_record_tabular("perf/mse", np.mean(mse_loss.detach().cpu().numpy()), 10)
             logger.record_tabular("y_out", np.mean(y))
             if i % 10 == 0:
+                logger.ma_record_tabular("perf/mse-long", np.mean(mse_loss.detach().cpu().numpy()), 10, freq=25)
+                logger.record_tabular("y_out-long", np.mean(y), freq=25)
                 def plot_func():
                     import matplotlib.pyplot as plt
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)

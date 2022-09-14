@@ -406,7 +406,7 @@ def timestep():
 ma_dict = {}
 
 
-def ma_record_tabular(key, val, record_len, ignore_nan=False, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
+def ma_record_tabular(key, val, record_len, ignore_nan=False, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Optional[int]=None):
     if key not in ma_dict:
         ma_dict[key] = deque(maxlen=record_len)
     if ignore_nan:
@@ -415,7 +415,10 @@ def ma_record_tabular(key, val, record_len, ignore_nan=False, exclude:Optional[U
     else:
         ma_dict[key].append(val)
     if len(ma_dict[key]) == record_len:
-        record_tabular(key, np.mean(ma_dict[key]), exclude)
+        record_tabular(key, np.mean(ma_dict[key]), exclude, freq)
+
+
+lst_print_dict = {}
 
 def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Optional[int]=None):
     """
@@ -426,8 +429,11 @@ def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Opt
     :param key: (Any) save to log this key
     :param val: (Any) save to log this value
     """
-    if freq is None or timestep() % freq == 0:
+    if key not in lst_print_dict:
+        lst_print_dict[key] = -np.inf
+    if freq is None or timestep() - lst_print_dict[key] >= freq:
         get_current().logkv(key, val, exclude)
+        lst_print_dict[key] = timestep()
 
 
 def log_from_tf_summary(summary):
