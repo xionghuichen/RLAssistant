@@ -469,12 +469,12 @@ def logkv_mean(key, val):
     """
     get_current().logkv_mean(key, val)
 
-def logkvs(d, exclude:Optional[Union[str, Tuple[str, ...]]]=None):
+def logkvs(d, prefix:Optional[str]='', exclude:Optional[Union[str, Tuple[str, ...]]]=None):
     """
     Log a dictionary of key-value pairs
     """
     for (k, v) in d.items():
-        logkv(k, v, exclude)
+        logkv(prefix+k, v, exclude)
 
 
 def log_key_value(keys, values, prefix_name=''):

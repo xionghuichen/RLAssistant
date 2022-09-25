@@ -67,7 +67,17 @@ Modifying:
 Querying:
 1. tensorboard: the recorded variables are added to tensorboard events and can be loaded via standard tensorboard tools.
   ![img.png](resource/tb-img.png)
-2. easy_plot: We give some APIs to load and visualize the data in CSV files. The results will be something like this: 
+2. easy_plot: We give some APIs to load and visualize the data in CSV files. The results will be something like this:
+   ```python
+    from RLA.easy_plot.plot_func_v2 import plot_func
+    data_root='your_project'
+    task = 'sac_test'
+    regs = [
+        '2022/03/01/21-[12]*'
+    ]
+    _ = plot_func(data_root=data_root, task_table_name=task, 
+   regs=regs , split_keys=['info', 'van_sac', 'alpha_max'], metrics=['perf/rewards'])
+   ```
     ![](resource/sample-plot.png)
 
 
@@ -104,8 +114,14 @@ We build an example project for integrating RLA, which can be seen in ./example/
     exp_manager.set_hyper_param(**kwargs) # kwargs are the hyper-parameters for your experiment
     exp_manager.add_record_param(["env_id"]) # add parts of hyper-parameters to name the index of data items for better readability.
     task_name = 'demo_task' # define your task
-    rla_data_root = '../' # the place to store the data items.
-    exp_manager.configure(task_table_name=task_name, rla_config='../../../rla_config.yaml', data_root=rla_data_root)
+   
+    def get_package_path():
+        return os.path.dirname(os.path.abspath(__file__))
+
+    rla_data_root = get_package_path() # the place to store the data items.
+   
+    rla_config = os.path.join(get_package_path(), 'rla_config.yaml')
+    exp_manager.configure(task_table_name=task_name, rla_config=rla_config, data_root=rla_data_root)
     exp_manager.log_files_gen() # initialize the data items.
     exp_manager.print_args()
    ```
@@ -191,7 +207,7 @@ Result visualization:
       For example, lanuch tensorboard by `tensorboard --logdir ./example/simplest_code/log/demo_task/2022/03`. We can see results:
         ![img.png](resource/demo-tb-res.png)
    2. Easy_plot toolkit: The intermediate scalar variables are saved in a CSV file in `${data_root}/log/${task_name}/${index_name}/progress.csv`. 
-      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in example/plot_res.ipynb. 
+      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in https://github.com/xionghuichen/RLAssistant/blob/main/example/plot_res.ipynb and more user cases in https://github.com/xionghuichen/RLAssistant/blob/main/test/test_plot.py
       The result will be something like this:
         ![img.png](resource/demo-easy-to-plot-res.png)
    3. View data in "results" directory directly: other type of data are stored in `${data_root}/results/${task_name}/${index_name}`
@@ -217,7 +233,7 @@ We manage the items in the database via toolkits in rla_scripts. Currently, the 
 3. Send to remote [TODO]
 4. Download from remote [TODO]
 
-We can use the above tools after copying the rla_scripts to our research project and modifying the DATA_ROOT in config.py to locate the root of the RLA database.
+We can use the above tools after copying the rla_scripts to our research project and modifying the DATA_ROOT in config.py to locate the root of the RLA database. We give several user cases in https://github.com/xionghuichen/RLAssistant/blob/main/test/test_scripts.py
 
 
 ## Distributed training & centralized logs
