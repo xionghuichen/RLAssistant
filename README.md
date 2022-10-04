@@ -96,7 +96,7 @@ We also list the RL research projects using RLA as follows:
 ```angular2html
 git clone https://github.com/xionghuichen/RLAssistant.git
 cd RLAssistant
-python setup.py install
+pip install -e .
 ```
 
 
