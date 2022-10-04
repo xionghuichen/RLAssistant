@@ -28,6 +28,9 @@ kwargs = get_param()
 
 task_name = 'demo_task'
 rla_data_root = '../'
+
+exp_manager.configure(task_name, rla_config='../rla_config.yaml', data_root=rla_data_root,
+                      ignore_file_path='./ignore')
 exp_manager.log_files_gen()
 exp_manager.print_args()
 
