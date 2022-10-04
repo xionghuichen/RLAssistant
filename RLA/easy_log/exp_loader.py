@@ -19,7 +19,7 @@ class ExperimentLoader(object):
     - resume an experiment:
         0. config loaded_task_name and loaded_date to the task and timestamp of the target experiment to load respectively.
         1. init your exp_manager;
-        2. call exp_loader.fork_tester_log_files to copy all of the log data of the target experiment to the current experiment.
+        2. call exp_loader.fork_log_files to copy all of the log data of the target experiment to the current experiment.
         3. call exp_loader.load_from_record_date to resume the neural networks and intermediate variables.
         4. start your process.
     - resume an experiment with other settings.
