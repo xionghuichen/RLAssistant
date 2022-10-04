@@ -523,17 +523,17 @@ def plot_results(
                     if shaded_err:
                         res = g2lf[original_legend_keys[index] + '-se']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-err : ({:.2f} \pm {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-err : ({:.3f} $\pm$ {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                         score_results[legend_keys[index]+'-err'] = [res[1][-1], res[2][-1]]
                     if shaded_std:
                         res = g2lf[original_legend_keys[index] + '-ss']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-std :({:.2f} \pm {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-std :({:.3f} $\pm$ {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                         score_results[legend_keys[index]+'-std'] = [res[1][-1], res[2][-1]]
                     if shaded_range:
                         res = g2lf[original_legend_keys[index] + '-sr']
                         res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-range : ({:.2f}, {:.2f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                        print("{}-range : ({:.3f}, {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
                         score_results[legend_keys[index]+'-range'] = [res[1][-1], res[2][-1]]
 
             if bound_line is not None:

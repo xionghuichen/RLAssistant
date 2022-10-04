@@ -22,7 +22,7 @@ args = mujoco_arg_parser().parse_args()
 task_name = 'demo_task'
 exp_manager.set_hyper_param(**vars(args))
 exp_manager.add_record_param(["info", "seed", 'env'])
-exp_manager.configure(task_name, private_config_path='../rla_config.yaml', data_root='../')
+exp_manager.configure(task_name, rla_config='../rla_config.yaml', data_root='../')
 exp_manager.log_files_gen()
 exp_manager.print_args()
 
