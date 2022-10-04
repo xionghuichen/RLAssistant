@@ -15,7 +15,6 @@ import datetime
 import os.path as osp
 import pprint
 
-import tensorboardX
 
 from RLA.easy_log.time_step import time_step_holder
 from RLA.easy_log import logger
@@ -134,7 +133,7 @@ class Tester(object,):
         :param is_master_node: In "distributed training & centralized logs" mode (By set SEND_LOG_FILE in rla_config.yaml to True),
         you should mark the master node (is_master_node=True) to collect logs of the slave nodes (is_master_node=False).
         :type is_master_node: bool
-        : param code_root:  Define the root of your codebase (for backup) explicitly. It will be in the same location as rla_config.yaml by default.
+        :param code_root:  Define the root of your codebase (for backup) explicitly. It will be in the same location as rla_config.yaml by default.
         """
         if isinstance(rla_config, str):
             self.private_config = load_yaml(rla_config)

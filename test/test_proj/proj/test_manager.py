@@ -24,7 +24,7 @@ class ManagerTest(BaseTest):
         task_name = 'test_manger_demo_task'
         rla_data_root = os.path.join(DATABASE_ROOT, 'test_data_root')
         config_yaml['BACKUP_CONFIG']['backup_code_dir'] = ['proj']
-        exp_manager.configure(task_name, private_config_path=config_yaml, data_root=rla_data_root,
+        exp_manager.configure(task_name, rla_config=config_yaml, data_root=rla_data_root,
                               code_root=CODE_ROOT, **kwargs)
         exp_manager.log_files_gen()
         exp_manager.print_args()
@@ -66,6 +66,8 @@ class ManagerTest(BaseTest):
             if i % 20 == 0:
                 exp_manager.save_checkpoint()
             if i % 10 == 0:
+                logger.ma_record_tabular("perf/mse-long", np.mean(mse_loss.detach().cpu().numpy()), 10, freq=25)
+                logger.record_tabular("y_out-long", np.mean(y), freq=25)
                 def plot_func():
                     import matplotlib.pyplot as plt
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)
@@ -109,6 +111,8 @@ class ManagerTest(BaseTest):
             logger.ma_record_tabular("perf/mse", np.mean(mse_loss.detach().cpu().numpy()), 10)
             logger.record_tabular("y_out", np.mean(y))
             if i % 10 == 0:
+                logger.ma_record_tabular("perf/mse-long", np.mean(mse_loss.detach().cpu().numpy()), 10, freq=25)
+                logger.record_tabular("y_out-long", np.mean(y), freq=25)
                 def plot_func():
                     import matplotlib.pyplot as plt
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)
