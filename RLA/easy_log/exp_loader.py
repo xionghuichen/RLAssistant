@@ -63,8 +63,8 @@ class ExperimentLoader(object):
                 for v in hp_to_overwrite:
                     target_hp[v] = exp_manager.hyper_param[v]
             args = argparse.Namespace(**target_hp)
-            args.load_date = self.load_date
-            args.load_task_name = self.task_name
+            args.loaded_date = self.load_date
+            args.loaded_task_name = self.task_name
             if sync_timestep:
                 load_iter = loaded_tester.get_custom_data(DEFAULT_X_NAME)
                 exp_manager.time_step_holder.set_time(load_iter)
