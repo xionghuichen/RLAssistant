@@ -11,6 +11,7 @@ import copy
 import time
 import os
 
+import json
 import datetime
 import os.path as osp
 import pprint
@@ -764,6 +765,12 @@ class Tester(object,):
         for key, value in sort_list:
             # logger.info("key: %s, value: %s" % (key, value))
             logger.backup("key: %s, value: %s" % (key, value))
+        # formatted_log_name = self.log_name_formatter(self.get_task_table_name(), self.record_date)
+        params = exp_manager.hyper_param
+        # params['formatted_log_name'] = formatted_log_name
+        json.dump(params, open(osp.join(self.code_dir, 'parameter.json'), 'w'), sort_keys=True, indent=4)
+        print("gen:", osp.join(self.code_dir, 'parameter.json'))
+
 
     def print_large_memory_variable(self):
         import sys
@@ -786,7 +793,6 @@ class Tester(object,):
         if large_mermory_dict != {}:
             summary = self.dict_to_table_text_summary(large_mermory_dict, 'large_memory')
             self.add_summary_to_logger(summary, 'large_memory')
-
 
     def dict_to_table_text_summary(self, input_dict, name):
         import tensorflow as tf
