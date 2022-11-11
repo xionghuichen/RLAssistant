@@ -122,6 +122,7 @@ We build an example project for integrating RLA, which can be seen in ./example/
     rla_data_root = get_package_path() # the place to store the data items.
    
     rla_config = os.path.join(get_package_path(), 'rla_config.yaml')
+
     ignore_file_path=os.path.join(get_package_path(), '.gitignore')
     exp_manager.configure(task_table_name=task_name, ignore_file_path=ignore_file_path,
                         rla_config=rla_config, data_root=rla_data_root)
