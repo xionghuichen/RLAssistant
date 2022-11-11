@@ -1,6 +1,6 @@
 import os
 import os.path as osp
-
+import numpy as np
 import seaborn as sns
 sns.set_style('darkgrid', {'legend.frameon': True})
 
@@ -10,18 +10,23 @@ from RLA.easy_log.time_step import time_step_holder
 from typing import Callable
 # video recorder
 
+def format_name(name, add_timestamp, cover):
+    save_path = osp.join(exp_manager.results_dir, name)
+    save_path_split = save_path.split('/')
+    if add_timestamp:
+        save_path = '/'.join(save_path_split[:-1]) + '/' + str(time_step_holder.get_time()) + "-" + str(save_path_split[-1])
+    if not osp.exists(save_path) or cover:
+        save_dir = '/'.join(save_path.split('/')[:-1])
+        os.makedirs(save_dir, exist_ok=True)
+    return save_path
+
 
 # figure recorder
 class MatplotlibRecorder:
     @classmethod
     def save(cls, name=None, fig=None, cover=False, add_timestamp=True, **kwargs):
-        save_path = osp.join(exp_manager.results_dir, name)
-        save_path_split = save_path.split('/')
-        if add_timestamp:
-            save_path = '/'.join(save_path_split[:-1]) + '/' + str(time_step_holder.get_time()) + "-" + str(save_path_split[-1])
+        save_path = format_name(name, add_timestamp, cover)
         if not osp.exists(save_path) or cover:
-            save_dir = '/'.join(save_path.split('/')[:-1])
-            os.makedirs(save_dir, exist_ok=True)
             if fig is not None:
                 fig.savefig(save_path, **kwargs)
             else:
@@ -72,3 +77,11 @@ class MatplotlibRecorder:
                      bbox_inches='tight', *args, **kwargs)
         else:
             cls.save(name, cover=cover, add_timestamp=add_timestamp, *args, **kwargs)
+
+class ImgRecorder:
+    @classmethod
+    def save(cls, name=None, img=None, cover=False, add_timestamp=True, **kwargs):
+        import cv2
+        save_path = format_name(name, add_timestamp, cover)
+        if not osp.exists(save_path) or cover:
+            cv2.imwrite(save_path, img.astype(np.uint8))
