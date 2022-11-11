@@ -15,6 +15,7 @@ import json
 import datetime
 import os.path as osp
 import pprint
+import numpy as np
 
 
 from RLA.easy_log.time_step import time_step_holder
