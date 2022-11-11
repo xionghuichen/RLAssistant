@@ -107,9 +107,10 @@ We build an example project for integrating RLA, which can be seen in ./example/
 
 ### Step1: Configuration. 
 1. We define the property of the database in `rla_config.yaml`. You can construct your YAML file based on the template in ./example/simplest_code/rla_config.yaml. 
-2. We define the property of the table in exp_manager.config. Before starting your experiment, you should configure the global object RLA.easy_log.tester.exp_manager like this.
+2. We define the property of the table in exp_manager.config. Before starting your experiment, you should configure the global object RLA.easy_log.tester.exp_manager like this:
     ```python
     from RLA import exp_manager
+    import os
     kwargs = {'env_id': 'Hopper-v2', 'lr': 1e-3}
     exp_manager.set_hyper_param(**kwargs) # kwargs are the hyper-parameters for your experiment
     exp_manager.add_record_param(["env_id"]) # add parts of hyper-parameters to name the index of data items for better readability.
@@ -121,11 +122,17 @@ We build an example project for integrating RLA, which can be seen in ./example/
     rla_data_root = get_package_path() # the place to store the data items.
    
     rla_config = os.path.join(get_package_path(), 'rla_config.yaml')
-    exp_manager.configure(task_table_name=task_name, rla_config=rla_config, data_root=rla_data_root)
+
+    ignore_file_path=os.path.join(get_package_path(), '.gitignore')
+    exp_manager.configure(task_table_name=task_name, ignore_file_path=ignore_file_path,
+                        rla_config=rla_config, data_root=rla_data_root)
     exp_manager.log_files_gen() # initialize the data items.
     exp_manager.print_args()
    ```
-3. We add the generated data items to .gitignore to avoid pushing them into our git repo.
+   where ``ignore_file_path`` is a gitignore-style file, which is used to ignored files when backing up your project into ``code`` folder.
+   It is an optional parameter, and you can use your `.gitignore` file of your git repository  directly.
+    
+4. We add the generated data items to .gitignore to avoid pushing them into our git repo.
    ```gitignore
    **/archive_tester/**
    **/checkpoint/**

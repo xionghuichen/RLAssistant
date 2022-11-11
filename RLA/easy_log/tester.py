@@ -11,6 +11,7 @@ import copy
 import time
 import os
 
+import json
 import datetime
 import os.path as osp
 import pprint
@@ -282,6 +283,12 @@ class Tester(object,):
         assert isinstance(load_tester, Tester)
         logger.info("update log files' root")
         load_tester.update_log_files_location(root=log_root)
+        logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(
+            str(load_tester.record_date.strftime("%Y/%m/%d")) + '/' + load_tester.record_date_to_str(
+                load_tester.record_date), load_tester.ipaddr, load_tester.info))
+
+
+
         return load_tester
 
     def add_record_param(self, keys):
@@ -427,15 +434,26 @@ class Tester(object,):
             if log_type == 'dir':
                 search_list = dirs
             elif log_type =='files':
-                search_list =files
+                search_list = files
             else:
                 raise NotImplementedError
             for search_item in search_list:
                 if search_item.startswith(str(record_date.strftime("%H-%M-%S-%f"))):
-                    split_dir = search_item.split(' ')
+
                     # self.__ipaddr = split_dir[1]
-                    info = " ".join(split_dir[2:])
-                    logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
+                    # if version_num is None:
+                    #     split_dir = search_item.split(' ')
+                    #     info = " ".join(split_dir[2:])
+                    #     logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
+                    #
+                    # elif version_num == LOG_NAME_FORMAT_VERSION.V1:
+                    #     split_dir = search_item.split('_')
+                    #     info = " ".join(split_dir[2:])
+                    #     logger.info("load data: \n ts {}, \n ip {}, \n info {}".format(split_dir[0], split_dir[1], info))
+                    #
+                    # else:
+                    #     raise RuntimeError("unknown version name", version_num)
+
                     file_found = search_item
                     break
         return directory, file_found
@@ -501,12 +519,16 @@ class Tester(object,):
     def record_date_to_str(self, record_date):
         return str(record_date.strftime("%H-%M-%S-%f"))
 
+    def get_version_num(self):
+        version_num = getattr(self, 'log_name_format_version', None)
+        return version_num
+
     def __create_file_directory(self, prefix, ext='', is_file=True, record_date=None):
         if record_date is None:
             record_date = self.record_date
         directory = str(record_date.strftime("%Y/%m/%d"))
         directory = osp.join(prefix, directory)
-        version_num = getattr(self, 'log_name_format_version', None)
+        version_num = self.get_version_num()
 
         if version_num is None:
             name_format = '{dir}/{timestep} {ip} {info}{ext}'
@@ -743,6 +765,13 @@ class Tester(object,):
         for key, value in sort_list:
             # logger.info("key: %s, value: %s" % (key, value))
             logger.backup("key: %s, value: %s" % (key, value))
+        # formatted_log_name = self.log_name_formatter(self.get_task_table_name(), self.record_date)
+        params = exp_manager.hyper_param
+        # params['formatted_log_name'] = formatted_log_name
+        json.dump(params, open(osp.join(self.code_dir, 'parameter.json'), 'w'),
+                  sort_keys=True, indent=4, allow_nan=True, default=lambda o: '<not serializable>')
+        print("gen:", osp.join(self.code_dir, 'parameter.json'))
+
 
     def print_large_memory_variable(self):
         import sys
@@ -765,7 +794,6 @@ class Tester(object,):
         if large_mermory_dict != {}:
             summary = self.dict_to_table_text_summary(large_mermory_dict, 'large_memory')
             self.add_summary_to_logger(summary, 'large_memory')
-
 
     def dict_to_table_text_summary(self, input_dict, name):
         import tensorflow as tf
