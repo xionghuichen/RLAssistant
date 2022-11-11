@@ -270,6 +270,10 @@ PS:
 
 2. An alternative way is building your own NFS for your physical machines and locate data_root to the NFS.
 
+## further usage demos
+
+We write the usage of RLA as unit tests. You can check the scripts in `test` folder for more details (include test_plot.py, test_scripts.py, and test_proj/proj/test_manger.py).
+
 # TODO
 - [ ] support custom data structure saving and loading.
 - [ ] support video visualization.
