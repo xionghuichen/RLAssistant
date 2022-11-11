@@ -768,7 +768,8 @@ class Tester(object,):
         # formatted_log_name = self.log_name_formatter(self.get_task_table_name(), self.record_date)
         params = exp_manager.hyper_param
         # params['formatted_log_name'] = formatted_log_name
-        json.dump(params, open(osp.join(self.code_dir, 'parameter.json'), 'w'), sort_keys=True, indent=4)
+        json.dump(params, open(osp.join(self.code_dir, 'parameter.json'), 'w'),
+                  sort_keys=True, indent=4, allow_nan=True, default=lambda o: '<not serializable>')
         print("gen:", osp.join(self.code_dir, 'parameter.json'))
 
 
