@@ -280,6 +280,5 @@ We write the usage of RLA as unit tests. You can check the scripts in `test` fol
 - [ ] add comments and documents to the functions.
 - [ ] add an auto integration script.
 - [ ] download / upload experiment logs through timestamp.
-- [ ] add a document to the plot function.
 - [ ] allow sync LOG only or ALL TYPE LOGS.
 - [ ] add unit_test to ckp loader.
