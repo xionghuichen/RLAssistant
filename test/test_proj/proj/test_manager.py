@@ -115,6 +115,7 @@ class ManagerTest(BaseTest):
                 logger.record_tabular("y_out-long", np.mean(y), freq=25)
                 def plot_func():
                     import matplotlib.pyplot as plt
+                    # plt.switch_backend('agg')
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)
                     testX = testX.astype(np.float32)
                     testY = target_func(testX)
