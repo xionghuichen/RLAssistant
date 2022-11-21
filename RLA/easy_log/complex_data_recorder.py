@@ -54,7 +54,7 @@ class MatplotlibRecorder:
         :param title: title of the plotted figure
         :type title: str
         :param add_timestamp: add the timestamp (recorded by the timestep holder) to the name.
-        :type add_timestamp:  str
+        :type add_timestamp:  bool
         :param args: other parameters to plt.savefig
         :type args:
         :param kwargs:  other parameters to plt.savefig

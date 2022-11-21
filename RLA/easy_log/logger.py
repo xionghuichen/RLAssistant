@@ -406,7 +406,16 @@ def timestep():
 ma_dict = {}
 
 
-def ma_record_tabular(key, val, record_len, ignore_nan=False, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Optional[int]=None):
+def ma_record_tabular(key, val, record_len:[int], ignore_nan=False, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Optional[int]=None):
+    """
+    Moving Averaged log recorder
+    :param key: save to log this key
+    :param val: save to log this value
+    :param record_len: sliding window size for averaged value computation
+    :param ignore_nan: ignore the nan value or not
+    :param exclude: exclude to save the log to some types of logger  (e.g., 'stdout', 'log', 'json', 'csv' or 'tensorboard')
+    :param freq: the log will be dumped only after the timestep gap (holden by the time_step_holder) of recording is larger than freq.
+    """
     if key not in ma_dict:
         ma_dict[key] = deque(maxlen=record_len)
     if ignore_nan:
@@ -428,6 +437,9 @@ def logkv(key, val, exclude:Optional[Union[str, Tuple[str, ...]]]=None, freq:Opt
 
     :param key: (Any) save to log this key
     :param val: (Any) save to log this value
+    :param exclude: exclude to save the log to some types of logger  (e.g., 'stdout', 'log', 'json', 'csv' or 'tensorboard')
+    :param freq: the log will be dumped only after the timestep gap (holden by the time_step_holder) of recording is larger than freq.
+
     """
     if key not in lst_print_dict:
         lst_print_dict[key] = -np.inf
@@ -629,6 +641,9 @@ class Logger(object):
 
         :param key: (Any) save to log this key
         :param val: (Any) save to log this value
+        :param exclude: exclude to save the log to some types of logger  (e.g., 'stdout', 'log', 'json', 'csv' or 'tensorboard')
+        :param freq: the log will be dumped only after the timestep gap (holden by the time_step_holder) of recording is larger than freq.
+
         """
         self.name2val[key] = val
         self.exclude_name[key] = exclude
