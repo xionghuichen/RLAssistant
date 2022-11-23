@@ -524,6 +524,24 @@ class Tester(object,):
         else:
             raise NotImplementedError
 
+    def log_name_formatter(self, prefix, record_date):
+        """
+        return a unified and unique name for the experiment log.
+        :param prefix: prefix location to store the log data.
+        :param record_date: the timestamp of the experiment log.
+        :return: a unify and unique name
+        """
+        version_num = self.get_version_num()
+        if version_num is None:
+            name_format = '{prefix}/{date}/{timestep} {ip} {info}'
+        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
+            name_format = '{prefix}/{date}/{timestep}_{ip}_{info}'
+        else:
+            raise RuntimeError("unknown version name", version_num)
+        date = record_date.strftime("%Y/%m/%d")
+        return name_format.format(prefix=prefix, date=date, timestep=self.record_date_to_str(record_date),
+                                                             ip=str(self.ipaddr), info=self.info)
+
     def record_date_to_str(self, record_date):
         return str(record_date.strftime("%H-%M-%S-%f"))
 
@@ -534,29 +552,14 @@ class Tester(object,):
     def __create_file_directory(self, prefix, ext='', is_file=True, record_date=None):
         if record_date is None:
             record_date = self.record_date
+        name = self.log_name_formatter(prefix, record_date)
         directory = str(record_date.strftime("%Y/%m/%d"))
         directory = osp.join(prefix, directory)
-        version_num = self.get_version_num()
-
-        if version_num is None:
-            name_format = '{dir}/{timestep} {ip} {info}{ext}'
-        elif version_num == LOG_NAME_FORMAT_VERSION.V1:
-            name_format = '{dir}/{timestep}_{ip}_{info}{ext}'
-        else:
-            raise RuntimeError("unknown version name", version_num)
-
         if is_file:
             os.makedirs(directory, exist_ok=True)
-            file_name = name_format.format(dir=directory, timestep=self.record_date_to_str(record_date),
-                                                                 ip=str(self.ipaddr),
-                                                                 info=self.info,
-                                                                 ext=ext)
+            file_name = name + ext
         else:
-            directory = (name_format + '/').format(dir=directory,
-                                                                 timestep=self.record_date_to_str(record_date),
-                                                                 ip=str(self.ipaddr),
-                                                                 info=self.info,
-                                                                 ext=ext)
+            directory = name + '/'
             os.makedirs(directory, exist_ok=True)
             file_name = ''
         return directory, file_name
