@@ -15,6 +15,7 @@ RLA_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
 DATABASE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 class ManagerTest(BaseTest):
 
     def _load_rla_config(self):
@@ -54,7 +55,6 @@ class ManagerTest(BaseTest):
 
         exp_manager.new_saver(var_prefix='', max_to_keep=1)
         # synthetic target function.
-
         for i in range(0, 100):
             exp_manager.time_step_holder.set_time(i)
             x_input = np.random.normal(0, 3, [64, kwargs["input_size"]])
@@ -66,8 +66,6 @@ class ManagerTest(BaseTest):
             if i % 20 == 0:
                 exp_manager.save_checkpoint()
             if i % 10 == 0:
-                logger.ma_record_tabular("perf/mse-long", np.mean(mse_loss.detach().cpu().numpy()), 10, freq=25)
-                logger.record_tabular("y_out-long", np.mean(y), freq=25)
                 def plot_func():
                     import matplotlib.pyplot as plt
                     testX = np.repeat(np.expand_dims(np.arange(-10, 10, 0.1), axis=-1), repeats=kwargs["input_size"], axis=-1)
@@ -139,7 +137,12 @@ class ManagerTest(BaseTest):
         exp_manager.set_hyper_param(**kwargs)
         exp_manager.add_record_param(['input_size'])
         yaml = self._load_rla_config()
-        from test.test_proj.proj import private_config
+        try:
+            from test.test_proj.proj import private_config
+        except ImportError as e:
+            print("[WARN] for this test, you should config your username, password, and the remote root firstly.")
+            return
+            # raise RuntimeError
         yaml['DL_FRAMEWORK'] = 'torch'
         yaml['SEND_LOG_FILE'] = True
         yaml['REMOTE_SETTING']['ftp_server'] = '127.0.0.1'
