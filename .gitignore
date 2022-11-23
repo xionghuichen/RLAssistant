@@ -11,5 +11,6 @@ RLA.egg-info**
 **/arc/**
 **/.ipynb_checkpoints/*
 **/.DS_Store
+test/test_data_root/*
 test/target_data_root/*
 **/private_config.py
