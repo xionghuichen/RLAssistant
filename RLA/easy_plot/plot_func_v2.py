@@ -18,9 +18,12 @@ from RLA.easy_log.const import LOG, ARCHIVE_TESTER, OTHER_RESULTS
 
 
 
-def default_key_to_legend(parse_dict, split_keys, y_name):
+def default_key_to_legend(parse_dict, split_keys, y_name, use_y_name=True):
     task_split_key = '.'.join(f'{k}={parse_dict[k]}' for k in split_keys)
-    return task_split_key + ' eval:' + y_name
+    if use_y_name:
+        return task_split_key + ' eval:' + y_name
+    else:
+        return task_split_key
 
 
 def plot_func(data_root:str, task_table_name:str, regs:list, split_keys:list, metrics:list,
@@ -29,6 +32,7 @@ def plot_func(data_root:str, task_table_name:str, regs:list, split_keys:list, me
               xlabel: Optional[str] = DEFAULT_X_NAME, ylabel: Optional[str] = None,
               scale_dict: Optional[dict] = None, regs2legends: Optional[list] = None,
               key_to_legend_fn: Optional[Callable] = default_key_to_legend,
+              split_by_metrics=True,
               save_name: Optional[str] = None, *args, **kwargs):
     """
     A high-level matplotlib plotter.
@@ -68,8 +72,11 @@ def plot_func(data_root:str, task_table_name:str, regs:list, split_keys:list, me
     :param key_to_legend_fn: we give a default function to stringify the k-v pairs. you can customize your own function in key_to_legend_fn.
     See default_key_to_legend for the detault way and test/test_plot/test_customize_legend_name_mode for details.
     :type key_to_legend_fn: Optional[Callable] = default_key_to_legend
+    :param split_by_metrics: you can plot figure with multiple metrics together.
+    By default, we will split the curves with the metric and merge them into a group figure.
+    If you would like to print multiple metrics in single figure, please set the parameter to False.
+    :type split_by_metrics: Optional[bool]
     :param args/kwargs: send other parameters to plot_util.plot_results
-
     :return:
     :rtype:
     """
@@ -112,10 +119,12 @@ def plot_func(data_root:str, task_table_name:str, regs:list, split_keys:list, me
         group_fn = lambda r: split_by_reg(taskpath=r, reg_group=reg_group, y_names=y_names)
     else:
         group_fn = lambda r: picture_split(taskpath=r, split_keys=split_keys, y_names=y_names,
-                                           key_to_legend_fn=key_to_legend_fn)
+                                           key_to_legend_fn=lambda parse_dict, split_keys, y_name:
+                                           key_to_legend_fn(parse_dict, split_keys, y_name, not split_by_metrics))
     _, _, lgd, texts, g2lf, score_results = \
         plot_util.plot_results(results, xy_fn= lambda r, y_names: csv_to_xy(r, DEFAULT_X_NAME, y_names, final_scale_dict),
-                           group_fn=group_fn, average_group=True, ylabel=ylabel, xlabel=xlabel, regs2legends=regs2legends, *args, **kwargs)
+                           group_fn=group_fn, average_group=True, ylabel=ylabel, xlabel=xlabel, metrics=metrics,
+                               split_by_metrics=split_by_metrics, regs2legends=regs2legends, *args, **kwargs)
     print("--- complete process ---")
     if save_name is not None:
         import os
@@ -140,7 +149,6 @@ def split_by_reg(taskpath, reg_group, y_names):
                 task_split_key = str(i)
     assert len(y_names) == 1
     return task_split_key, y_names
-
 
 def split_by_task(taskpath, split_keys, y_names, key_to_legend_fn):
     pair_delimiter = '&'

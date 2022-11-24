@@ -289,6 +289,7 @@ def default_split_fn(r):
 def plot_results(
     allresults, *,
     xy_fn=default_xy_fn,
+    metrics=None,
     split_fn=None, # default_split_fn,
     group_fn=None, # default_split_fn,
     average_group=False,
@@ -296,15 +297,14 @@ def plot_results(
     shaded_err=True,
     shaded_range=True,
     figsize=None,
-    legend_outside=False,
+    legend_outside=True,
     resample=0,
     vary_len_plot=False,
     smooth_step=1.0,
-    tiling='vertical',
+    tiling='symmetric',
     xlabel=None,
     ylabel=None,
     title=None,
-    replace_legend_keys=None,
     regs2legends=None,
     pretty=False,
     bound_line=None,
@@ -314,6 +314,7 @@ def plot_results(
     xlim=None,
     show_number=True,
     skip_legend=False,
+    split_by_metrics=False,
     rescale_idx=None):
     '''
     Plot multiple Results objects
@@ -364,12 +365,20 @@ def plot_results(
             colors = PRETTY_COLORS
         else:
             colors = COLORS
+
+    if pretty:
+        assert not split_by_metrics or len(metrics) == 1, "pretty mode cannot support the multiply metric plotting. Please use only one metric for plotting."
+    split_by_metrics = split_by_metrics and len(metrics) != 1
     if split_fn is None: split_fn = lambda _ : ''
     if group_fn is None: group_fn = lambda _ : ''
     sk2r = defaultdict(list) # splitkey2results
-    for result in allresults:
-        splitkey = split_fn(result)
-        sk2r[splitkey].append(result)
+    if split_by_metrics:
+        for y in metrics:
+            sk2r[y].extend(allresults)
+    else:
+        for result in allresults:
+            splitkey = split_fn(result)
+            sk2r[splitkey].append(result)
     assert len(sk2r) > 0
     assert isinstance(resample, int), "0: don't resample. <integer>: that many samples"
     if tiling == 'vertical' or tiling is None:
@@ -392,7 +401,7 @@ def plot_results(
     #     figsize = list(figsize)
     #     figsize[0] += 4
     #     figsize = tuple(figsize)
-    f, axarr = plt.subplots(nrows, ncols, sharex=False, squeeze=False, figsize=figsize)
+    f, axarr = plt.subplots(nrows, ncols, sharex=False, squeeze=False, figsize=figsize, dpi=90 * ncols)
     groups = []
     for results in allresults:
         groups.extend(group_fn(results)[0])
@@ -415,6 +424,8 @@ def plot_results(
         ax = axarr[idx_row][idx_col]
         for result in sresults:
             result_groups, y_names = group_fn(result)
+            if split_by_metrics:
+                y_names = [sk]
             for group, y_name in zip(result_groups, y_names):
                 g2c[group] += 1
                 res = xy_fn(result, y_name)
@@ -449,7 +460,7 @@ def plot_results(
                 def allequal(qs):
                     return all((q==qs[0]).all() for q in qs[1:])
                 if resample:
-                    low  = max(x[0] for x in origxs)
+                    low = max(x[0] for x in origxs)
                     high = min(x[-1] for x in origxs)
                     usex = np.linspace(low, high, resample)
                     ys = []
@@ -487,62 +498,66 @@ def plot_results(
                 if shaded_range:
                     g2lf[group + '-sr'] = [ax.fill_between(usex, ymin,    ymax,    color=color, alpha=.1), ymin, ymax]
 
+        ax.set_title(sk)
+        if split_by_metrics:
+            ax.set_ylabel(sk)
+        if log:
+            ax.set_yscale('log')
 
+    # https://matplotlib.org/users/legend_guide.html
+    # if not pretty:
+    #     plt.tight_layout()
+    if any(g2l.keys()):
+        if show_number:
+            legend_keys = np.array(['%s (%i)' % (g, g2c[g]) for g in g2l] if average_group else g2l.keys())
+        else:
+            legend_keys = np.array(['%s' % (g) for g in g2l] if average_group else g2l.keys())
 
-        # https://matplotlib.org/users/legend_guide.html
-        if not pretty:
-            plt.tight_layout()
-        if any(g2l.keys()):
-            if show_number:
-                legend_keys = np.array(['%s (%i)'%(g, g2c[g]) for g in g2l] if average_group else g2l.keys())
-            else:
-                legend_keys = np.array(['%s'%(g) for g in g2l] if average_group else g2l.keys())
+        legend_lines = np.array(list(g2l.values()))
+        sorted_index = np.argsort(legend_keys)
+        legend_keys = legend_keys[sorted_index]
+        legend_lines = legend_lines[sorted_index]
+        if regs2legends is not None:
+            legend_keys = np.array(regs2legends)
+            # if replace_legend_sort is not None:
+            #     sorted_index = replace_legend_sort
+            # else:
+            #     sorted_index = np.argsort(legend_keys)
+            # assert legend_keys.shape[0] == legend_lines.shape[0], \
+            #     "The number of lines is not consistent with the keys"
+            # legend_keys = legend_keys[sorted_index]
+            # legend_lines = legend_lines[sorted_index]
+        if pretty:
+            for index, l in enumerate(legend_lines):
+                l.update(props={"color": colors[index % len(colors)]})
+                original_legend_keys = np.array(['%s' % (g) for g in g2l] if average_group else g2l.keys())
+                original_legend_keys = original_legend_keys[sorted_index]
+                if shaded_err:
+                    res = g2lf[original_legend_keys[index] + '-se']
+                    res[0].update(props={"color": colors[index % len(colors)]})
+                    print("{}-err : ({:.3f} $\pm$ {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                    score_results[legend_keys[index]+'-err'] = [res[1][-1], res[2][-1]]
+                if shaded_std:
+                    res = g2lf[original_legend_keys[index] + '-ss']
+                    res[0].update(props={"color": colors[index % len(colors)]})
+                    print("{}-std :({:.3f} $\pm$ {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                    score_results[legend_keys[index]+'-std'] = [res[1][-1], res[2][-1]]
+                if shaded_range:
+                    res = g2lf[original_legend_keys[index] + '-sr']
+                    res[0].update(props={"color": colors[index % len(colors)]})
+                    print("{}-range : ({:.3f}, {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
+                    score_results[legend_keys[index]+'-range'] = [res[1][-1], res[2][-1]]
 
-            legend_lines = np.array(list(g2l.values()))
+        if bound_line is not None:
+            for bl in bound_line:
+                y = np.ones(x.shape) * bl[0]
+                l, = ax.plot(x, y, bl[2], color=bl[1])
+                legend_lines = np.append(legend_lines, l)
+                legend_keys = np.append(legend_keys, bl[3])
 
-            sorted_index = np.argsort(legend_keys)
-            legend_keys = legend_keys[sorted_index]
-            legend_lines = legend_lines[sorted_index]
-            if replace_legend_keys is not None:
-                legend_keys = np.array(replace_legend_keys)
-            if regs2legends is not None:
-                legend_keys = np.array(regs2legends)
-                # if replace_legend_sort is not None:
-                #     sorted_index = replace_legend_sort
-                # else:
-                #     sorted_index = np.argsort(legend_keys)
-                # assert legend_keys.shape[0] == legend_lines.shape[0], \
-                #     "The number of lines is not consistent with the keys"
-                # legend_keys = legend_keys[sorted_index]
-                # legend_lines = legend_lines[sorted_index]
-            if pretty:
-                for index, l in enumerate(legend_lines):
-                    l.update(props={"color": colors[index % len(colors)]})
-                    original_legend_keys = np.array(['%s' % (g) for g in g2l] if average_group else g2l.keys())
-                    original_legend_keys = original_legend_keys[sorted_index]
-                    if shaded_err:
-                        res = g2lf[original_legend_keys[index] + '-se']
-                        res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-err : ({:.3f} $\pm$ {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
-                        score_results[legend_keys[index]+'-err'] = [res[1][-1], res[2][-1]]
-                    if shaded_std:
-                        res = g2lf[original_legend_keys[index] + '-ss']
-                        res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-std :({:.3f} $\pm$ {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
-                        score_results[legend_keys[index]+'-std'] = [res[1][-1], res[2][-1]]
-                    if shaded_range:
-                        res = g2lf[original_legend_keys[index] + '-sr']
-                        res[0].update(props={"color": colors[index % len(colors)]})
-                        print("{}-range : ({:.3f}, {:.3f})".format(legend_keys[index], res[1][-1], res[2][-1]))
-                        score_results[legend_keys[index]+'-range'] = [res[1][-1], res[2][-1]]
-
-            if bound_line is not None:
-                for bl in bound_line:
-                    y = np.ones(x.shape) * bl[0]
-                    l, = ax.plot(x, y, bl[2], color=bl[1])
-                    legend_lines = np.append(legend_lines, l)
-                    legend_keys = np.append(legend_keys, bl[3])
-            if not skip_legend:
+        if not skip_legend:
+            # print(nrows)
+            if len(sk2r.keys()) == 1:
                 lgd = ax.legend(
                     legend_lines,
                     legend_keys,
@@ -550,21 +565,36 @@ def plot_results(
                     bbox_to_anchor=(1,1) if legend_outside else None,
                     fontsize=15 if pretty else None)
             else:
-                lgd = None
-        ax.set_title(sk)
-        if log:
-            ax.set_yscale('log')
+                lgd = f.legend(
+                    legend_lines,
+                    legend_keys,
+                    loc='lower center' if legend_outside else None,
+                    bbox_to_anchor=(0.5, 0.0) if legend_outside else None,
+                    fontsize=15 if pretty else None,
+                    borderaxespad=0)
+        else:
+            lgd = None
 
-        # add xlabels, but only to the bottom row
-        if xlabel is not None:
-            for ax in axarr[-1]:
-                plt.sca(ax)
+
+    # add xlabels, but only to the bottom row
+    if xlabel is not None:
+        for ax in axarr[-1]:
+            plt.sca(ax)
+            if pretty:
+                plt.xlabel(xlabel, fontsize=20)
+            else:
                 plt.xlabel(xlabel)
-        # add ylabels, but only to left column
-        if ylabel is not None:
-            for ax in axarr[:,0]:
-                plt.sca(ax)
-                plt.ylabel(ylabel)
+    # add ylabels, but only to left column
+    if ylabel is not None:
+        # for ax in axarr[:,0]:
+        # plt.sca(axarr[0, 0])
+        # plt.ylabel(ylabel)
+        # plt.sca(f)
+        if pretty:
+            f.supylabel(ylabel, fontsize=20, horizontalalignment='center')
+        else:
+            if not split_by_metrics or len(metrics) == 1:
+                f.supylabel(ylabel, horizontalalignment='center')
     if title is not None:
         plt.title(title)
     plt.grid(True)
@@ -581,8 +611,8 @@ def plot_results(
         plt.gca().yaxis.offsetText.set_fontsize(15)
         plt.gca().xaxis.set_major_formatter(xfmt)
         plt.gca().xaxis.offsetText.set_fontsize(15)
-        plt.xlabel(xlabel, fontsize=20)
-        plt.ylabel(ylabel, fontsize=20)
+        # plt.xlabel(xlabel, fontsize=20)
+        # plt.ylabel(ylabel, fontsize=20)
         plt.xticks(fontsize=16)
         plt.yticks(fontsize=16)
         plt.title(title, fontsize=18)

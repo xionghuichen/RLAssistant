@@ -80,6 +80,8 @@ for i in range(start_epoch, 1000):
     loss_out, y_pred = sess.run([loss, out, opt], feed_dict={X_ph:x_input, y_ph: y})[:-1]
     logger.ma_record_tabular("perf/mse", loss_out, 10)
     logger.record_tabular("y_out", np.mean(y))
+    logger.record_tabular("y_out_max", np.max(y))
+    logger.record_tabular("y_out_std", np.std(y))
     logger.dump_tabular()
     if i % 100 == 0:
         exp_manager.save_checkpoint()
