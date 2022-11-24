@@ -315,7 +315,6 @@ def plot_results(
     show_number=True,
     skip_legend=False,
     split_by_metrics=False,
-    base_dpi=90,
     rescale_idx=None):
     '''
     Plot multiple Results objects
@@ -403,7 +402,7 @@ def plot_results(
     #     figsize = list(figsize)
     #     figsize[0] += 4
     #     figsize = tuple(figsize)
-    f, axarr = plt.subplots(nrows, ncols, sharex=False, squeeze=False, figsize=figsize)
+    f, axarr = plt.subplots(nrows, ncols, sharex=False, squeeze=False, figsize=figsize, dpi=90 * ncols)
     groups = []
     for results in allresults:
         groups.extend(group_fn(results)[0])
