@@ -178,6 +178,7 @@ class CSVOutputFormat(KVWriter):
             lines = self.file.readlines()
             self.file = open(self.filename, 'w+t')
             self.file.seek(0)
+
             for (i, key) in enumerate(self.keys):
                 if i > 0:
                     self.file.write(',')
