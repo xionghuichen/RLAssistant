@@ -213,8 +213,8 @@ Result visualization:
       We can view the results in tensorboard by: `tensorboard --logdir ${data_root}/log/${task_name}`.
       For example, lanuch tensorboard by `tensorboard --logdir ./example/simplest_code/log/demo_task/2022/03`. We can see results:
         ![img.png](resource/demo-tb-res.png)
-   2. Easy_plot toolkit: The intermediate scalar variables are saved in a CSV file in `${data_root}/log/${task_name}/${index_name}/progress.csv`. 
-      We develop high-level APIs to load the CSV files from multiple experiments and group the lines by custom keys. We give an example to use easy_plot toolkit in https://github.com/xionghuichen/RLAssistant/blob/main/example/plot_res.ipynb and more user cases in https://github.com/xionghuichen/RLAssistant/blob/main/test/test_plot.py
+   2. Easy_plot toolkit: 
+       **We recommend the users maintain their research projects via some jupyter notebooks. You can record your ideas, surmises, related empirical evidence, and benchmark results in a notebook together.**  We develop high-level APIs to load the CSV files of the experiments (stored in `${data_root}/log/${task_name}/${index_name}/progress.csv`) and group the curves by custom keys.    We give common user cases of the plotter in https://github.com/xionghuichen/RLAssistant/blob/main/test/test_plot.ipynb
       The result will be something like this:
         ![img.png](resource/demo-easy-to-plot-res.png)
    3. View data in "results" directory directly: other type of data are stored in `${data_root}/results/${task_name}/${index_name}`
