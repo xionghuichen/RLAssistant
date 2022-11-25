@@ -4,7 +4,6 @@ import json
 import os
 import numpy as np
 import pandas
-from collections import defaultdict, namedtuple
 import seaborn as sns
 from collections import defaultdict, namedtuple
 from RLA.easy_log.logger import read_json, read_csv
@@ -414,7 +413,11 @@ def plot_results(
     # if average_group:
     #     resample = resample or default_samples
     lgd = None
-    for (isplit, sk) in enumerate(sorted(sk2r.keys())):
+    if split_by_metrics:
+        keys = metrics
+    else:
+        keys = sorted(sk2r.keys())
+    for (isplit, sk) in enumerate(keys):
         g2l = {}
         g2lf = {}
         g2c = defaultdict(int)

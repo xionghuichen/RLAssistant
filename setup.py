@@ -23,6 +23,7 @@ setup(
             "pathspec",
             'tensorboardX', 
             'pysftp',
-            'typing'
+            'typing',
+            'matplotlib>=3.4' # for supylabel and supxlabel
         ]
     )
