@@ -315,6 +315,7 @@ def plot_results(
     show_number=True,
     skip_legend=False,
     split_by_metrics=False,
+    base_dpi=90,
     rescale_idx=None):
     '''
     Plot multiple Results objects
@@ -355,6 +356,7 @@ def plot_results(
 
     smooth_step: float                      - when resampling (i.e. when resample > 0 or average_group is True), use this EMA decay parameter (in units of the new grid step).
                                               See docstrings for decay_steps in symmetric_ema or one_sided_ema functions.
+
 
     '''
     score_results = {}
@@ -401,7 +403,7 @@ def plot_results(
     #     figsize = list(figsize)
     #     figsize[0] += 4
     #     figsize = tuple(figsize)
-    f, axarr = plt.subplots(nrows, ncols, sharex=False, squeeze=False, figsize=figsize, dpi=90 * ncols)
+    f, axarr = plt.subplots(nrows, ncols, sharex=False, squeeze=False, figsize=figsize)
     groups = []
     for results in allresults:
         groups.extend(group_fn(results)[0])
