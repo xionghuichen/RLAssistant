@@ -391,12 +391,12 @@ def plot_results(
     elif tiling == 'symmetric':
         import math
         N = len(sk2r)
-        largest_divisor = 1
-        for i in range(1, int(math.sqrt(N))+1):
-            if N % i == 0:
-                largest_divisor = i
-        ncols = largest_divisor
-        nrows = N // ncols
+        largest_divisor = int(math.sqrt(N))
+        # for i in range(1, int(math.sqrt(N))+1):
+        #     if N % i == 0:
+        #         largest_divisor = i
+        nrows  = largest_divisor
+        ncols = int(math.ceil(N / nrows))
     figsize = figsize or (7 * ncols, 6 * nrows)
     # if legend_outside:
     #     figsize = list(figsize)
