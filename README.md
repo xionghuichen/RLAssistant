@@ -1,3 +1,4 @@
+NOTE: We maintain an RLA in https://github.com/polixir/RLAssistant in the future.
 # RL experiment Assistant (RLA)
 ![img.png](resource/logo.png)
 RLA is a tool for managing your RL experiments automatically (e.g., your hyper-parameters, logs, checkpoints, figures, and code, etc.). 
@@ -7,7 +8,7 @@ RLA has decoupled to the training code and only some additional configuration ar
 
 The project is still in developing. Welcome to join us. :)
 
-We maintain an RLA in https://github.com/polixir/RLAssistant in the future which will consider extra requirements needed in the team cooperation scenario.
+
 
 
 
