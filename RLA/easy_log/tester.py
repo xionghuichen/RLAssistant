@@ -354,7 +354,8 @@ class Tester(object,):
         """
         syn_log_file is an automatic synchronization function.
         It will send all log files (e.g., code/**, checkpoint/**, log/**, etc.) to your target server via the FTP protocol.
-        To run this function, you should add some configuration on SRG.private_config.py
+        To run this function, you should add some configuration on rla_config.yaml.
+        We transfer files in SFTP by setting cnopts.hostkeys=None for convenience which is not safe.
 
         SEND_LOG_FILE: boolean. denotes synchronization or not.
         ftp_server: target server ip address
@@ -393,7 +394,8 @@ class Tester(object,):
                 ftp = ftp_factory(name=self.private_config["REMOTE_SETTING"]['file_transfer_protocol'],
                                   server=self.private_config["REMOTE_SETTING"]["ftp_server"],
                                   username=self.private_config["REMOTE_SETTING"]["username"],
-                                   password=self.private_config["REMOTE_SETTING"]["password"])
+                                   password=self.private_config["REMOTE_SETTING"]["password"],
+                                   port=self.private_config["REMOTE_SETTING"]["port"])
                 if self.private_config["REMOTE_SETTING"]['file_transfer_protocol'] == 'ftp':
                     alternative_protocol = 'sftp'
                 else:
@@ -407,7 +409,8 @@ class Tester(object,):
                     ftp = ftp_factory(name=alternative_protocol,
                                       server=self.private_config["REMOTE_SETTING"]["ftp_server"],
                                       username=self.private_config["REMOTE_SETTING"]["username"],
-                                      password=self.private_config["REMOTE_SETTING"]["password"])
+                                      password=self.private_config["REMOTE_SETTING"]["password"],
+                                      port=self.private_config["REMOTE_SETTING"]["port"])
                     send_data(ftp_obj=ftp)
                     logger.warn("sync: send success!")
                 except Exception as e:

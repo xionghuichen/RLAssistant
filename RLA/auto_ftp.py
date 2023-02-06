@@ -9,20 +9,21 @@ from RLA.easy_log import logger
 import pysftp
 
 
-def ftp_factory(name, server, username, password, ignore=None):
+def ftp_factory(name, server, username, password, port, ignore=None):
     if name == FTP_PROTOCOL_NAME.FTP:
-        return FTPHandler(ftp_server=server, username=username,password=password, ignore=ignore)
+        return FTPHandler(ftp_server=server, username=username,password=password, port=port, ignore=ignore)
     elif name == FTP_PROTOCOL_NAME.SFTP:
-        return SFTPHandler(sftp_server=server, username=username, password=password, ignore=ignore)
+        return SFTPHandler(sftp_server=server, username=username, password=password, port=port, ignore=ignore)
     else:
         raise NotImplementedError
 
 class FTPHandler(object):
 
-    def __init__(self, ftp_server, username, password, ignore=None):
+    def __init__(self, ftp_server, username, password, port, ignore=None):
         self.ftp_server = ftp_server
         self.username = username
         self.password = password
+        self.port=port
         self.ftp = self.ftpconnect()
         logger.info("login success.")
         self.ignore = ignore
@@ -53,7 +54,7 @@ class FTPHandler(object):
     def ftpconnect(self):
         ftp = FTP()
         ftp.set_debuglevel(0)
-        ftp.connect(self.ftp_server, 21, timeout=60)
+        ftp.connect(self.ftp_server, int(self.port), timeout=60)
         ftp.login(self.username, self.password)
         logger.warn("login succeed")
         return ftp
@@ -140,10 +141,11 @@ class FTPHandler(object):
 
 class SFTPHandler(FTPHandler):
 
-    def __init__(self, sftp_server, username, password, ignore=None):
+    def __init__(self, sftp_server, username, password, port, ignore=None):
         self.sftp_server = sftp_server
         self.username = username
         self.password = password
+        self.port = port 
         self.sftp = self.sftpconnect()
         logger.info("login success.")
         self.ignore = ignore
@@ -152,7 +154,9 @@ class SFTPHandler(FTPHandler):
             self.__init_gitignore()
 
     def sftpconnect(self):
-        sftp = pysftp.Connection(self.sftp_server, username=self.username, password=self.password)
+        cnopts=pysftp.CnOpts()
+        cnopts.hostkeys=None
+        sftp = pysftp.Connection(self.sftp_server, username=self.username, port=int(self.port), password=self.password, cnopts=cnopts)
         logger.warn("login succeed")
         return sftp
 
